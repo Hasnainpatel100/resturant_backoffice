@@ -73,9 +73,9 @@ final GoRouter appRouter = GoRouter(
         final sessionCubit = context.watch<CubitSession>();
         final user = sessionCubit.state.user;
         return AppShell(
-          child: child,
           currentLocation: state.matchedLocation,
           user: user,
+          child: child,
         );
       },
       routes: [
