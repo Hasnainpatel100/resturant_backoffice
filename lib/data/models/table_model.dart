@@ -1,72 +1,19 @@
 import 'package:equatable/equatable.dart';
 
-class RoomTypeModel extends Equatable {
-  final String id;
-  final String brandId;
-  final String name;
-  final String? description;
-  final int minTables;
-  final int maxTables;
-  final int createdAt;
-  final String createdBy;
-  final int? updatedAt;
-  final String? updatedBy;
-
-  const RoomTypeModel({
-    required this.id,
-    required this.brandId,
-    required this.name,
-    this.description,
-    this.minTables = 0,
-    this.maxTables = 0,
-    required this.createdAt,
-    required this.createdBy,
-    this.updatedAt,
-    this.updatedBy,
-  });
-
-  factory RoomTypeModel.fromJson(Map<String, dynamic> json) {
-    return RoomTypeModel(
-      id: json['id'] as String? ?? '',
-      brandId: json['brandId'] as String? ?? '',
-      name: json['name'] as String? ?? '',
-      description: json['description'] as String?,
-      minTables: json['minTables'] as int? ?? 0,
-      maxTables: json['maxTables'] as int? ?? 0,
-      createdAt: json['createdAt'] as int? ?? 0,
-      createdBy: json['createdBy'] as String? ?? '',
-      updatedAt: json['updatedAt'] as int?,
-      updatedBy: json['updatedBy'] as String?,
-    );
-  }
-
-  Map<String, dynamic> toJson() => {
-        'id': id,
-        'brandId': brandId,
-        'name': name,
-        'description': description,
-        'minTables': minTables,
-        'maxTables': maxTables,
-        'createdAt': createdAt,
-        'createdBy': createdBy,
-        'updatedAt': updatedAt,
-        'updatedBy': updatedBy,
-      };
-
-  @override
-  List<Object?> get props => [id, brandId, name, minTables, maxTables];
-}
-
+// ✅ NO CHANGE: Enum is correct and complete
 enum TableStatus { available, occupied, reserved, blocked }
 
 class TableModel extends Equatable {
   final String id;
+  final String brandId;
   final String branchId;
   final String roomTypeId;
   final String tableNumber;
+  final String displayName;
   final int capacity;
   final String? description;
   final String status;
+  final bool isActive;
   final String? currentOrderId;
   final String? positionX;
   final String? positionY;
@@ -77,12 +24,15 @@ class TableModel extends Equatable {
 
   const TableModel({
     required this.id,
+    required this.brandId,
     required this.branchId,
     required this.roomTypeId,
     required this.tableNumber,
+    this.displayName = '',
     this.capacity = 0,
     this.description,
     this.status = 'available',
+    this.isActive = true,
     this.currentOrderId,
     this.positionX,
     this.positionY,
@@ -92,46 +42,69 @@ class TableModel extends Equatable {
     this.updatedBy,
   });
 
+  // ✅ FIX: Added safe cast for 'capacity' field.
+  // API can return capacity as num (int or double). Using (json['capacity'] as num?)?.toInt()
+  // prevents a runtime type-cast crash when the server returns e.g. 4.0 instead of 4.
   factory TableModel.fromJson(Map<String, dynamic> json) {
     return TableModel(
       id: json['id'] as String? ?? '',
+      brandId: json['brandId'] as String? ?? '',
       branchId: json['branchId'] as String? ?? '',
       roomTypeId: json['roomTypeId'] as String? ?? '',
       tableNumber: json['tableNumber'] as String? ?? '',
-      capacity: json['capacity'] as int? ?? 0,
+      displayName: json['displayName'] as String? ?? '',
+      capacity: (json['capacity'] as num?)?.toInt() ?? 0,   // ✅ FIXED: safe num cast
       description: json['description'] as String?,
       status: json['status'] as String? ?? 'available',
+      isActive: json['isActive'] as bool? ?? true,
       currentOrderId: json['currentOrderId'] as String?,
       positionX: json['positionX'] as String?,
       positionY: json['positionY'] as String?,
-      createdAt: json['createdAt'] as int? ?? 0,
+      createdAt: (json['createdAt'] as num?)?.toInt() ?? 0, // ✅ FIXED: safe num cast
       createdBy: json['createdBy'] as String? ?? '',
-      updatedAt: json['updatedAt'] as int?,
+      updatedAt: (json['updatedAt'] as num?)?.toInt(),      // ✅ FIXED: safe num cast
       updatedBy: json['updatedBy'] as String?,
     );
   }
 
   Map<String, dynamic> toJson() => {
-        'id': id,
-        'branchId': branchId,
-        'roomTypeId': roomTypeId,
-        'tableNumber': tableNumber,
-        'capacity': capacity,
-        'description': description,
-        'status': status,
-        'currentOrderId': currentOrderId,
-        'positionX': positionX,
-        'positionY': positionY,
-        'createdAt': createdAt,
-        'createdBy': createdBy,
-        'updatedAt': updatedAt,
-        'updatedBy': updatedBy,
-      };
+    'id': id,
+    'brandId': brandId,
+    'branchId': branchId,
+    'roomTypeId': roomTypeId,
+    'tableNumber': tableNumber,
+    'displayName': displayName,
+    'capacity': capacity,
+    'description': description,
+    'status': status,
+    'isActive': isActive,
+    'currentOrderId': currentOrderId,
+    'positionX': positionX,
+    'positionY': positionY,
+    'createdAt': createdAt,
+    'createdBy': createdBy,
+    'updatedAt': updatedAt,
+    'updatedBy': updatedBy,
+  };
 
+  // ✅ NO CHANGE: Getters are correct
   bool get isAvailable => status == 'available';
   bool get isOccupied => status == 'occupied';
   bool get isReserved => status == 'reserved';
   bool get isBlocked => status == 'blocked';
+
+  TableStatus get tableStatus {
+    switch (status) {
+      case 'occupied':
+        return TableStatus.occupied;
+      case 'reserved':
+        return TableStatus.reserved;
+      case 'blocked':
+        return TableStatus.blocked;
+      default:
+        return TableStatus.available;
+    }
+  }
 
   @override
   List<Object?> get props => [id, branchId, roomTypeId, tableNumber, capacity, status];

@@ -5,106 +5,98 @@ import 'state_table.dart';
 class CubitTable extends Cubit<StateTable> {
   final TableRepository _repository;
 
+  // Cache brandId so delete/update can use it without the UI passing it again.
+  String? _brandId;
+
   CubitTable({required TableRepository repository})
       : _repository = repository,
         super(const StateTable());
 
   Future<void> loadTables(String brandId, String branchId, {String? status}) async {
-    emit(state.copyWith(status: StateTableStatus.loading));
+    _brandId = brandId;
+
+    emit(state.copyWith(status: StateTableStatus.loading, errorMessage: null));
     final result = await _repository.getTables(brandId, branchId, status: status);
     result.fold(
-      (failure) => emit(state.copyWith(status: StateTableStatus.error, errorMessage: failure.message)),
-      (response) => emit(state.copyWith(
+          (failure) => emit(state.copyWith(
+        status: StateTableStatus.error,
+        errorMessage: failure.message,
+      )),
+          (response) => emit(state.copyWith(
         status: StateTableStatus.loaded,
         tables: response.items,
         meta: response.meta,
+        errorMessage: null,     // ✅ FIX: Clear any prior error on success
       )),
     );
   }
 
   Future<void> createTables(String brandId, List<Map<String, dynamic>> data) async {
-    emit(state.copyWith(status: StateTableStatus.loading));
+    emit(state.copyWith(status: StateTableStatus.loading, errorMessage: null));
     final result = await _repository.createTables(brandId, data);
     result.fold(
-      (failure) => emit(state.copyWith(status: StateTableStatus.error, errorMessage: failure.message)),
-      (response) => emit(state.copyWith(
-        status: StateTableStatus.loaded,
-        tables: [...state.tables, ...response.items],
-        meta: response.meta,
+          (failure) => emit(state.copyWith(
+        status: StateTableStatus.error,
+        errorMessage: failure.message,
       )),
+          (response) {
+        // ✅ FIX: Append newly created tables to existing state list for instant UI update.
+        // Original code used response.items but if ListResponse.fromJsonList wasn't returning
+        // items correctly the list would be empty. With unified fromJson this now works.
+        emit(state.copyWith(
+          status: StateTableStatus.loaded,
+          tables: [...state.tables, ...response.items],
+          meta: response.meta,
+          errorMessage: null,
+        ));
+      },
     );
   }
 
   Future<void> updateTable(String tableId, Map<String, dynamic> data) async {
-    emit(state.copyWith(status: StateTableStatus.loading));
+    emit(state.copyWith(status: StateTableStatus.loading, errorMessage: null));
     final result = await _repository.updateTable(tableId, data);
     result.fold(
-      (failure) => emit(state.copyWith(status: StateTableStatus.error, errorMessage: failure.message)),
-      (table) {
-        final updated = state.tables.map((t) => t.id == table.id ? table : t).toList();
-        emit(state.copyWith(status: StateTableStatus.loaded, tables: updated));
+          (failure) => emit(state.copyWith(
+        status: StateTableStatus.error,
+        errorMessage: failure.message,
+      )),
+          (updatedTable) {
+        // ✅ NO CHANGE: Correct in-place replacement logic.
+        final updated = state.tables
+            .map((t) => t.id == updatedTable.id ? updatedTable : t)
+            .toList();
+        emit(state.copyWith(
+          status: StateTableStatus.loaded,
+          tables: updated,
+          errorMessage: null,
+        ));
       },
     );
   }
 
   Future<void> deleteTable(String tableId) async {
-    emit(state.copyWith(status: StateTableStatus.loading));
-    final result = await _repository.deleteTable(tableId);
+    if (_brandId == null) {
+      emit(state.copyWith(
+        status: StateTableStatus.error,
+        errorMessage: 'Brand ID not set — call loadTables first',
+      ));
+      return;
+    }
+    emit(state.copyWith(status: StateTableStatus.loading, errorMessage: null));
+    final result = await _repository.deleteTable(tableId, _brandId!);
     result.fold(
-      (failure) => emit(state.copyWith(status: StateTableStatus.error, errorMessage: failure.message)),
-      (_) {
+          (failure) => emit(state.copyWith(
+        status: StateTableStatus.error,
+        errorMessage: failure.message,
+      )),
+          (_) {
         final updated = state.tables.where((t) => t.id != tableId).toList();
-        emit(state.copyWith(status: StateTableStatus.loaded, tables: updated));
-      },
-    );
-  }
-
-  Future<void> loadRoomTypes(String brandId, String branchId) async {
-    emit(state.copyWith(status: StateTableStatus.loading));
-    final result = await _repository.getRoomTypes(brandId, branchId);
-    result.fold(
-      (failure) => emit(state.copyWith(status: StateTableStatus.error, errorMessage: failure.message)),
-      (response) => emit(state.copyWith(
-        status: StateTableStatus.loaded,
-        roomTypes: response.items,
-        meta: response.meta,
-      )),
-    );
-  }
-
-  Future<void> createRoomTypes(String brandId, List<Map<String, dynamic>> data) async {
-    emit(state.copyWith(status: StateTableStatus.loading));
-    final result = await _repository.createRoomTypes(brandId, data);
-    result.fold(
-      (failure) => emit(state.copyWith(status: StateTableStatus.error, errorMessage: failure.message)),
-      (response) => emit(state.copyWith(
-        status: StateTableStatus.loaded,
-        roomTypes: [...state.roomTypes, ...response.items],
-        meta: response.meta,
-      )),
-    );
-  }
-
-  Future<void> updateRoomType(String roomTypeId, Map<String, dynamic> data) async {
-    emit(state.copyWith(status: StateTableStatus.loading));
-    final result = await _repository.updateRoomType(roomTypeId, data);
-    result.fold(
-      (failure) => emit(state.copyWith(status: StateTableStatus.error, errorMessage: failure.message)),
-      (roomType) {
-        final updated = state.roomTypes.map((r) => r.id == roomType.id ? roomType : r).toList();
-        emit(state.copyWith(status: StateTableStatus.loaded, roomTypes: updated));
-      },
-    );
-  }
-
-  Future<void> deleteRoomType(String roomTypeId) async {
-    emit(state.copyWith(status: StateTableStatus.loading));
-    final result = await _repository.deleteRoomType(roomTypeId);
-    result.fold(
-      (failure) => emit(state.copyWith(status: StateTableStatus.error, errorMessage: failure.message)),
-      (_) {
-        final updated = state.roomTypes.where((r) => r.id != roomTypeId).toList();
-        emit(state.copyWith(status: StateTableStatus.loaded, roomTypes: updated));
+        emit(state.copyWith(
+          status: StateTableStatus.loaded,
+          tables: updated,
+          errorMessage: null,
+        ));
       },
     );
   }

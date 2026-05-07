@@ -34,6 +34,8 @@ import 'package:back_office/ui/settings/settings/screen_settings.dart';
 import 'package:back_office/ui/profile/screen_profile.dart';
 import 'package:back_office/ui/shell/placeholder_screens.dart';
 
+import '../ui/room_types/screen_room_type_dashboard.dart';
+
 final GoRouter appRouter = GoRouter(
   navigatorKey: rootNavigatorKey,
   initialLocation: AppRoutes.login,
@@ -157,6 +159,14 @@ final GoRouter appRouter = GoRouter(
           builder: (context, state) {
             final brandId = state.pathParameters['brandId']!;
             return ScreenTableLayout(brandId: brandId);
+          },
+        ),
+        GoRoute(
+          path: AppRoutes.roomTypes,
+          name: 'roomTypes',
+          builder: (context, state) {
+            final brandId = state.pathParameters['brandId']!;
+            return ScreenRoomTypeDashboard(brandId: brandId);
           },
         ),
         GoRoute(
