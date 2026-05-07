@@ -20,6 +20,7 @@ import 'package:back_office/ui/brand/brand_form/screen_brand_form.dart';
 
 import 'package:back_office/ui/branch/branch_list/screen_branch_list.dart';
 import 'package:back_office/ui/branch/branch_detail/screen_branch_detail.dart';
+import 'package:back_office/ui/branch/branch_form/screen_branch_form.dart';
 
 import 'package:back_office/ui/users/user_list/screen_user_list.dart';
 import 'package:back_office/ui/users/user_form/screen_user_form.dart';
@@ -121,12 +122,29 @@ final GoRouter appRouter = GoRouter(
           },
         ),
         GoRoute(
+          path: AppRoutes.branchCreate,
+          name: 'branchCreate',
+          builder: (context, state) {
+            final brandId = state.pathParameters['brandId']!;
+            return ScreenBranchForm(brandId: brandId);
+          },
+        ),
+        GoRoute(
           path: AppRoutes.branchDetail,
           name: 'branchDetail',
           builder: (context, state) {
             final brandId = state.pathParameters['brandId']!;
             final branchId = state.pathParameters['branchId']!;
             return ScreenBranchDetail(brandId: brandId, branchId: branchId);
+          },
+        ),
+        GoRoute(
+          path: AppRoutes.branchEdit,
+          name: 'branchEdit',
+          builder: (context, state) {
+            final brandId = state.pathParameters['brandId']!;
+            final branchId = state.pathParameters['branchId']!;
+            return ScreenBranchForm(brandId: brandId, branchId: branchId);
           },
         ),
         GoRoute(

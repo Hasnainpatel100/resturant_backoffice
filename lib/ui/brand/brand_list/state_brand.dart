@@ -2,7 +2,7 @@ import 'package:equatable/equatable.dart';
 import 'package:back_office/data/models/brand_model.dart';
 import 'package:back_office/data/models/api_response_model.dart';
 
-enum BrandStatus { initial, loading, loaded, error }
+enum BrandStatus { initial, loading, loaded, success, error }
 
 class StateBrand extends Equatable {
   final BrandStatus status;
