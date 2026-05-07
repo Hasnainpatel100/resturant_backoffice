@@ -24,6 +24,7 @@ import 'package:back_office/ui/branch/branch_form/screen_branch_form.dart';
 
 import 'package:back_office/ui/users/user_list/screen_user_list.dart';
 import 'package:back_office/ui/users/user_form/screen_user_form.dart';
+import 'package:back_office/ui/users/user_detail/screen_user_detail.dart';
 
 import 'package:back_office/ui/menu/menu_dashboard/screen_menu_dashboard.dart';
 
@@ -161,6 +162,24 @@ final GoRouter appRouter = GoRouter(
           builder: (context, state) {
             final brandId = state.pathParameters['brandId']!;
             return ScreenUserForm(brandId: brandId);
+          },
+        ),
+        GoRoute(
+          path: AppRoutes.userDetail,
+          name: 'userDetail',
+          builder: (context, state) {
+            final brandId = state.pathParameters['brandId']!;
+            final userId = state.pathParameters['userId']!;
+            return ScreenUserDetail(brandId: brandId, userId: userId);
+          },
+        ),
+        GoRoute(
+          path: AppRoutes.userEdit,
+          name: 'userEdit',
+          builder: (context, state) {
+            final brandId = state.pathParameters['brandId']!;
+            final userId = state.pathParameters['userId']!;
+            return ScreenUserForm(brandId: brandId, userId: userId);
           },
         ),
         GoRoute(
