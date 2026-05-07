@@ -214,6 +214,14 @@ class _BrandDetailView extends StatelessWidget {
                     SizedBox(width: AppSpacing.sm),
                     Expanded(
                       child: _QuickActionCard(
+                        icon: Icons.bed,
+                        label: 'Room Types',
+                        onTap: () => context.go('/brands/$brandId/room-types'),
+                      ),
+                    ),
+                    SizedBox(width: AppSpacing.sm),
+                    Expanded(
+                      child: _QuickActionCard(
                         icon: Icons.tablet_android,
                         label: 'POS Devices',
                         onTap: () => context.go('/brands/$brandId/pos-devices'),
