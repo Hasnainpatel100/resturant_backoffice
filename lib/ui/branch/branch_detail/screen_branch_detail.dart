@@ -52,6 +52,17 @@ class _BranchDetailView extends StatelessWidget {
               onPressed: () => context.go('/brands/$brandId/branches'),
             ),
             actions: [
+              FilledButton.icon(
+                onPressed: () => context.go(
+                    '/brands/$brandId/branches/$branchId/subscription'),
+                icon: const Icon(Icons.layers, size: 16),
+                label: const Text('Subscription'),
+                style: FilledButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  visualDensity: VisualDensity.compact,
+                ),
+              ),
+              const SizedBox(width: 4),
               IconButton(
                 icon: const Icon(Icons.edit_outlined),
                 tooltip: 'Edit Branch',

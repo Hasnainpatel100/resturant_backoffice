@@ -223,6 +223,14 @@ class _DesktopSidebar extends StatelessWidget {
                   currentLocation: currentLocation,
                 ),
 
+                _NavItem(
+                  icon: Icons.layers_outlined,
+                  activeIcon: Icons.layers,
+                  label: 'Plans',
+                  route: AppRoutes.planList,
+                  currentLocation: currentLocation,
+                ),
+
                 SizedBox(height: AppSpacing.lg),
                 _NavSection(title: 'SYSTEM'),
                 _NavItem(

@@ -37,6 +37,10 @@ import 'package:back_office/ui/profile/screen_profile.dart';
 import 'package:back_office/ui/shell/placeholder_screens.dart';
 
 import '../ui/room_types/screen_room_type_dashboard.dart';
+import '../ui/plans/plan_list/screen_plan_list.dart';
+import '../ui/plans/plan_list/screen_plan_form.dart';
+import '../ui/subscriptions/subscription_detail/screen_branch_subscription.dart';
+import '../ui/subscriptions/subscription_detail/screen_branch_plan_assignment.dart';
 
 final GoRouter appRouter = GoRouter(
   navigatorKey: rootNavigatorKey,
@@ -223,6 +227,44 @@ final GoRouter appRouter = GoRouter(
           path: AppRoutes.profile,
           name: 'profile',
           builder: (context, state) => const ScreenProfile(),
+        ),
+        GoRoute(
+          path: AppRoutes.planList,
+          name: 'planList',
+          builder: (context, state) => const ScreenPlanList(),
+        ),
+        GoRoute(
+          path: AppRoutes.planCreate,
+          name: 'planCreate',
+          builder: (context, state) => const ScreenPlanForm(),
+        ),
+        GoRoute(
+          path: AppRoutes.planEdit,
+          name: 'planEdit',
+          builder: (context, state) {
+            final planId = state.pathParameters['planId']!;
+            return ScreenPlanForm(planId: planId);
+          },
+        ),
+        GoRoute(
+          path: AppRoutes.branchSubscription,
+          name: 'branchSubscription',
+          builder: (context, state) {
+            final brandId = state.pathParameters['brandId']!;
+            final branchId = state.pathParameters['branchId']!;
+            return ScreenBranchSubscription(
+                brandId: brandId, branchId: branchId);
+          },
+        ),
+        GoRoute(
+          path: AppRoutes.branchPlanAssignment,
+          name: 'branchPlanAssignment',
+          builder: (context, state) {
+            final brandId = state.pathParameters['brandId']!;
+            final branchId = state.pathParameters['branchId']!;
+            return ScreenBranchPlanAssignment(
+                brandId: brandId, branchId: branchId);
+          },
         ),
         // Placeholder routes
         GoRoute(
