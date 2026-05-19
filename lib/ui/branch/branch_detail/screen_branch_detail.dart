@@ -53,10 +53,15 @@ class _BranchDetailView extends StatelessWidget {
             ),
             actions: [
               FilledButton.icon(
-                onPressed: () => context.go(
-                    '/brands/$brandId/branches/$branchId/subscription'),
+                onPressed: () => context.goNamed(
+                  'branchPlanHistory',
+                  pathParameters: {
+                    'brandId': brandId,
+                    'branchId': branchId,
+                  },
+                ),
                 icon: const Icon(Icons.layers, size: 16),
-                label: const Text('Subscription'),
+                label: const Text('Plan'),
                 style: FilledButton.styleFrom(
                   padding: const EdgeInsets.symmetric(horizontal: 12),
                   visualDensity: VisualDensity.compact,

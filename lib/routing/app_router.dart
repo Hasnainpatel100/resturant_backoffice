@@ -37,10 +37,8 @@ import 'package:back_office/ui/profile/screen_profile.dart';
 import 'package:back_office/ui/shell/placeholder_screens.dart';
 
 import '../ui/room_types/screen_room_type_dashboard.dart';
-import '../ui/plans/plan_list/screen_plan_list.dart';
-import '../ui/plans/plan_list/screen_plan_form.dart';
-import '../ui/subscriptions/subscription_detail/screen_branch_subscription.dart';
-import '../ui/subscriptions/subscription_detail/screen_branch_plan_assignment.dart';
+import '../ui/branch/branch_plan/screen_branch_plan_history.dart';
+import '../ui/branch/branch_plan/screen_branch_plan_form.dart';
 
 final GoRouter appRouter = GoRouter(
   navigatorKey: rootNavigatorKey,
@@ -229,40 +227,22 @@ final GoRouter appRouter = GoRouter(
           builder: (context, state) => const ScreenProfile(),
         ),
         GoRoute(
-          path: AppRoutes.planList,
-          name: 'planList',
-          builder: (context, state) => const ScreenPlanList(),
-        ),
-        GoRoute(
-          path: AppRoutes.planCreate,
-          name: 'planCreate',
-          builder: (context, state) => const ScreenPlanForm(),
-        ),
-        GoRoute(
-          path: AppRoutes.planEdit,
-          name: 'planEdit',
-          builder: (context, state) {
-            final planId = state.pathParameters['planId']!;
-            return ScreenPlanForm(planId: planId);
-          },
-        ),
-        GoRoute(
-          path: AppRoutes.branchSubscription,
-          name: 'branchSubscription',
+          path: AppRoutes.branchPlanHistory,
+          name: 'branchPlanHistory',
           builder: (context, state) {
             final brandId = state.pathParameters['brandId']!;
             final branchId = state.pathParameters['branchId']!;
-            return ScreenBranchSubscription(
+            return ScreenBranchPlanHistory(
                 brandId: brandId, branchId: branchId);
           },
         ),
         GoRoute(
-          path: AppRoutes.branchPlanAssignment,
-          name: 'branchPlanAssignment',
+          path: AppRoutes.branchPlanForm,
+          name: 'branchPlanForm',
           builder: (context, state) {
             final brandId = state.pathParameters['brandId']!;
             final branchId = state.pathParameters['branchId']!;
-            return ScreenBranchPlanAssignment(
+            return ScreenBranchPlanForm(
                 brandId: brandId, branchId: branchId);
           },
         ),

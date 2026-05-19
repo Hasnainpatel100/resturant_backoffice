@@ -50,15 +50,10 @@ abstract final class AppRoutes {
   static const String deviceRegistration =
       '/brands/:brandId/pos-devices/register';
 
-  // Plan routes (SaaS master plans)
-  static const String planList = '/plans';
-  static const String planCreate = '/plans/create';
-  static const String planEdit = '/plans/:planId/edit';
-
-  // Branch Subscription routes
-  static const String branchSubscription =
-      '/brands/:brandId/branches/:branchId/subscription';
-  static const String branchPlanAssignment =
+  // Branch Plan routes
+  static const String branchPlanHistory =
+      '/brands/:brandId/branches/:branchId/plan-history';
+  static const String branchPlanForm =
       '/brands/:brandId/branches/:branchId/plan';
 
   // Settings
