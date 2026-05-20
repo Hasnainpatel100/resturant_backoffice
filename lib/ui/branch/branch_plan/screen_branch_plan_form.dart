@@ -1,9 +1,12 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:go_router/go_router.dart';
+import '../../../data/repositories/branch_plan_repository_impl.dart';
 import '../../../theme/theme_constants.dart';
+import 'cubit_branch_plan.dart';
+import 'state_branch_plan.dart';
 
 class ScreenBranchPlanForm extends StatefulWidget {
   final String brandId;
@@ -28,6 +31,7 @@ class _ScreenBranchPlanFormState extends State<ScreenBranchPlanForm> {
   
   DateTime? _selectedExpiryDate;
   final _dateController = TextEditingController();
+  bool _isSaving = false;
 
   @override
   void dispose() {
@@ -59,7 +63,7 @@ class _ScreenBranchPlanFormState extends State<ScreenBranchPlanForm> {
     );
   }
 
-  void _submit() {
+  void _submit(BuildContext blocContext) {
     if (_formKey.currentState!.validate()) {
       if (_selectedExpiryDate == null) {
         _showSnackBar('Please select an expiry date');
@@ -76,121 +80,158 @@ class _ScreenBranchPlanFormState extends State<ScreenBranchPlanForm> {
         "note": _noteController.text,
       };
 
-      // Phase 1: Print to console
-      debugPrint('--- BRANCH PLAN DATA ---');
-      debugPrint(jsonEncode(data));
-      debugPrint('------------------------');
-
-      _showSnackBar('Data printed to console (Phase 1)');
+      // Call the API via cubit
+      blocContext.read<CubitBranchPlan>().assignPlan(widget.branchId, data);
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
+    return BlocProvider(
+      create: (_) => CubitBranchPlan(repository: BranchPlanRepositoryImpl()),
+      child: Builder(
+        builder: (blocContext) {
+          final cs = Theme.of(blocContext).colorScheme;
 
-    return ScaffoldMessenger(
-      key: _scaffoldMessengerKey,
-      child: Scaffold(
-      appBar: AppBar(
-        title: const Text('Assign Plan'),
-        actions: [
-          TextButton.icon(
-            onPressed: _submit,
-            icon: const Icon(Icons.save),
-            label: const Text('Save'),
-            style: TextButton.styleFrom(foregroundColor: cs.primary),
-          ),
-          SizedBox(width: AppSpacing.md),
-        ],
-      ),
-      body: SingleChildScrollView(
-        padding: EdgeInsets.all(AppSpacing.lg),
-        child: Center(
-          child: Container(
-            constraints: const BoxConstraints(maxWidth: 600),
-            child: Form(
-              key: _formKey,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildHeader(cs),
-                  SizedBox(height: AppSpacing.xl),
-                  
-                  // Max Users
-                  _buildLabel('Max Users'),
-                  TextFormField(
-                    controller: _maxUsersController,
-                    keyboardType: TextInputType.number,
-                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                    decoration: const InputDecoration(
-                      hintText: 'e.g. 10',
-                      prefixIcon: Icon(Icons.people_outline),
-                    ),
-                    validator: (v) => v == null || v.isEmpty ? 'Required' : null,
-                  ),
-                  SizedBox(height: AppSpacing.lg),
+          return ScaffoldMessenger(
+            key: _scaffoldMessengerKey,
+            child: BlocListener<CubitBranchPlan, StateBranchPlan>(
+              listener: (context, state) {
+                if (state.status == BranchPlanStatus.loading) {
+                  setState(() => _isSaving = true);
+                } else {
+                  setState(() => _isSaving = false);
+                }
 
-                  // Max POS Devices
-                  _buildLabel('Max POS Devices'),
-                  TextFormField(
-                    controller: _maxPosDevicesController,
-                    keyboardType: TextInputType.number,
-                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                    decoration: const InputDecoration(
-                      hintText: 'e.g. 5',
-                      prefixIcon: Icon(Icons.devices_outlined),
+                if (state.status == BranchPlanStatus.success) {
+                  _showSnackBar('Plan assigned successfully!');
+                  // Navigate back after a short delay so user sees the message
+                  Future.delayed(const Duration(milliseconds: 500), () {
+                    if (mounted) context.pop();
+                  });
+                } else if (state.status == BranchPlanStatus.error) {
+                  _showSnackBar(state.errorMessage ?? 'Failed to assign plan');
+                }
+              },
+              child: Scaffold(
+                appBar: AppBar(
+                  title: const Text('Assign Plan'),
+                  actions: [
+                    TextButton.icon(
+                      onPressed: _isSaving ? null : () => _submit(blocContext),
+                      icon: _isSaving
+                          ? const SizedBox(
+                              width: 18,
+                              height: 18,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            )
+                          : const Icon(Icons.save),
+                      label: Text(_isSaving ? 'Saving...' : 'Save'),
+                      style: TextButton.styleFrom(foregroundColor: cs.primary),
                     ),
-                    validator: (v) => v == null || v.isEmpty ? 'Required' : null,
-                  ),
-                  SizedBox(height: AppSpacing.lg),
+                    SizedBox(width: AppSpacing.md),
+                  ],
+                ),
+                body: SingleChildScrollView(
+                  padding: EdgeInsets.all(AppSpacing.lg),
+                  child: Center(
+                    child: Container(
+                      constraints: const BoxConstraints(maxWidth: 600),
+                      child: Form(
+                        key: _formKey,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            _buildHeader(cs),
+                            SizedBox(height: AppSpacing.xl),
+                            
+                            // Max Users
+                            _buildLabel('Max Users'),
+                            TextFormField(
+                              controller: _maxUsersController,
+                              keyboardType: TextInputType.number,
+                              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                              decoration: const InputDecoration(
+                                hintText: 'e.g. 10',
+                                prefixIcon: Icon(Icons.people_outline),
+                              ),
+                              validator: (v) => v == null || v.isEmpty ? 'Required' : null,
+                            ),
+                            SizedBox(height: AppSpacing.lg),
 
-                  // Expiry Date
-                  _buildLabel('Expiry Date'),
-                  TextFormField(
-                    controller: _dateController,
-                    readOnly: true,
-                    onTap: () => _selectDate(context),
-                    decoration: const InputDecoration(
-                      hintText: 'Select Date',
-                      prefixIcon: Icon(Icons.calendar_today_outlined),
-                      suffixIcon: Icon(Icons.arrow_drop_down),
-                    ),
-                    validator: (v) => v == null || v.isEmpty ? 'Required' : null,
-                  ),
-                  SizedBox(height: AppSpacing.lg),
+                            // Max POS Devices
+                            _buildLabel('Max POS Devices'),
+                            TextFormField(
+                              controller: _maxPosDevicesController,
+                              keyboardType: TextInputType.number,
+                              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                              decoration: const InputDecoration(
+                                hintText: 'e.g. 5',
+                                prefixIcon: Icon(Icons.devices_outlined),
+                              ),
+                              validator: (v) => v == null || v.isEmpty ? 'Required' : null,
+                            ),
+                            SizedBox(height: AppSpacing.lg),
 
-                  // Note
-                  _buildLabel('Note'),
-                  TextFormField(
-                    controller: _noteController,
-                    maxLines: 3,
-                    decoration: const InputDecoration(
-                      hintText: 'Premium plan assigned...',
-                      prefixIcon: Icon(Icons.note_outlined),
-                    ),
-                  ),
-                  
-                  SizedBox(height: AppSpacing.xxl),
-                  
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: _submit,
-                      style: ElevatedButton.styleFrom(
-                        padding: EdgeInsets.symmetric(vertical: AppSpacing.md),
-                        backgroundColor: cs.primary,
-                        foregroundColor: cs.onPrimary,
+                            // Expiry Date
+                            _buildLabel('Expiry Date'),
+                            TextFormField(
+                              controller: _dateController,
+                              readOnly: true,
+                              onTap: () => _selectDate(context),
+                              decoration: const InputDecoration(
+                                hintText: 'Select Date',
+                                prefixIcon: Icon(Icons.calendar_today_outlined),
+                                suffixIcon: Icon(Icons.arrow_drop_down),
+                              ),
+                              validator: (v) => v == null || v.isEmpty ? 'Required' : null,
+                            ),
+                            SizedBox(height: AppSpacing.lg),
+
+                            // Note
+                            _buildLabel('Note'),
+                            TextFormField(
+                              controller: _noteController,
+                              maxLines: 3,
+                              decoration: const InputDecoration(
+                                hintText: 'Premium plan assigned...',
+                                prefixIcon: Icon(Icons.note_outlined),
+                              ),
+                            ),
+                            
+                            SizedBox(height: AppSpacing.xxl),
+                            
+                            SizedBox(
+                              width: double.infinity,
+                              child: ElevatedButton(
+                                onPressed: _isSaving ? null : () => _submit(blocContext),
+                                style: ElevatedButton.styleFrom(
+                                  padding: EdgeInsets.symmetric(vertical: AppSpacing.md),
+                                  backgroundColor: cs.primary,
+                                  foregroundColor: cs.onPrimary,
+                                ),
+                                child: _isSaving
+                                    ? const SizedBox(
+                                        width: 20,
+                                        height: 20,
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                          color: Colors.white,
+                                        ),
+                                      )
+                                    : const Text('Assign Plan'),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
-                      child: const Text('Save & Print to Console'),
                     ),
                   ),
-                ],
+                ),
               ),
             ),
-          ),
-        ),
-      ),
+          );
+        },
       ),
     );
   }

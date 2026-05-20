@@ -26,7 +26,7 @@ class BranchPlanRepositoryImpl implements BranchPlanRepository {
   @override
   FutureEither<void> assignPlan(String branchId, Map<String, dynamic> data) async {
     return runTask(() async {
-      await AppConfig.dio.put(
+      final response = await AppConfig.dio.put(
         '/api/branches/$branchId/plan',
         data: data,
       );
