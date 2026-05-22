@@ -157,32 +157,36 @@ final GoRouter appRouter = GoRouter(
             final brandId = state.pathParameters['brandId']!;
             return ScreenUserList(brandId: brandId);
           },
-        ),
-        GoRoute(
-          path: AppRoutes.userCreate,
-          name: 'userCreate',
-          builder: (context, state) {
-            final brandId = state.pathParameters['brandId']!;
-            return ScreenUserForm(brandId: brandId);
-          },
-        ),
-        GoRoute(
-          path: AppRoutes.userDetail,
-          name: 'userDetail',
-          builder: (context, state) {
-            final brandId = state.pathParameters['brandId']!;
-            final userId = state.pathParameters['userId']!;
-            return ScreenUserDetail(brandId: brandId, userId: userId);
-          },
-        ),
-        GoRoute(
-          path: AppRoutes.userEdit,
-          name: 'userEdit',
-          builder: (context, state) {
-            final brandId = state.pathParameters['brandId']!;
-            final userId = state.pathParameters['userId']!;
-            return ScreenUserForm(brandId: brandId, userId: userId);
-          },
+          routes: [
+            GoRoute(
+              path: 'create',
+              name: 'userCreate',
+              builder: (context, state) {
+                final brandId = state.pathParameters['brandId']!;
+                return ScreenUserForm(brandId: brandId);
+              },
+            ),
+            GoRoute(
+              path: ':userId',
+              name: 'userDetail',
+              builder: (context, state) {
+                final brandId = state.pathParameters['brandId']!;
+                final userId = state.pathParameters['userId']!;
+                return ScreenUserDetail(brandId: brandId, userId: userId);
+              },
+              routes: [
+                GoRoute(
+                  path: 'edit',
+                  name: 'userEdit',
+                  builder: (context, state) {
+                    final brandId = state.pathParameters['brandId']!;
+                    final userId = state.pathParameters['userId']!;
+                    return ScreenUserForm(brandId: brandId, userId: userId);
+                  },
+                ),
+              ],
+            ),
+          ],
         ),
         GoRoute(
           path: AppRoutes.menuDashboard,

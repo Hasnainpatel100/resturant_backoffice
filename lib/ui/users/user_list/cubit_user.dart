@@ -44,7 +44,7 @@ class CubitUser extends Cubit<StateUser> {
     final result =
         await _branchRepository.getBranchesByBrand(brandId, limit: 100);
     result.fold(
-      (failure) => {},
+      (failure) => null,
       (response) => emit(state.copyWith(branches: response.items)),
     );
   }
