@@ -66,7 +66,19 @@ class UserRepositoryImpl implements UserRepository {
       );
       return ListResponse<UserData>.fromJson(
         response.data!,
-        (json) => UserData.fromJson(json),
+        (json) {
+          // The list API returns UserProfileModel-shaped objects where user
+          // fields sit under a nested 'user' key and permissions sit at root.
+          // Merge them so UserData gets the correct id / name / email / etc.
+          if (json['user'] is Map<String, dynamic>) {
+            final userMap = Map<String, dynamic>.from(json['user'] as Map<String, dynamic>);
+            // Prefer root-level permissions (aggregate list) over the nested one
+            final rootPerms = json['permissions'] as List<dynamic>?;
+            if (rootPerms != null) userMap['permissions'] = rootPerms;
+            return UserData.fromJson(userMap);
+          }
+          return UserData.fromJson(json);
+        },
       );
     });
   }

@@ -52,6 +52,22 @@ class _BranchDetailView extends StatelessWidget {
               onPressed: () => context.go('/brands/$brandId/branches'),
             ),
             actions: [
+              FilledButton.icon(
+                onPressed: () => context.goNamed(
+                  'branchPlanHistory',
+                  pathParameters: {
+                    'brandId': brandId,
+                    'branchId': branchId,
+                  },
+                ),
+                icon: const Icon(Icons.layers, size: 16),
+                label: const Text('Plan'),
+                style: FilledButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  visualDensity: VisualDensity.compact,
+                ),
+              ),
+              const SizedBox(width: 4),
               IconButton(
                 icon: const Icon(Icons.edit_outlined),
                 tooltip: 'Edit Branch',

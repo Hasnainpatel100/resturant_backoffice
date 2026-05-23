@@ -223,6 +223,8 @@ class _DesktopSidebar extends StatelessWidget {
                   currentLocation: currentLocation,
                 ),
 
+
+
                 SizedBox(height: AppSpacing.lg),
                 _NavSection(title: 'SYSTEM'),
                 _NavItem(

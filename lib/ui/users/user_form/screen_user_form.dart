@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:back_office/imports/core_imports.dart';
@@ -6,6 +6,63 @@ import 'package:back_office/data/repositories/user_repository_impl.dart';
 import 'package:back_office/ui/users/user_list/cubit_user.dart';
 import 'package:back_office/ui/users/user_list/state_user.dart';
 import 'package:back_office/shared/shared.dart';
+
+/// All available permissions matching the API spec.
+const List<String> _allPermissions = [
+  'USER_CREATE',
+  'USER_READ',
+  'USER_UPDATE',
+  'USER_DELETE',
+  'ORDER_CREATE',
+  'ORDER_READ',
+  'ORDER_UPDATE',
+  'ORDER_DELETE',
+  'PAYMENT_PROCESS',
+  'REFUND_PROCESS',
+  'REPORT_VIEW',
+  'REPORT_EXPORT',
+  'REPORT_CREATE',
+  'REPORT_UPDATE',
+  'REPORT_DELETE',
+  'INVENTORY_CREATE',
+  'INVENTORY_READ',
+  'INVENTORY_UPDATE',
+  'INVENTORY_DELETE',
+  'DEVICE_MANAGE',
+  'BRANCH_CREATE',
+  'BRANCH_READ',
+  'BRANCH_UPDATE',
+  'BRANCH_DELETE',
+  'RESTAURANT_READ',
+  'RESTAURANT_UPDATE',
+  'DASHBOARD_VIEW',
+  'DASHBOARD_EXPORT',
+  'EXPENSE_CREATE',
+  'EXPENSE_READ',
+  'EXPENSE_UPDATE',
+  'EXPENSE_DELETE',
+  'EXPENSE_APPROVE',
+  'ACCOUNT_CREATE',
+  'ACCOUNT_READ',
+  'ACCOUNT_UPDATE',
+  'ACCOUNT_DELETE',
+  'ACCOUNT_MANAGE',
+];
+
+/// Grouped permissions for better UX in the form.
+const Map<String, List<String>> _permissionGroups = {
+  'User': ['USER_CREATE', 'USER_READ', 'USER_UPDATE', 'USER_DELETE'],
+  'Order': ['ORDER_CREATE', 'ORDER_READ', 'ORDER_UPDATE', 'ORDER_DELETE'],
+  'Payment': ['PAYMENT_PROCESS', 'REFUND_PROCESS'],
+  'Report': ['REPORT_VIEW', 'REPORT_EXPORT', 'REPORT_CREATE', 'REPORT_UPDATE', 'REPORT_DELETE'],
+  'Inventory': ['INVENTORY_CREATE', 'INVENTORY_READ', 'INVENTORY_UPDATE', 'INVENTORY_DELETE'],
+  'Device': ['DEVICE_MANAGE'],
+  'Branch': ['BRANCH_CREATE', 'BRANCH_READ', 'BRANCH_UPDATE', 'BRANCH_DELETE'],
+  'Restaurant': ['RESTAURANT_READ', 'RESTAURANT_UPDATE'],
+  'Dashboard': ['DASHBOARD_VIEW', 'DASHBOARD_EXPORT'],
+  'Expense': ['EXPENSE_CREATE', 'EXPENSE_READ', 'EXPENSE_UPDATE', 'EXPENSE_DELETE', 'EXPENSE_APPROVE'],
+  'Account': ['ACCOUNT_CREATE', 'ACCOUNT_READ', 'ACCOUNT_UPDATE', 'ACCOUNT_DELETE', 'ACCOUNT_MANAGE'],
+};
 
 class ScreenUserForm extends StatelessWidget {
   final String brandId;
@@ -40,137 +97,91 @@ class _UserFormView extends StatefulWidget {
   State<_UserFormView> createState() => _UserFormViewState();
 }
 
-class _UserFormViewState extends State<_UserFormView> with SingleTickerProviderStateMixin {
+class _UserFormViewState extends State<_UserFormView> {
   final _formKey = GlobalKey<FormState>();
-  
-  // Core Info
+
+  // Core fields matching the API
   final _firstNameCtrl = TextEditingController();
   final _lastNameCtrl = TextEditingController();
+  final _usernameCtrl = TextEditingController();
   final _emailCtrl = TextEditingController();
   final _phoneCtrl = TextEditingController();
   final _pinCtrl = TextEditingController();
-  String _selectedRole = 'CASHIER';
+
+  String _selectedRole = 'SUPPORT_TEAM';
+  String _selectedUserType = 'PLATFORM';
   String? _selectedBranchId;
-  
-  // Employment Info
-  final _employeeIdCtrl = TextEditingController();
-  final _departmentCtrl = TextEditingController();
-  final _designationCtrl = TextEditingController();
-  final _shiftCtrl = TextEditingController();
-  final _joinDateCtrl = TextEditingController();
-
-  // Personal Details
-  final _dobCtrl = TextEditingController();
-  final _genderCtrl = TextEditingController();
-  final _fatherNameCtrl = TextEditingController();
-
-  // Address
-  final _streetCtrl = TextEditingController();
-  final _cityCtrl = TextEditingController();
-  final _stateCtrl = TextEditingController();
-  final _postalCodeCtrl = TextEditingController();
-  final _countryCtrl = TextEditingController();
-
-  // Emergency Contact
-  final _emNameCtrl = TextEditingController();
-  final _emRelCtrl = TextEditingController();
-  final _emPhoneCtrl = TextEditingController();
-
-  // Bank Details
-  final _bankNameCtrl = TextEditingController();
-  final _accountNameCtrl = TextEditingController();
-  final _accountNumCtrl = TextEditingController();
-  final _ifscCtrl = TextEditingController();
-  final _branchNameCtrl = TextEditingController();
+  List<String> _selectedPermissions = [];
 
   bool get _isEditing => widget.userId != null;
-  final List<String> _roles = ['ADMIN', 'MANAGER', 'CASHIER', 'OWNER'];
-  
-  late TabController _tabController;
+
+  final List<String> _roles = [
+    'ADMIN',
+    'MANAGER',
+    'CASHIER',
+    'OWNER',
+    'SUPPORT_TEAM',
+  ];
+
+  final List<String> _userTypes = [
+    'PLATFORM',
+    'BRAND',
+    'BRANCH',
+  ];
+
+  bool _dataPopulated = false;
+  bool _submitting = false;
 
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 4, vsync: this);
   }
 
   @override
   void dispose() {
-    _tabController.dispose();
     _firstNameCtrl.dispose();
     _lastNameCtrl.dispose();
+    _usernameCtrl.dispose();
     _emailCtrl.dispose();
     _phoneCtrl.dispose();
     _pinCtrl.dispose();
-    _employeeIdCtrl.dispose();
-    _departmentCtrl.dispose();
-    _designationCtrl.dispose();
-    _shiftCtrl.dispose();
-    _joinDateCtrl.dispose();
-    _dobCtrl.dispose();
-    _genderCtrl.dispose();
-    _fatherNameCtrl.dispose();
-    _streetCtrl.dispose();
-    _cityCtrl.dispose();
-    _stateCtrl.dispose();
-    _postalCodeCtrl.dispose();
-    _countryCtrl.dispose();
-    _emNameCtrl.dispose();
-    _emRelCtrl.dispose();
-    _emPhoneCtrl.dispose();
-    _bankNameCtrl.dispose();
-    _accountNameCtrl.dispose();
-    _accountNumCtrl.dispose();
-    _ifscCtrl.dispose();
-    _branchNameCtrl.dispose();
     super.dispose();
   }
 
   void _populateData(StateUser state) {
-    if (state.user == null || _firstNameCtrl.text.isNotEmpty) return;
-    
+    if (state.user == null || _dataPopulated) return;
+    _dataPopulated = true;
+
     final user = state.user!.user;
-    final details = state.user!.userDetails;
 
     _firstNameCtrl.text = user.firstName;
     _lastNameCtrl.text = user.lastName;
+    _usernameCtrl.text = user.username;
     _emailCtrl.text = user.email;
     _phoneCtrl.text = user.phoneNumber;
-    _selectedRole = user.role;
     
-    if (details != null) {
-      _employeeIdCtrl.text = details.employeeId ?? '';
-      _departmentCtrl.text = details.department ?? '';
-      _designationCtrl.text = details.designation ?? '';
-      _shiftCtrl.text = details.shift ?? '';
-      _joinDateCtrl.text = details.joinDate ?? '';
-      
-      _dobCtrl.text = details.dateOfBirth ?? '';
-      _genderCtrl.text = details.gender ?? '';
-      _fatherNameCtrl.text = details.fatherName ?? '';
-
-      if (details.address != null) {
-        _streetCtrl.text = details.address!.street;
-        _cityCtrl.text = details.address!.city;
-        _stateCtrl.text = details.address!.state;
-        _postalCodeCtrl.text = details.address!.postalCode;
-        _countryCtrl.text = details.address!.country;
-      }
-
-      if (details.emergencyContact != null) {
-        _emNameCtrl.text = details.emergencyContact!.name;
-        _emRelCtrl.text = details.emergencyContact!.relationship;
-        _emPhoneCtrl.text = details.emergencyContact!.phone;
-      }
-
-      if (details.bankDetails != null) {
-        _bankNameCtrl.text = details.bankDetails!.bankName ?? '';
-        _accountNameCtrl.text = details.bankDetails!.accountHolderName ?? '';
-        _accountNumCtrl.text = details.bankDetails!.accountNumber ?? '';
-        _ifscCtrl.text = details.bankDetails!.ifscCode ?? '';
-        _branchNameCtrl.text = details.bankDetails!.branchName ?? '';
+    // Ensure the role exists in the dropdown list, otherwise default or add it
+    if (user.role.isNotEmpty) {
+      if (_roles.contains(user.role)) {
+        _selectedRole = user.role;
+      } else {
+        _roles.add(user.role);
+        _selectedRole = user.role;
       }
     }
+
+    if (user.userType.isNotEmpty) {
+      if (_userTypes.contains(user.userType)) {
+        _selectedUserType = user.userType;
+      } else {
+        _userTypes.add(user.userType);
+        _selectedUserType = user.userType;
+      }
+    }
+
+    _selectedBranchId = user.branchId.isNotEmpty ? user.branchId : null;
+    _selectedPermissions = List<String>.from(user.permissions);
+
     setState(() {});
   }
 
@@ -178,46 +189,76 @@ class _UserFormViewState extends State<_UserFormView> with SingleTickerProviderS
   Widget build(BuildContext context) {
     return BlocConsumer<CubitUser, StateUser>(
       listener: (context, state) {
-        if (state.status == UserStatus.loaded) {
+        if (state.status == UserStatus.loaded && !_submitting) {
           _populateData(state);
         }
         if (!_isEditing && _selectedBranchId == null && state.branches.isNotEmpty) {
           _selectedBranchId = state.branches.first.id;
         }
+        // Navigate on successful save
+        if (_submitting && state.status == UserStatus.loaded) {
+          _submitting = false;
+          if (_isEditing) {
+            showToast(context, message: 'User updated successfully', status: 'success');
+            context.go('/brands/${widget.brandId}/users/${widget.userId}');
+          } else {
+            showToast(context, message: 'User created successfully', status: 'success');
+            // Navigate to the newly created user's detail screen
+            final newUserId = state.user?.user.id ?? '';
+            if (newUserId.isNotEmpty) {
+              context.go('/brands/${widget.brandId}/users/$newUserId');
+            } else {
+              context.go('/brands/${widget.brandId}/users');
+            }
+          }
+        }
+        if (state.status == UserStatus.error && state.errorMessage != null) {
+          _submitting = false;
+          showToast(context, message: state.errorMessage!, status: 'error');
+        }
       },
       builder: (context, state) {
         return Scaffold(
           appBar: AppBar(
-            title: Text(_isEditing ? 'Edit User' : 'Create User'),
-            leading: IconButton(icon: const Icon(Icons.close), onPressed: () {
-              if (context.canPop()) {
-                context.pop();
-              } else {
-                context.go('/brands/${widget.brandId}/users');
-              }
-            }),
-            bottom: TabBar(
-              controller: _tabController,
-              isScrollable: true,
-              tabs: const [
-                Tab(text: 'Basic Info'),
-                Tab(text: 'Employment'),
-                Tab(text: 'Address/Contact'),
-                Tab(text: 'Bank Details'),
-              ],
+            title: Text(_isEditing ? 'Update User' : 'Create User'),
+            leading: IconButton(
+              icon: const Icon(Icons.close),
+              onPressed: () {
+                if (context.canPop()) {
+                  context.pop();
+                } else {
+                  context.go('/brands/${widget.brandId}/users');
+                }
+              },
             ),
           ),
-          body: state.status == UserStatus.loading && state.user == null
+          body: state.status == UserStatus.loading && state.user == null && _isEditing
               ? const Center(child: CircularProgressIndicator())
               : Form(
                   key: _formKey,
-                  child: TabBarView(
-                    controller: _tabController,
+                  child: ListView(
+                    padding: EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.md),
                     children: [
-                      _buildBasicInfoTab(state),
-                      _buildEmploymentTab(),
-                      _buildAddressContactTab(),
-                      _buildBankDetailsTab(),
+                      if (!_isEditing) ..._buildCreateFields(state),
+                      if (_isEditing)
+                        Padding(
+                          padding: EdgeInsets.only(bottom: AppSpacing.lg),
+                          child: Text(
+                            'Update Permissions',
+                            style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                      if (_isEditing)
+                        Padding(
+                          padding: EdgeInsets.only(bottom: AppSpacing.md),
+                          child: Text(
+                            'You can only modify the permissions for this user.',
+                            style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Theme.of(context).colorScheme.outline),
+                          ),
+                        ),
+                      if (!_isEditing) SizedBox(height: AppSpacing.lg),
+                      _buildPermissionsSection(),
+                      SizedBox(height: AppSpacing.xxl),
                     ],
                   ),
                 ),
@@ -228,8 +269,8 @@ class _UserFormViewState extends State<_UserFormView> with SingleTickerProviderS
                 children: [
                   Expanded(
                     child: OutlinedButton(
-                      onPressed: () => context.go('/brands/${widget.brandId}/users'), 
-                      child: const Text('Cancel')
+                      onPressed: () => context.go('/brands/${widget.brandId}/users'),
+                      child: const Text('Cancel'),
                     ),
                   ),
                   SizedBox(width: AppSpacing.md),
@@ -249,203 +290,348 @@ class _UserFormViewState extends State<_UserFormView> with SingleTickerProviderS
     );
   }
 
-  Widget _buildBasicInfoTab(StateUser state) {
-    return ListView(
-      padding: EdgeInsets.all(AppSpacing.md),
-      children: [
-        Row(
-          children: [
-            Expanded(child: AppTextField(controller: _firstNameCtrl, label: 'First Name', validator: (v) => v?.isEmpty == true ? 'Required' : null)),
-            SizedBox(width: AppSpacing.md),
-            Expanded(child: AppTextField(controller: _lastNameCtrl, label: 'Last Name', validator: (v) => v?.isEmpty == true ? 'Required' : null)),
-          ],
+  /// Build fields shown only when creating a new user.
+  List<Widget> _buildCreateFields(StateUser state) {
+    final cs = Theme.of(context).colorScheme;
+
+    return [
+      Text(
+        'Basic Information',
+        style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+      ),
+      SizedBox(height: AppSpacing.sm),
+      Text(
+        'Enter the fundamental details for this user.',
+        style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: cs.outline),
+      ),
+      SizedBox(height: AppSpacing.md),
+      Card(
+        elevation: 0,
+        shape: RoundedRectangleBorder(
+          borderRadius: AppBorders.lg,
+          side: BorderSide(color: cs.outlineVariant.withOpacity(0.5)),
         ),
-        SizedBox(height: AppSpacing.md),
-        AppTextField(
-          controller: _emailCtrl,
-          label: 'Email',
-          keyboardType: TextInputType.emailAddress,
-          validator: (v) => v?.isEmpty == true ? 'Required' : null,
-        ),
-        SizedBox(height: AppSpacing.md),
-        AppTextField(
-          controller: _phoneCtrl,
-          label: 'Phone',
-          keyboardType: TextInputType.phone,
-        ),
-        SizedBox(height: AppSpacing.md),
-        if (!_isEditing) _buildBranchDropdown(state),
-        if (!_isEditing) SizedBox(height: AppSpacing.md),
-        DropdownButtonFormField<String>(
-          value: _selectedRole,
-          decoration: const InputDecoration(labelText: 'Role'),
-          items: _roles.map((role) => DropdownMenuItem(value: role, child: Text(role))).toList(),
-          onChanged: (value) => setState(() => _selectedRole = value!),
-        ),
-        SizedBox(height: AppSpacing.md),
-        if (!_isEditing)
-          AppTextField(
-            controller: _pinCtrl,
-            label: 'PIN (4 digits)',
-            keyboardType: TextInputType.number,
-            obscureText: true,
-            validator: (v) => v?.length != 4 ? 'PIN must be 4 digits' : null,
+        color: cs.surface,
+        child: Padding(
+          padding: EdgeInsets.all(AppSpacing.lg),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Expanded(
+                    child: DropdownButtonFormField<String>(
+                      value: _selectedUserType,
+                      decoration: InputDecoration(
+                        labelText: 'User Type',
+                        border: OutlineInputBorder(borderRadius: AppBorders.sm),
+                        filled: true,
+                        fillColor: cs.surfaceContainerLowest,
+                      ),
+                      items: _userTypes
+                          .map((type) => DropdownMenuItem(value: type, child: Text(type)))
+                          .toList(),
+                      onChanged: _isEditing ? null : (value) => setState(() => _selectedUserType = value!),
+                      validator: (v) => v == null ? 'Required' : null,
+                    ),
+                  ),
+                  SizedBox(width: AppSpacing.md),
+                  Expanded(
+                    child: DropdownButtonFormField<String>(
+                      value: _selectedRole,
+                      decoration: InputDecoration(
+                        labelText: 'Role',
+                        border: OutlineInputBorder(borderRadius: AppBorders.sm),
+                        filled: true,
+                        fillColor: cs.surfaceContainerLowest,
+                      ),
+                      items: _roles
+                          .map((role) => DropdownMenuItem(value: role, child: Text(role)))
+                          .toList(),
+                      onChanged: _isEditing ? null : (value) => setState(() => _selectedRole = value!),
+                      validator: (v) => v == null ? 'Required' : null,
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: AppSpacing.lg),
+              Row(
+                children: [
+                  Expanded(
+                    child: AppTextField(
+                      controller: _firstNameCtrl,
+                      label: 'First Name',
+                      readOnly: _isEditing,
+                      validator: (v) => (v?.isEmpty ?? true) ? 'Required' : null,
+                    ),
+                  ),
+                  SizedBox(width: AppSpacing.md),
+                  Expanded(
+                    child: AppTextField(
+                      controller: _lastNameCtrl,
+                      label: 'Last Name',
+                      readOnly: _isEditing,
+                      validator: (v) => (v?.isEmpty ?? true) ? 'Required' : null,
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: AppSpacing.lg),
+              AppTextField(
+                controller: _usernameCtrl,
+                label: 'Username',
+                readOnly: _isEditing,
+                validator: (v) => (v?.isEmpty ?? true) ? 'Required' : null,
+              ),
+              if (!_isEditing) ...[
+                SizedBox(height: AppSpacing.lg),
+                AppTextField(
+                  controller: _pinCtrl,
+                  label: 'Login PIN (6 digits)',
+                  keyboardType: TextInputType.number,
+                  obscureText: true,
+                  readOnly: _isEditing,
+                  validator: (v) => v == null || v.length != 6 ? 'PIN must be 6 digits' : null,
+                ),
+              ],
+              SizedBox(height: AppSpacing.lg),
+              Row(
+                children: [
+                  Expanded(
+                    child: AppTextField(
+                      controller: _emailCtrl,
+                      label: 'Email',
+                      keyboardType: TextInputType.emailAddress,
+                      readOnly: _isEditing,
+                      validator: (v) => (v?.isEmpty ?? true) ? 'Required' : null,
+                    ),
+                  ),
+                  SizedBox(width: AppSpacing.md),
+                  Expanded(
+                    child: AppTextField(
+                      controller: _phoneCtrl,
+                      label: 'Phone Number',
+                      keyboardType: TextInputType.phone,
+                      readOnly: _isEditing,
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: AppSpacing.lg),
+              _buildBranchDropdown(state),
+            ],
           ),
-      ],
-    );
-  }
-
-  Widget _buildEmploymentTab() {
-    return ListView(
-      padding: EdgeInsets.all(AppSpacing.md),
-      children: [
-        AppTextField(controller: _employeeIdCtrl, label: 'Employee ID'),
-        SizedBox(height: AppSpacing.md),
-        AppTextField(controller: _designationCtrl, label: 'Designation'),
-        SizedBox(height: AppSpacing.md),
-        AppTextField(controller: _departmentCtrl, label: 'Department'),
-        SizedBox(height: AppSpacing.md),
-        AppTextField(controller: _shiftCtrl, label: 'Shift'),
-        SizedBox(height: AppSpacing.md),
-        AppTextField(controller: _joinDateCtrl, label: 'Join Date'),
-      ],
-    );
-  }
-
-  Widget _buildAddressContactTab() {
-    return ListView(
-      padding: EdgeInsets.all(AppSpacing.md),
-      children: [
-        Text('Personal', style: Theme.of(context).textTheme.titleSmall),
-        SizedBox(height: AppSpacing.sm),
-        AppTextField(controller: _dobCtrl, label: 'Date of Birth'),
-        SizedBox(height: AppSpacing.md),
-        AppTextField(controller: _genderCtrl, label: 'Gender'),
-        SizedBox(height: AppSpacing.md),
-        AppTextField(controller: _fatherNameCtrl, label: 'Father\'s Name'),
-        const Divider(height: 32),
-        Text('Address', style: Theme.of(context).textTheme.titleSmall),
-        SizedBox(height: AppSpacing.sm),
-        AppTextField(controller: _streetCtrl, label: 'Street'),
-        SizedBox(height: AppSpacing.md),
-        Row(
-          children: [
-            Expanded(child: AppTextField(controller: _cityCtrl, label: 'City')),
-            SizedBox(width: AppSpacing.md),
-            Expanded(child: AppTextField(controller: _stateCtrl, label: 'State')),
-          ],
         ),
-        SizedBox(height: AppSpacing.md),
-        Row(
-          children: [
-            Expanded(child: AppTextField(controller: _postalCodeCtrl, label: 'Postal Code')),
-            SizedBox(width: AppSpacing.md),
-            Expanded(child: AppTextField(controller: _countryCtrl, label: 'Country')),
-          ],
-        ),
-        const Divider(height: 32),
-        Text('Emergency Contact', style: Theme.of(context).textTheme.titleSmall),
-        SizedBox(height: AppSpacing.sm),
-        AppTextField(controller: _emNameCtrl, label: 'Contact Name'),
-        SizedBox(height: AppSpacing.md),
-        AppTextField(controller: _emRelCtrl, label: 'Relationship'),
-        SizedBox(height: AppSpacing.md),
-        AppTextField(controller: _emPhoneCtrl, label: 'Phone Number', keyboardType: TextInputType.phone),
-      ],
-    );
-  }
-
-  Widget _buildBankDetailsTab() {
-    return ListView(
-      padding: EdgeInsets.all(AppSpacing.md),
-      children: [
-        AppTextField(controller: _bankNameCtrl, label: 'Bank Name'),
-        SizedBox(height: AppSpacing.md),
-        AppTextField(controller: _accountNameCtrl, label: 'Account Holder Name'),
-        SizedBox(height: AppSpacing.md),
-        AppTextField(controller: _accountNumCtrl, label: 'Account Number'),
-        SizedBox(height: AppSpacing.md),
-        AppTextField(controller: _ifscCtrl, label: 'IFSC Code'),
-        SizedBox(height: AppSpacing.md),
-        AppTextField(controller: _branchNameCtrl, label: 'Branch Name'),
-      ],
-    );
+      ),
+    ];
   }
 
   Widget _buildBranchDropdown(StateUser state) {
+    final cs = Theme.of(context).colorScheme;
     if (state.status == UserStatus.loading && state.branches.isEmpty) {
-      return const Center(child: CircularProgressIndicator());
+      return const Padding(
+        padding: EdgeInsets.all(8.0),
+        child: Center(child: CircularProgressIndicator()),
+      );
     }
     if (state.branches.isEmpty) {
-      return Text('No branches found. Create a branch first.', style: TextStyle(color: Theme.of(context).colorScheme.error));
+      return Text(
+        'No branches found. Create a branch first.',
+        style: TextStyle(color: cs.error),
+      );
     }
+    
+    // Ensure selected branch exists in the list
+    if (_selectedBranchId != null && !state.branches.any((b) => b.id == _selectedBranchId)) {
+      _selectedBranchId = null;
+    }
+
     return DropdownButtonFormField<String>(
       value: _selectedBranchId,
-      decoration: const InputDecoration(labelText: 'Branch'),
+      decoration: InputDecoration(
+        labelText: 'Branch (Optional)',
+        border: OutlineInputBorder(borderRadius: AppBorders.sm),
+        filled: true,
+        fillColor: cs.surfaceContainerLowest,
+      ),
       hint: const Text('Select branch'),
-      items: state.branches.map((b) => DropdownMenuItem(value: b.id, child: Text(b.displayName))).toList(),
-      onChanged: (value) => setState(() => _selectedBranchId = value),
-      validator: (v) => v == null ? 'Required' : null,
+      items: [
+        const DropdownMenuItem<String>(value: null, child: Text('None (Brand Level)')),
+        ...state.branches.map((b) => DropdownMenuItem(value: b.id, child: Text(b.displayName))),
+      ],
+      onChanged: _isEditing ? null : (value) => setState(() => _selectedBranchId = value),
+    );
+  }
+
+  /// Build the permissions section with categorized checkboxes.
+  Widget _buildPermissionsSection() {
+    final cs = Theme.of(context).colorScheme;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Header with select all / deselect all
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              'Permissions',
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+            ),
+            Row(
+              children: [
+                TextButton(
+                  onPressed: () {
+                    setState(() {
+                      _selectedPermissions = List<String>.from(_allPermissions);
+                    });
+                  },
+                  child: const Text('Select All'),
+                ),
+                TextButton(
+                  onPressed: () {
+                    setState(() {
+                      _selectedPermissions = [];
+                    });
+                  },
+                  child: const Text('Clear All'),
+                ),
+              ],
+            ),
+          ],
+        ),
+        SizedBox(height: AppSpacing.sm),
+        Text(
+          '${_selectedPermissions.length} of ${_allPermissions.length} selected',
+          style: Theme.of(context).textTheme.bodySmall?.copyWith(color: cs.outline),
+        ),
+        SizedBox(height: AppSpacing.md),
+
+        // Permission groups
+        ..._permissionGroups.entries.map((entry) {
+          final groupName = entry.key;
+          final groupPerms = entry.value;
+          final allSelected = groupPerms.every((p) => _selectedPermissions.contains(p));
+          final someSelected = groupPerms.any((p) => _selectedPermissions.contains(p));
+
+          return Card(
+            margin: EdgeInsets.only(bottom: AppSpacing.md),
+            shape: RoundedRectangleBorder(
+              borderRadius: AppBorders.lg,
+              side: BorderSide(color: cs.outlineVariant.withOpacity(0.4)),
+            ),
+            elevation: 0,
+            clipBehavior: Clip.antiAlias,
+            child: Theme(
+              data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+              child: ExpansionTile(
+                backgroundColor: cs.surfaceContainerLowest,
+                collapsedBackgroundColor: cs.surface,
+                leading: Checkbox(
+                  value: allSelected
+                      ? true
+                      : someSelected
+                          ? null
+                          : false,
+                  tristate: true,
+                  onChanged: (value) {
+                    setState(() {
+                      if (allSelected) {
+                        _selectedPermissions.removeWhere((p) => groupPerms.contains(p));
+                      } else {
+                        for (final p in groupPerms) {
+                          if (!_selectedPermissions.contains(p)) {
+                            _selectedPermissions.add(p);
+                          }
+                        }
+                      }
+                    });
+                  },
+                ),
+                title: Text(
+                  groupName,
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                ),
+                subtitle: Text(
+                  '${groupPerms.where((p) => _selectedPermissions.contains(p)).length} of ${groupPerms.length} assigned',
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(color: cs.outline),
+                ),
+                children: [
+                  Container(
+                    color: cs.surface,
+                    padding: EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.sm),
+                    child: Wrap(
+                      spacing: AppSpacing.sm,
+                      runSpacing: AppSpacing.xs,
+                      children: groupPerms.map((perm) {
+                        final isSelected = _selectedPermissions.contains(perm);
+                        final displayName = perm.replaceAll('_', ' ').toLowerCase().split(' ').map((word) {
+                          return word[0].toUpperCase() + word.substring(1);
+                        }).join(' ');
+
+                        return FilterChip(
+                          selected: isSelected,
+                          label: Text(displayName, style: TextStyle(fontSize: 13)),
+                          onSelected: (selected) {
+                            setState(() {
+                              if (selected) {
+                                _selectedPermissions.add(perm);
+                              } else {
+                                _selectedPermissions.remove(perm);
+                              }
+                            });
+                          },
+                          backgroundColor: cs.surfaceContainerHigh,
+                          selectedColor: cs.primaryContainer,
+                          checkmarkColor: cs.onPrimaryContainer,
+                          shape: RoundedRectangleBorder(borderRadius: AppBorders.sm),
+                        );
+                      }).toList(),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        }),
+      ],
     );
   }
 
   void _submitForm() {
-    if (!(_formKey.currentState?.validate() ?? false)) {
-      _tabController.animateTo(0);
+    if (!_isEditing && !(_formKey.currentState?.validate() ?? false)) {
       return;
     }
 
-    final data = {
-      'firstName': _firstNameCtrl.text,
-      'lastName': _lastNameCtrl.text,
-      'email': _emailCtrl.text,
-      'phoneNumber': _phoneCtrl.text,
-      'username': _emailCtrl.text.split('@').first,
-      'role': _selectedRole,
-      'userType': 'BRAND',
-      'brandId': widget.brandId,
-      if (!_isEditing) 'loginPin': _pinCtrl.text,
-      if (!_isEditing && _selectedBranchId != null) 'branchId': _selectedBranchId,
-      
-      'userDetails': {
-        'employeeId': _employeeIdCtrl.text,
-        'department': _departmentCtrl.text,
-        'designation': _designationCtrl.text,
-        'shift': _shiftCtrl.text,
-        'joinDate': _joinDateCtrl.text,
-        'dateOfBirth': _dobCtrl.text,
-        'gender': _genderCtrl.text,
-        'fatherName': _fatherNameCtrl.text,
-        'address': {
-          'street': _streetCtrl.text,
-          'city': _cityCtrl.text,
-          'state': _stateCtrl.text,
-          'postalCode': _postalCodeCtrl.text,
-          'country': _countryCtrl.text,
-        },
-        'emergencyContact': {
-          'name': _emNameCtrl.text,
-          'relationship': _emRelCtrl.text,
-          'phone': _emPhoneCtrl.text,
-        },
-        'bankDetails': {
-          'bankName': _bankNameCtrl.text,
-          'accountHolderName': _accountNameCtrl.text,
-          'accountNumber': _accountNumCtrl.text,
-          'ifscCode': _ifscCtrl.text,
-          'branchName': _branchNameCtrl.text,
-        }
-      }
-    };
+    setState(() => _submitting = true);
 
     if (_isEditing) {
+      // The update API only takes permissions
+      final data = {
+        'permissions': _selectedPermissions,
+      };
       context.read<CubitUser>().updateUser(widget.userId!, data);
-      showToast(context, message: 'User updated successfully', status: 'success');
-      context.go('/brands/${widget.brandId}/users/${widget.userId}');
     } else {
+      // Create user sends all fields
+      final data = {
+        'brandId': widget.brandId,
+        'branchId': _selectedBranchId,
+        'userType': _selectedUserType,
+        'role': _selectedRole,
+        'firstName': _firstNameCtrl.text,
+        'lastName': _lastNameCtrl.text,
+        'username': _usernameCtrl.text,
+        if (_pinCtrl.text.isNotEmpty) 'loginPin': _pinCtrl.text,
+        'email': _emailCtrl.text,
+        'phoneNumber': _phoneCtrl.text,
+        'permissions': _selectedPermissions,
+      };
       context.read<CubitUser>().createUser(data);
-      showToast(context, message: 'User created successfully', status: 'success');
-      context.go('/brands/${widget.brandId}/users');
     }
+    // Navigation is handled in BlocConsumer listener after API responds
   }
 }
