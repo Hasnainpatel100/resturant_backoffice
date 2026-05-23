@@ -7,8 +7,8 @@ abstract class MenuRepository {
   FutureEither<ListResponse<CategoryModel>> createCategories(String brandId, List<Map<String, dynamic>> data);
   FutureEither<ListResponse<CategoryModel>> getCategories(String brandId, String branchId, {int page = 1, int limit = 20});
   FutureEither<CategoryModel> getCategory(String categoryId);
-  FutureEither<CategoryModel> updateCategory(String categoryId, Map<String, dynamic> data);
-  FutureEither<void> deleteCategory(String categoryId);
+  FutureEither<CategoryModel> updateCategory(String brandId,String categoryId,Map<String, dynamic> data);
+  FutureEither<void> deleteCategory(String brandId,String categoryId);
 
   // Menu Items
   FutureEither<ListResponse<MenuItemResponse>> createMenuItems(String brandId, List<Map<String, dynamic>> data);

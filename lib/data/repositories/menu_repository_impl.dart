@@ -61,24 +61,46 @@ class MenuRepositoryImpl implements MenuRepository {
   }
 
   @override
+  @override
   FutureEither<CategoryModel> updateCategory(
-    String categoryId,
-    Map<String, dynamic> data,
-  ) async {
+      String brandId,
+      String categoryId,
+      Map<String, dynamic> data,
+      ) async {
+
     return runTask(() async {
-      final response = await AppConfig.dio.put<Map<String, dynamic>>(
+
+      final response =
+      await AppConfig.dio.put<Map<String, dynamic>>(
+
         '/api/menu/categories/$categoryId',
-        data: data,
+
+        data: {
+          'brandId': brandId,
+          ...data,
+        },
       );
-      final responseData = response.data!['data'] as Map<String, dynamic>;
+
+      final responseData =
+      response.data!['data'] as Map<String, dynamic>;
+
       return CategoryModel.fromJson(responseData);
+
     }, requiresNetwork: true);
   }
 
   @override
-  FutureEither<void> deleteCategory(String categoryId) async {
+  FutureEither<void> deleteCategory(
+      String brandId,
+      String categoryId,
+      ) async {
     return runTask(() async {
-      await AppConfig.dio.delete<void>('/api/menu/categories/$categoryId');
+      await AppConfig.dio.delete<void>(
+        '/api/menu/categories/$categoryId',
+        queryParameters: {
+          'brandId': brandId,
+        },
+      );
     }, requiresNetwork: true);
   }
 
