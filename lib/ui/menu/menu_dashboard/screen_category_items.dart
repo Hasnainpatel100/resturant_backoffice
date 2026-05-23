@@ -178,7 +178,7 @@ class _ScreenCategoryItemsState extends State<ScreenCategoryItems> {
             ),
             onPressed: () {
               Navigator.pop(ctx);
-              _cubit.deleteMenuItem(item.id);
+              _cubit.deleteMenuItem(item.id, widget.brandId);
             },
             child: const Text('Delete'),
           ),
@@ -857,7 +857,16 @@ class _MenuItemFormSheetState extends State<_MenuItemFormSheet> {
           : '',
     );
     _orderCtrl = TextEditingController();
-    _isVeg = true; // default veg; could be derived from e.foodType
+    if (e != null) {
+      final t = e.foodType.toUpperCase();
+      if (t.contains('NON')) {
+        _isVeg = false;
+      } else {
+        _isVeg = t.contains('VEG') || t.isEmpty;
+      }
+    } else {
+      _isVeg = true;
+    }
     _isAvailable = e?.isAvailable ?? true;
   }
 
@@ -882,10 +891,12 @@ class _MenuItemFormSheetState extends State<_MenuItemFormSheet> {
     if (_isEditMode) {
       // ── EDIT ──
       cubit.updateMenuItem(widget.existingItem!.id, {
+        'brandId': widget.brandId,
         'name': _nameCtrl.text.trim(),
         'description': _descCtrl.text.trim(),
-        'basePrice': price,
+        'price': price,
         'isVeg': _isVeg,
+        'foodType': _isVeg ? 'VEG' : 'NON_VEG',
         'isAvailable': _isAvailable,
         if (_orderCtrl.text.trim().isNotEmpty) 'displayOrder': order,
       });
@@ -902,8 +913,9 @@ class _MenuItemFormSheetState extends State<_MenuItemFormSheet> {
           'name': _nameCtrl.text.trim(),
           'code': _codeCtrl.text.trim(),
           'description': _descCtrl.text.trim(),
-          'basePrice': price,
+          'price': price,
           'isVeg': _isVeg,
+          'foodType': _isVeg ? 'VEG' : 'NON_VEG',
           'isAvailable': _isAvailable,
           'displayOrder': order,
         }

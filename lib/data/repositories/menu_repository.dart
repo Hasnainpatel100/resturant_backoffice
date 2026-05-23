@@ -16,5 +16,5 @@ abstract class MenuRepository {
   FutureEither<MenuItemResponse> getMenuItem(String itemId);
   FutureEither<MenuItemResponse> updateMenuItem(String itemId, Map<String, dynamic> data);
   FutureEither<MenuItemResponse> toggleAvailability(String itemId, Map<String, dynamic> data);
-  FutureEither<void> deleteMenuItem(String itemId);
+  FutureEither<void> deleteMenuItem(String itemId, String brandId);
 }

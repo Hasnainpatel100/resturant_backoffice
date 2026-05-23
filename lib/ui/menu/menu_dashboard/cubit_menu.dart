@@ -245,9 +245,9 @@ class CubitMenu extends Cubit<StateMenu> {
     );
   }
 
-  Future<void> deleteMenuItem(String itemId) async {
+  Future<void> deleteMenuItem(String itemId, String brandId) async {
     emit(state.copyWith(status: MenuStatus.loading));
-    final result = await _repository.deleteMenuItem(itemId);
+    final result = await _repository.deleteMenuItem(itemId, brandId);
     result.fold(
           (failure) => emit(
         state.copyWith(

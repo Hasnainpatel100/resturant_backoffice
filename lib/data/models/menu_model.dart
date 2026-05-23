@@ -117,7 +117,7 @@ class MenuItemResponse extends Equatable {
       categoryId: json['categoryId'] as String? ?? '',
       name: json['name'] as String? ?? '',
       description: json['description'] as String?,
-      basePrice: (json['basePrice'] as num?)?.toDouble() ?? 0.0,
+      basePrice: (json['basePrice'] as num?)?.toDouble() ?? (json['price'] as num?)?.toDouble() ?? 0.0,
       currency: json['currency'] as String? ?? 'INR',
       sizePrices: (json['sizePrices'] as List<dynamic>?)?.map((e) => SizePrice.fromJson(e)).toList() ?? [],
       allergenInfo: (json['allergenInfo'] as List<dynamic>?)?.cast<String>() ?? [],
