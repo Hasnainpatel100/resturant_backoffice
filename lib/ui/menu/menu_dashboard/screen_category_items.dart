@@ -105,39 +105,53 @@ class _ScreenCategoryItemsState extends State<ScreenCategoryItems> {
   // ── Sheet / dialog helpers ─────────────────────────────────────────────────
 
   void _openAddItemSheet() {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      useSafeArea: true,
-      backgroundColor: Colors.transparent,
-      builder: (_) => BlocProvider.value(
+    final parentContext = context;
+    showDialog(
+      context: parentContext,
+      barrierColor: Colors.black54,
+      builder: (dialogContext) => BlocProvider.value(
         value: _cubit,
-        child: _MenuItemFormSheet(
-          brandId: widget.brandId,
-          branchId: widget.branchId,
-          categoryId: widget.categoryId,
-          onSuccess: () => _showSuccess('Item added successfully'),
-          onError: _showErrorSnack,
+        child: Dialog(
+          insetPadding: EdgeInsets.zero,
+          backgroundColor: Colors.transparent,
+          alignment: Alignment.bottomCenter,
+          child: _MenuItemFormSheet(
+            brandId: widget.brandId,
+            branchId: widget.branchId,
+            categoryId: widget.categoryId,
+            onSuccess: () {
+              Navigator.of(dialogContext).pop();
+              _showSuccess('Item added successfully');
+            },
+            onError: _showErrorSnack,
+          ),
         ),
       ),
     );
   }
 
   void _openEditItemSheet(MenuItemResponse item) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      useSafeArea: true,
-      backgroundColor: Colors.transparent,
-      builder: (_) => BlocProvider.value(
+    final parentContext = context;
+    showDialog(
+      context: parentContext,
+      barrierColor: Colors.black54,
+      builder: (dialogContext) => BlocProvider.value(
         value: _cubit,
-        child: _MenuItemFormSheet(
-          brandId: widget.brandId,
-          branchId: widget.branchId,
-          categoryId: widget.categoryId,
-          existingItem: item,
-          onSuccess: () => _showSuccess('Item updated successfully'),
-          onError: _showErrorSnack,
+        child: Dialog(
+          insetPadding: EdgeInsets.zero,
+          backgroundColor: Colors.transparent,
+          alignment: Alignment.bottomCenter,
+          child: _MenuItemFormSheet(
+            brandId: widget.brandId,
+            branchId: widget.branchId,
+            categoryId: widget.categoryId,
+            existingItem: item,
+            onSuccess: () {
+              Navigator.of(dialogContext).pop();
+              _showSuccess('Item updated successfully');
+            },
+            onError: _showErrorSnack,
+          ),
         ),
       ),
     );
@@ -886,6 +900,7 @@ class _MenuItemFormSheetState extends State<_MenuItemFormSheet> {
 
     final cubit = context.read<CubitMenu>();
     final price = double.parse(_priceCtrl.text.trim());
+    final desc = _descCtrl.text.trim();
     final order = int.tryParse(_orderCtrl.text.trim()) ?? 0;
 
     if (_isEditMode) {
@@ -893,8 +908,8 @@ class _MenuItemFormSheetState extends State<_MenuItemFormSheet> {
       cubit.updateMenuItem(widget.existingItem!.id, {
         'brandId': widget.brandId,
         'name': _nameCtrl.text.trim(),
-        'description': _descCtrl.text.trim(),
-        'price': price,
+        if (desc.isNotEmpty) 'description': desc,
+        'basePrice': price,           // ← correct field name
         'isVeg': _isVeg,
         'foodType': _isVeg ? 'VEG' : 'NON_VEG',
         'isAvailable': _isAvailable,
@@ -902,9 +917,6 @@ class _MenuItemFormSheetState extends State<_MenuItemFormSheet> {
       });
     } else {
       // ── CREATE ──
-      // Payload matches the documented structure:
-      // { brandId, branchId, categoryId, name, code, description,
-      //   price → basePrice, isVeg, isAvailable, displayOrder }
       cubit.createMenuItems(widget.brandId, [
         {
           'brandId': widget.brandId,
@@ -912,8 +924,8 @@ class _MenuItemFormSheetState extends State<_MenuItemFormSheet> {
           'categoryId': widget.categoryId,
           'name': _nameCtrl.text.trim(),
           'code': _codeCtrl.text.trim(),
-          'description': _descCtrl.text.trim(),
-          'price': price,
+          if (desc.isNotEmpty) 'description': desc,
+          'basePrice': price,         // ← correct field name
           'isVeg': _isVeg,
           'foodType': _isVeg ? 'VEG' : 'NON_VEG',
           'isAvailable': _isAvailable,
@@ -935,8 +947,7 @@ class _MenuItemFormSheetState extends State<_MenuItemFormSheet> {
       listener: (context, state) {
         if (!_submitted) return; // only react to our own submit
         if (state.status == MenuStatus.loaded) {
-          Navigator.pop(context);
-          widget.onSuccess();
+          widget.onSuccess(); // parent already pops the dialog
         } else if (state.status == MenuStatus.error) {
           setState(() => _submitted = false);
           widget.onError(state.errorMessage ?? 'An error occurred');
