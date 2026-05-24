@@ -6,7 +6,7 @@ class CategoryModel extends Equatable {
   final String? parentId;
   final String name;
   final String? description;
-  final int sortOrder;
+  final int displayOrder;
   final String imageUrl;
   final bool isActive;
   final int createdAt;
@@ -20,7 +20,7 @@ class CategoryModel extends Equatable {
     this.parentId,
     required this.name,
     this.description,
-    this.sortOrder = 0,
+    this.displayOrder = 0,
     this.imageUrl = '',
     this.isActive = true,
     required this.createdAt,
@@ -36,7 +36,7 @@ class CategoryModel extends Equatable {
       parentId: json['parentId'] as String?,
       name: json['name'] as String? ?? '',
       description: json['description'] as String?,
-      sortOrder: json['sortOrder'] as int? ?? 0,
+      displayOrder: json['displayOrder'] as int? ?? 0,
       imageUrl: json['imageUrl'] as String? ?? '',
       isActive: json['isActive'] as bool? ?? true,
       createdAt: json['createdAt'] as int? ?? 0,
@@ -52,7 +52,7 @@ class CategoryModel extends Equatable {
         'parentId': parentId,
         'name': name,
         'description': description,
-        'sortOrder': sortOrder,
+        'displayOrder': displayOrder,
         'imageUrl': imageUrl,
         'isActive': isActive,
         'createdAt': createdAt,
@@ -62,7 +62,7 @@ class CategoryModel extends Equatable {
       };
 
   @override
-  List<Object?> get props => [id, brandId, name, sortOrder, isActive];
+  List<Object?> get props => [id, brandId, name, displayOrder, isActive];
 }
 
 class MenuItemResponse extends Equatable {
@@ -117,7 +117,7 @@ class MenuItemResponse extends Equatable {
       categoryId: json['categoryId'] as String? ?? '',
       name: json['name'] as String? ?? '',
       description: json['description'] as String?,
-      basePrice: (json['basePrice'] as num?)?.toDouble() ?? 0.0,
+      basePrice: (json['basePrice'] as num?)?.toDouble() ?? (json['price'] as num?)?.toDouble() ?? 0.0,
       currency: json['currency'] as String? ?? 'INR',
       sizePrices: (json['sizePrices'] as List<dynamic>?)?.map((e) => SizePrice.fromJson(e)).toList() ?? [],
       allergenInfo: (json['allergenInfo'] as List<dynamic>?)?.cast<String>() ?? [],

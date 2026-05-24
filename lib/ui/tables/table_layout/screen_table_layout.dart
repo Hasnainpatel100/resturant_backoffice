@@ -12,6 +12,12 @@ import 'package:back_office/ui/branch/branch_list/state_branch.dart';
 
 import '../../../data/models/room_type_model.dart';
 import '../../../data/repositories/room_type_repository_impl.dart';
+import '../../../services/table_import_service.dart';
+
+// Import / Export services (created alongside this file)
+// ---------------------------------------------------------------------------
+// ScreenTableLayout
+// ---------------------------------------------------------------------------
 
 class ScreenTableLayout extends StatefulWidget {
   final String brandId;
@@ -29,6 +35,14 @@ class _ScreenTableLayoutState extends State<ScreenTableLayout> {
   bool _roomTypesLoading = false;
   CubitTable? _cubitTable;
 
+  // Services
+  final _importService = TableImportService();
+  final _exportService = TableExportService();
+
+  // Loading state flags for button indicators
+  bool _isImporting = false;
+  bool _isDownloading = false;
+
   void _initTableCubit(String branchId) {
     _cubitTable?.close();
     _cubitTable = CubitTable(repository: TableRepositoryImpl())
@@ -41,9 +55,6 @@ class _ScreenTableLayoutState extends State<ScreenTableLayout> {
     if (_selectedBranchId != null) {
       _cubitTable = CubitTable(repository: TableRepositoryImpl())
         ..loadTables(widget.brandId, _selectedBranchId!);
-      // ✅ FIX: Load room types on init when branchId is pre-provided.
-      // Previously _loadRoomTypes() was only called on branch selection,
-      // so the dropdown was always empty if branchId came from route params.
       _loadRoomTypes();
     }
   }
@@ -54,37 +65,11 @@ class _ScreenTableLayoutState extends State<ScreenTableLayout> {
     super.dispose();
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return MultiBlocProvider(
-      providers: [
-        BlocProvider(
-          create: (context) =>
-          CubitBranch(repository: BranchRepositoryImpl())
-            ..loadBranches(widget.brandId),
-        ),
-        if (_cubitTable != null)
-          BlocProvider<CubitTable>.value(value: _cubitTable!),
-      ],
-      child: _TableLayoutBody(
-        brandId: widget.brandId,
-        selectedBranchId: _selectedBranchId,
-        hasCubitTable: _cubitTable != null,
-        onBranchSelected: (branchId) {
-          setState(() {
-            _selectedBranchId = branchId;
-            _initTableCubit(branchId);
-          });
-          _loadRoomTypes();
-        },
-        onAddTable: _showAddTableDialog,
-      ),
-    );
-  }
+  // ── Room types ─────────────────────────────────────────────────────────────
 
   Future<void> _loadRoomTypes() async {
     if (_selectedBranchId == null) return;
-    if (_roomTypes.isNotEmpty) return; // Cache: skip if already loaded
+    if (_roomTypes.isNotEmpty) return;
 
     setState(() => _roomTypesLoading = true);
 
@@ -93,7 +78,8 @@ class _ScreenTableLayoutState extends State<ScreenTableLayout> {
 
     result.fold(
           (failure) {
-        debugPrint("RoomType load error: ${failure.message}");
+        debugPrint('RoomType load error: ${failure.message}');
+        setState(() => _roomTypesLoading = false);
       },
           (response) {
         setState(() {
@@ -104,25 +90,96 @@ class _ScreenTableLayoutState extends State<ScreenTableLayout> {
     );
   }
 
-  void _showAddTableDialog(BuildContext context) {
+  // ── Upload (Import) ────────────────────────────────────────────────────────
+
+  Future<void> _handleUpload(BuildContext context) async {
     if (_selectedBranchId == null) {
-      showDialog(
-        context: context,
-        builder: (dialogContext) => AlertDialog(
-          title: const Text('Branch Required'),
-          content: const Text('Please select a branch before adding tables.'),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(dialogContext),
-              child: const Text('OK'),
-            ),
-          ],
-        ),
-      );
+      _showBranchRequired(context);
       return;
     }
 
-    // Controllers
+    setState(() => _isImporting = true);
+
+    TableImportResult? result;
+    try {
+      result = await _importService.pickAndParse();
+    } finally {
+      if (mounted) setState(() => _isImporting = false);
+    }
+
+    if (result == null || !mounted) return; // user cancelled
+
+    // Show preview dialog
+    await showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => ImportPreviewDialog(
+        result: result!,
+        onConfirm: () => _submitImport(context, result!),
+      ),
+    );
+  }
+
+  void _submitImport(BuildContext context, TableImportResult result) {
+    if (_cubitTable == null) return;
+
+    final rows = result.rows
+        .map((r) => r.toApiMap(
+      brandId: widget.brandId,
+      branchId: _selectedBranchId!,
+    ))
+        .toList();
+
+    _cubitTable!.createTables(widget.brandId, rows);
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          '${result.rows.length} table${result.rows.length == 1 ? '' : 's'} imported successfully.',
+        ),
+        behavior: SnackBarBehavior.floating,
+        backgroundColor: Colors.green.shade700,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+      ),
+    );
+  }
+
+  // ── Download Format ────────────────────────────────────────────────────────
+
+  Future<void> _handleDownloadFormat(BuildContext context) async {
+    setState(() => _isDownloading = true);
+
+    bool success = false;
+    try {
+      success = await _exportService.downloadTemplate();
+    } finally {
+      if (mounted) setState(() => _isDownloading = false);
+    }
+
+    if (!mounted) return;
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          success
+              ? 'Template downloaded to your Downloads folder.'
+              : 'Download failed. Please try again.',
+        ),
+        behavior: SnackBarBehavior.floating,
+        backgroundColor: success ? Colors.green.shade700 : Colors.red.shade700,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+      ),
+    );
+  }
+
+  // ── Add Table dialog ───────────────────────────────────────────────────────
+
+  void _showAddTableDialog(BuildContext context) {
+    if (_selectedBranchId == null) {
+      _showBranchRequired(context);
+      return;
+    }
+
     final tableNumberController = TextEditingController();
     final displayNameController = TextEditingController();
     final capacityController = TextEditingController(text: '4');
@@ -135,23 +192,24 @@ class _ScreenTableLayoutState extends State<ScreenTableLayout> {
       builder: (dialogContext) => StatefulBuilder(
         builder: (ctx, setDialogState) {
           return AlertDialog(
+            shape:
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
             title: const Text('Add Table'),
             content: SingleChildScrollView(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // ✅ BULK TOGGLE
+                  // Bulk toggle
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text(
-                        'Bulk Add',
-                        style: TextStyle(fontWeight: FontWeight.w600),
-                      ),
+                      const Text('Bulk Add',
+                          style: TextStyle(fontWeight: FontWeight.w600)),
                       Switch(
                         value: isBulk,
-                        onChanged: (val) => setDialogState(() => isBulk = val),
+                        onChanged: (val) =>
+                            setDialogState(() => isBulk = val),
                       ),
                     ],
                   ),
@@ -159,7 +217,6 @@ class _ScreenTableLayoutState extends State<ScreenTableLayout> {
                   const SizedBox(height: 8),
 
                   if (!isBulk) ...[
-                    // ── SINGLE MODE ──
                     TextField(
                       controller: tableNumberController,
                       decoration: const InputDecoration(
@@ -178,7 +235,6 @@ class _ScreenTableLayoutState extends State<ScreenTableLayout> {
                       ),
                     ),
                   ] else ...[
-                    // ── BULK MODE ──
                     TextField(
                       controller: tableNumberController,
                       decoration: const InputDecoration(
@@ -201,7 +257,6 @@ class _ScreenTableLayoutState extends State<ScreenTableLayout> {
 
                   const SizedBox(height: 12),
 
-                  // ── SHARED FIELDS ──
                   TextField(
                     controller: capacityController,
                     decoration: const InputDecoration(
@@ -218,26 +273,23 @@ class _ScreenTableLayoutState extends State<ScreenTableLayout> {
                       labelText: 'Room Type *',
                       border: OutlineInputBorder(),
                     ),
-                    initialValue: selectedRoomTypeId,
+                    value: selectedRoomTypeId,
                     items: _roomTypes.map((room) {
                       return DropdownMenuItem(
-                        value: room.id,
-                        child: Text(room.name),
-                      );
+                          value: room.id, child: Text(room.name));
                     }).toList(),
-                    onChanged: (value) {
-                      setDialogState(() => selectedRoomTypeId = value);
-                    },
+                    onChanged: (value) =>
+                        setDialogState(() => selectedRoomTypeId = value),
                   ),
 
-                  // Loading / hint when no room types
                   if (_roomTypesLoading)
                     const Padding(
                       padding: EdgeInsets.only(top: 6),
                       child: SizedBox(
                         width: 16,
                         height: 16,
-                        child: CircularProgressIndicator(strokeWidth: 2),
+                        child:
+                        CircularProgressIndicator(strokeWidth: 2),
                       ),
                     )
                   else if (_roomTypes.isEmpty)
@@ -245,7 +297,8 @@ class _ScreenTableLayoutState extends State<ScreenTableLayout> {
                       padding: EdgeInsets.only(top: 6),
                       child: Text(
                         'No room types found. Please add a room type first.',
-                        style: TextStyle(fontSize: 11, color: Colors.orange),
+                        style:
+                        TextStyle(fontSize: 11, color: Colors.orange),
                       ),
                     ),
                 ],
@@ -259,13 +312,14 @@ class _ScreenTableLayoutState extends State<ScreenTableLayout> {
               ElevatedButton(
                 onPressed: () {
                   final prefix = tableNumberController.text.trim();
-                  final capacity = int.tryParse(capacityController.text) ?? 4;
+                  final capacity =
+                      int.tryParse(capacityController.text) ?? 4;
 
-                  // Validation
                   if (prefix.isEmpty || selectedRoomTypeId == null) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
-                        content: Text('Table number and room type are required.'),
+                        content: Text(
+                            'Table number and room type are required.'),
                       ),
                     );
                     return;
@@ -274,22 +328,28 @@ class _ScreenTableLayoutState extends State<ScreenTableLayout> {
                   List<Map<String, dynamic>> tables;
 
                   if (isBulk) {
-                    final count = int.tryParse(bulkCountController.text) ?? 1;
+                    final count =
+                        int.tryParse(bulkCountController.text) ?? 1;
                     if (count < 1) return;
-                    // ✅ Generates: T1, T2, T3... with all required fields
-                    tables = List.generate(count, (i) => {
-                      'tableNumber': '$prefix${i + 1}',
-                      'displayName': '$prefix${i + 1}',
-                      'capacity': capacity,
-                      'branchId': _selectedBranchId,
-                      'roomTypeId': selectedRoomTypeId,
-                    });
+                    tables = List.generate(
+                      count,
+                          (i) => {
+                        'tableNumber': '$prefix${i + 1}',
+                        'displayName': '$prefix${i + 1}',
+                        'capacity': capacity,
+                        'branchId': _selectedBranchId,
+                        'roomTypeId': selectedRoomTypeId,
+                      },
+                    );
                   } else {
-                    final displayName = displayNameController.text.trim();
+                    final displayName =
+                    displayNameController.text.trim();
                     tables = [
                       {
                         'tableNumber': prefix,
-                        'displayName': displayName.isNotEmpty ? displayName : prefix,
+                        'displayName': displayName.isNotEmpty
+                            ? displayName
+                            : prefix,
                         'capacity': capacity,
                         'branchId': _selectedBranchId,
                         'roomTypeId': selectedRoomTypeId,
@@ -308,23 +368,87 @@ class _ScreenTableLayoutState extends State<ScreenTableLayout> {
       ),
     );
   }
+
+  // ── Helper dialogs ─────────────────────────────────────────────────────────
+
+  void _showBranchRequired(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        shape:
+        RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: const Text('Branch Required'),
+        content:
+        const Text('Please select a branch before managing tables.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ── Build ──────────────────────────────────────────────────────────────────
+
+  @override
+  Widget build(BuildContext context) {
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(
+          create: (_) => CubitBranch(repository: BranchRepositoryImpl())
+            ..loadBranches(widget.brandId),
+        ),
+        if (_cubitTable != null)
+          BlocProvider<CubitTable>.value(value: _cubitTable!),
+      ],
+      child: _TableLayoutBody(
+        brandId: widget.brandId,
+        selectedBranchId: _selectedBranchId,
+        hasCubitTable: _cubitTable != null,
+        isImporting: _isImporting,
+        isDownloading: _isDownloading,
+        onBranchSelected: (branchId) {
+          setState(() {
+            _selectedBranchId = branchId;
+            _initTableCubit(branchId);
+          });
+          _loadRoomTypes();
+        },
+        onAddTable: _showAddTableDialog,
+        onUpload: _handleUpload,
+        onDownloadFormat: _handleDownloadFormat,
+      ),
+    );
+  }
 }
 
+// ---------------------------------------------------------------------------
+// _TableLayoutBody
 // ---------------------------------------------------------------------------
 
 class _TableLayoutBody extends StatelessWidget {
   final String brandId;
   final String? selectedBranchId;
   final bool hasCubitTable;
+  final bool isImporting;
+  final bool isDownloading;
   final ValueChanged<String> onBranchSelected;
   final void Function(BuildContext context) onAddTable;
+  final void Function(BuildContext context) onUpload;
+  final void Function(BuildContext context) onDownloadFormat;
 
   const _TableLayoutBody({
     required this.brandId,
     this.selectedBranchId,
     required this.hasCubitTable,
+    required this.isImporting,
+    required this.isDownloading,
     required this.onBranchSelected,
     required this.onAddTable,
+    required this.onUpload,
+    required this.onDownloadFormat,
   });
 
   @override
@@ -337,12 +461,61 @@ class _TableLayoutBody extends StatelessWidget {
           onPressed: () => context.go('/brands/$brandId'),
         ),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.add),
-            onPressed: () => onAddTable(context),
+          // ── Upload button ─────────────────────────────────────────────────
+          Tooltip(
+            message: 'Bulk import tables from Excel or CSV',
+            child: _HeaderButton(
+              label: 'Upload',
+              icon: isImporting
+                  ? const SizedBox(
+                width: 16,
+                height: 16,
+                child: CircularProgressIndicator(
+                    strokeWidth: 2, color: Colors.blueGrey),
+              )
+                  : const Icon(Icons.upload_file_outlined, size: 18),
+              outlined: true,
+              disabled: isImporting,
+              onPressed: () => onUpload(context),
+            ),
           ),
+          const SizedBox(width: 8),
+
+          // ── Download Format button ────────────────────────────────────────
+          Tooltip(
+            message: 'Download Excel import template',
+            child: _HeaderButton(
+              label: 'Download Format',
+              icon: isDownloading
+                  ? const SizedBox(
+                width: 16,
+                height: 16,
+                child: CircularProgressIndicator(
+                    strokeWidth: 2, color: Colors.blueGrey),
+              )
+                  : const Icon(Icons.download_outlined, size: 18),
+              outlined: true,
+              disabled: isDownloading,
+              onPressed: () => onDownloadFormat(context),
+            ),
+          ),
+          const SizedBox(width: 8),
+
+          // ── Add Table button (primary / filled) ───────────────────────────
+          Tooltip(
+            message: 'Add a new table',
+            child: _HeaderButton(
+              label: 'Add Table',
+              icon: const Icon(Icons.add_rounded, size: 18),
+              outlined: false,
+              onPressed: () => onAddTable(context),
+            ),
+          ),
+          const SizedBox(width: 12),
         ],
       ),
+
+      // ── Body ───────────────────────────────────────────────────────────────
       body: Column(
         children: [
           if (selectedBranchId == null)
@@ -351,7 +524,8 @@ class _TableLayoutBody extends StatelessWidget {
               child: BlocBuilder<CubitBranch, StateBranch>(
                 builder: (context, branchState) {
                   if (branchState.status == BranchStatus.loading) {
-                    return const Center(child: CircularProgressIndicator());
+                    return const Center(
+                        child: CircularProgressIndicator());
                   }
                   if (branchState.branches.isEmpty) {
                     return Card(
@@ -359,16 +533,21 @@ class _TableLayoutBody extends StatelessWidget {
                         padding: EdgeInsets.all(AppSpacing.lg),
                         child: Text(
                           'No branches found',
-                          style: TextStyle(color: Theme.of(context).colorScheme.outline),
+                          style: TextStyle(
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .outline),
                         ),
                       ),
                     );
                   }
                   return DropdownButtonFormField<String>(
-                    decoration: const InputDecoration(labelText: 'Branch'),
+                    decoration:
+                    const InputDecoration(labelText: 'Branch'),
                     hint: const Text('Select branch'),
                     items: branchState.branches.map((b) {
-                      return DropdownMenuItem(value: b.id, child: Text(b.displayName));
+                      return DropdownMenuItem(
+                          value: b.id, child: Text(b.displayName));
                     }).toList(),
                     onChanged: (value) {
                       if (value != null) onBranchSelected(value);
@@ -386,14 +565,17 @@ class _TableLayoutBody extends StatelessWidget {
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          const Icon(Icons.error_outline, size: 48, color: Colors.red),
+                          const Icon(Icons.error_outline,
+                              size: 48, color: Colors.red),
                           SizedBox(height: AppSpacing.md),
-                          Text(state.errorMessage ?? 'An error occurred'),
+                          Text(state.errorMessage ??
+                              'An error occurred'),
                           SizedBox(height: AppSpacing.md),
                           ElevatedButton(
                             onPressed: () => context
                                 .read<CubitTable>()
-                                .loadTables(brandId, selectedBranchId!),
+                                .loadTables(
+                                brandId, selectedBranchId!),
                             child: const Text('Retry'),
                           ),
                         ],
@@ -402,7 +584,8 @@ class _TableLayoutBody extends StatelessWidget {
                   }
 
                   if (state.status == StateTableStatus.loading) {
-                    return const Center(child: CircularProgressIndicator());
+                    return const Center(
+                        child: CircularProgressIndicator());
                   }
 
                   if (state.tables.isEmpty) {
@@ -413,7 +596,8 @@ class _TableLayoutBody extends StatelessWidget {
                           Icon(
                             Icons.table_restaurant_outlined,
                             size: 64,
-                            color: Theme.of(context).colorScheme.outline,
+                            color:
+                            Theme.of(context).colorScheme.outline,
                           ),
                           SizedBox(height: AppSpacing.md),
                           const Text('No tables configured'),
@@ -430,8 +614,10 @@ class _TableLayoutBody extends StatelessWidget {
 
                   return GridView.builder(
                     padding: EdgeInsets.all(AppSpacing.md),
-                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: _crossAxisCount(context),
+                    gridDelegate:
+                    SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount:
+                      _crossAxisCount(context),
                       mainAxisSpacing: AppSpacing.sm,
                       crossAxisSpacing: AppSpacing.sm,
                     ),
@@ -440,8 +626,11 @@ class _TableLayoutBody extends StatelessWidget {
                       final table = state.tables[index];
                       return _TableCard(
                         table: table,
-                        onEdit: () => _showEditTableDialog(context, table),
-                        onDelete: () => context.read<CubitTable>().deleteTable(table.id),
+                        onEdit: () =>
+                            _showEditTableDialog(context, table),
+                        onDelete: () => context
+                            .read<CubitTable>()
+                            .deleteTable(table.id),
                       );
                     },
                   );
@@ -462,12 +651,16 @@ class _TableLayoutBody extends StatelessWidget {
   }
 
   void _showEditTableDialog(BuildContext context, TableModel table) {
-    final displayNameController = TextEditingController(text: table.displayName);
-    final capacityController = TextEditingController(text: table.capacity.toString());
+    final displayNameController =
+    TextEditingController(text: table.displayName);
+    final capacityController =
+    TextEditingController(text: table.capacity.toString());
 
     showDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(
+        shape:
+        RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: Text('Edit Table ${table.tableNumber}'),
         content: Column(
           mainAxisSize: MainAxisSize.min,
@@ -499,7 +692,9 @@ class _TableLayoutBody extends StatelessWidget {
             onPressed: () {
               context.read<CubitTable>().updateTable(table.id, {
                 'displayName': displayNameController.text,
-                'capacity': int.tryParse(capacityController.text) ?? table.capacity,
+                'capacity':
+                int.tryParse(capacityController.text) ??
+                    table.capacity,
                 'tableNumber': table.tableNumber,
                 'brandId': table.brandId,
                 'branchId': table.branchId,
@@ -515,6 +710,146 @@ class _TableLayoutBody extends StatelessWidget {
   }
 }
 
+// ---------------------------------------------------------------------------
+// _HeaderButton  – compact desktop-style AppBar action button
+// ---------------------------------------------------------------------------
+
+class _HeaderButton extends StatefulWidget {
+  final String label;
+  final Widget icon;
+  final bool outlined;
+  final bool disabled;
+  final VoidCallback onPressed;
+
+  const _HeaderButton({
+    required this.label,
+    required this.icon,
+    required this.outlined,
+    required this.onPressed,
+    this.disabled = false,
+  });
+
+  @override
+  State<_HeaderButton> createState() => _HeaderButtonState();
+}
+
+class _HeaderButtonState extends State<_HeaderButton> {
+  bool _hovered = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
+    // ── Outlined style (Upload / Download Format) ──────────────────────────
+    if (widget.outlined) {
+      return MouseRegion(
+        onEnter: (_) => setState(() => _hovered = true),
+        onExit: (_) => setState(() => _hovered = false),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 150),
+          decoration: BoxDecoration(
+            color: _hovered && !widget.disabled
+                ? colorScheme.surfaceContainerHighest
+                : Colors.transparent,
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(
+              color: widget.disabled
+                  ? colorScheme.outline.withOpacity(0.35)
+                  : colorScheme.outline.withOpacity(0.6),
+            ),
+          ),
+          child: InkWell(
+            onTap: widget.disabled ? null : widget.onPressed,
+            borderRadius: BorderRadius.circular(8),
+            child: Padding(
+              padding:
+              const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  IconTheme(
+                    data: IconThemeData(
+                      color: widget.disabled
+                          ? colorScheme.onSurface.withOpacity(0.38)
+                          : colorScheme.onSurface,
+                      size: 18,
+                    ),
+                    child: widget.icon,
+                  ),
+                  const SizedBox(width: 6),
+                  Text(
+                    widget.label,
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w500,
+                      color: widget.disabled
+                          ? colorScheme.onSurface.withOpacity(0.38)
+                          : colorScheme.onSurface,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      );
+    }
+
+    // ── Filled / primary style (Add Table) ────────────────────────────────
+    return MouseRegion(
+      onEnter: (_) => setState(() => _hovered = true),
+      onExit: (_) => setState(() => _hovered = false),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 150),
+        decoration: BoxDecoration(
+          color: _hovered
+              ? colorScheme.primary.withOpacity(0.88)
+              : colorScheme.primary,
+          borderRadius: BorderRadius.circular(8),
+          boxShadow: _hovered
+              ? [
+            BoxShadow(
+              color: colorScheme.primary.withOpacity(0.28),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            )
+          ]
+              : [],
+        ),
+        child: InkWell(
+          onTap: widget.disabled ? null : widget.onPressed,
+          borderRadius: BorderRadius.circular(8),
+          child: Padding(
+            padding:
+            const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                IconTheme(
+                  data: IconThemeData(
+                      color: colorScheme.onPrimary, size: 18),
+                  child: widget.icon,
+                ),
+                const SizedBox(width: 6),
+                Text(
+                  widget.label,
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    color: colorScheme.onPrimary,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// _TableCard  – unchanged from original
 // ---------------------------------------------------------------------------
 
 class _TableCard extends StatelessWidget {
@@ -552,8 +887,11 @@ class _TableCard extends StatelessWidget {
           showDialog(
             context: context,
             builder: (dialogContext) => AlertDialog(
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16)),
               title: Text('Delete Table ${table.tableNumber}?'),
-              content: const Text('This action cannot be undone.'),
+              content:
+              const Text('This action cannot be undone.'),
               actions: [
                 TextButton(
                   onPressed: () => Navigator.pop(dialogContext),
@@ -564,7 +902,8 @@ class _TableCard extends StatelessWidget {
                     Navigator.pop(dialogContext);
                     onDelete();
                   },
-                  style: TextButton.styleFrom(foregroundColor: Colors.red),
+                  style: TextButton.styleFrom(
+                      foregroundColor: Colors.red),
                   child: const Text('Delete'),
                 ),
               ],
@@ -580,10 +919,13 @@ class _TableCard extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(Icons.table_restaurant, color: statusColor, size: 24),
+              Icon(Icons.table_restaurant,
+                  color: statusColor, size: 24),
               const SizedBox(height: 4),
               Text(
-                table.displayName.isNotEmpty ? table.displayName : table.tableNumber,
+                table.displayName.isNotEmpty
+                    ? table.displayName
+                    : table.tableNumber,
                 style: Theme.of(context).textTheme.titleSmall,
                 textAlign: TextAlign.center,
                 maxLines: 2,
@@ -596,14 +938,16 @@ class _TableCard extends StatelessWidget {
               if (!table.isActive)
                 Container(
                   margin: const EdgeInsets.only(top: 2),
-                  padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 4, vertical: 1),
                   decoration: BoxDecoration(
                     color: Colors.red.withOpacity(0.15),
                     borderRadius: BorderRadius.circular(4),
                   ),
                   child: const Text(
                     'Inactive',
-                    style: TextStyle(fontSize: 9, color: Colors.red),
+                    style:
+                    TextStyle(fontSize: 9, color: Colors.red),
                   ),
                 ),
             ],
