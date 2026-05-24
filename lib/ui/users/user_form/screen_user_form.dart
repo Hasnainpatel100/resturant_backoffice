@@ -153,7 +153,6 @@ class _UserFormViewState extends State<_UserFormView> {
     _dataPopulated = true;
 
     final user = state.user!.user;
-
     _firstNameCtrl.text = user.firstName;
     _lastNameCtrl.text = user.lastName;
     _usernameCtrl.text = user.username;
