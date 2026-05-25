@@ -1,24 +1,41 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:back_office/data/repositories/menu_repository.dart';
+import 'package:back_office/data/repositories/room_type_repository.dart';
 import 'state_menu.dart';
 
 class CubitMenu extends Cubit<StateMenu> {
   final MenuRepository _repository;
+  final RoomTypeRepository _roomTypeRepository;
 
-  CubitMenu({required MenuRepository repository})
-      : _repository = repository,
+  CubitMenu({
+    required MenuRepository repository,
+    required RoomTypeRepository roomTypeRepository,
+  })  : _repository = repository,
+        _roomTypeRepository = roomTypeRepository,
         super(const StateMenu());
+
+  // ─────────────────────────────────────────────
+  // ROOM TYPES  (loaded once so the form can build dropdowns)
+  // ─────────────────────────────────────────────
+
+  Future<void> loadRoomTypes(String brandId, String branchId) async {
+    final result = await _roomTypeRepository.getRoomTypes(brandId, branchId, limit: 100);
+    result.fold(
+      (_) => null, // silently ignore – room prices are optional
+      (response) => emit(state.copyWith(roomTypes: response.items)),
+    );
+  }
 
   // ─────────────────────────────────────────────
   // CATEGORIES
   // ─────────────────────────────────────────────
 
   Future<void> loadCategories(
-      String brandId,
-      String branchId, {
-        int page = 1,
-        int limit = 20,
-      }) async {
+    String brandId,
+    String branchId, {
+    int page = 1,
+    int limit = 20,
+  }) async {
     emit(state.copyWith(status: MenuStatus.loading));
     final result = await _repository.getCategories(
       brandId,
@@ -27,13 +44,13 @@ class CubitMenu extends Cubit<StateMenu> {
       limit: limit,
     );
     result.fold(
-          (failure) => emit(
+      (failure) => emit(
         state.copyWith(
           status: MenuStatus.error,
           errorMessage: failure.message,
         ),
       ),
-          (response) => emit(
+      (response) => emit(
         state.copyWith(
           status: MenuStatus.loaded,
           categories: response.items,
@@ -45,19 +62,19 @@ class CubitMenu extends Cubit<StateMenu> {
   }
 
   Future<void> createCategories(
-      String brandId,
-      List<Map<String, dynamic>> data,
-      ) async {
+    String brandId,
+    List<Map<String, dynamic>> data,
+  ) async {
     emit(state.copyWith(status: MenuStatus.loading));
     final result = await _repository.createCategories(brandId, data);
     result.fold(
-          (failure) => emit(
+      (failure) => emit(
         state.copyWith(
           status: MenuStatus.error,
           errorMessage: failure.message,
         ),
       ),
-          (response) => emit(
+      (response) => emit(
         state.copyWith(
           status: MenuStatus.loaded,
           categories: [...state.categories, ...response.items],
@@ -69,24 +86,21 @@ class CubitMenu extends Cubit<StateMenu> {
   }
 
   /// PUT /api/menu/categories/{categoryId}
-  ///
-  /// [data] may contain any subset of:
-  ///   { "name": "...", "displayOrder": 1, "imageUrl": "https://..." }
   Future<void> updateCategory(
-      String brandId,
-      String categoryId,
-      Map<String, dynamic> data,
-      ) async {
+    String brandId,
+    String categoryId,
+    Map<String, dynamic> data,
+  ) async {
     emit(state.copyWith(status: MenuStatus.loading));
-    final result = await _repository.updateCategory(brandId,categoryId,data);
+    final result = await _repository.updateCategory(brandId, categoryId, data);
     result.fold(
-          (failure) => emit(
+      (failure) => emit(
         state.copyWith(
           status: MenuStatus.error,
           errorMessage: failure.message,
         ),
       ),
-          (updated) {
+      (updated) {
         final updatedList = state.categories
             .map((c) => c.id == updated.id ? updated : c)
             .toList();
@@ -103,31 +117,21 @@ class CubitMenu extends Cubit<StateMenu> {
   }
 
   Future<void> deleteCategory(
-      String brandId,
-      String categoryId,
-      ) async {
-
+    String brandId,
+    String categoryId,
+  ) async {
     emit(state.copyWith(status: MenuStatus.loading));
-
-    final result = await _repository.deleteCategory(
-      brandId,
-      categoryId,
-    );
-
+    final result = await _repository.deleteCategory(brandId, categoryId);
     result.fold(
-          (failure) => emit(
+      (failure) => emit(
         state.copyWith(
           status: MenuStatus.error,
           errorMessage: failure.message,
         ),
       ),
-
-          (_) {
+      (_) {
         final updatedList =
-        state.categories
-            .where((c) => c.id != categoryId)
-            .toList();
-
+            state.categories.where((c) => c.id != categoryId).toList();
         emit(
           state.copyWith(
             status: MenuStatus.loaded,
@@ -139,17 +143,18 @@ class CubitMenu extends Cubit<StateMenu> {
       },
     );
   }
+
   // ─────────────────────────────────────────────
   // MENU ITEMS
   // ─────────────────────────────────────────────
 
   Future<void> loadMenuItems(
-      String brandId,
-      String branchId, {
-        String? categoryId,
-        int page = 1,
-        int limit = 20,
-      }) async {
+    String brandId,
+    String branchId, {
+    String? categoryId,
+    int page = 1,
+    int limit = 20,
+  }) async {
     emit(
       state.copyWith(
         status: MenuStatus.loading,
@@ -164,13 +169,13 @@ class CubitMenu extends Cubit<StateMenu> {
       limit: limit,
     );
     result.fold(
-          (failure) => emit(
+      (failure) => emit(
         state.copyWith(
           status: MenuStatus.error,
           errorMessage: failure.message,
         ),
       ),
-          (response) => emit(
+      (response) => emit(
         state.copyWith(
           status: MenuStatus.loaded,
           menuItems: response.items,
@@ -181,19 +186,19 @@ class CubitMenu extends Cubit<StateMenu> {
   }
 
   Future<void> createMenuItems(
-      String brandId,
-      List<Map<String, dynamic>> data,
-      ) async {
+    String brandId,
+    List<Map<String, dynamic>> data,
+  ) async {
     emit(state.copyWith(status: MenuStatus.loading));
     final result = await _repository.createMenuItems(brandId, data);
     result.fold(
-          (failure) => emit(
+      (failure) => emit(
         state.copyWith(
           status: MenuStatus.error,
           errorMessage: failure.message,
         ),
       ),
-          (response) => emit(
+      (response) => emit(
         state.copyWith(
           status: MenuStatus.loaded,
           menuItems: [...state.menuItems, ...response.items],
@@ -204,42 +209,42 @@ class CubitMenu extends Cubit<StateMenu> {
   }
 
   Future<void> updateMenuItem(
-      String itemId,
-      Map<String, dynamic> data,
-      ) async {
+    String itemId,
+    Map<String, dynamic> data,
+  ) async {
     emit(state.copyWith(status: MenuStatus.loading));
     final result = await _repository.updateMenuItem(itemId, data);
     result.fold(
-          (failure) => emit(
+      (failure) => emit(
         state.copyWith(
           status: MenuStatus.error,
           errorMessage: failure.message,
         ),
       ),
-          (item) {
+      (item) {
         final updated =
-        state.menuItems.map((i) => i.id == item.id ? item : i).toList();
+            state.menuItems.map((i) => i.id == item.id ? item : i).toList();
         emit(state.copyWith(status: MenuStatus.loaded, menuItems: updated));
       },
     );
   }
 
   Future<void> toggleMenuItemAvailability(
-      String itemId,
-      Map<String, dynamic> data,
-      ) async {
+    String itemId,
+    Map<String, dynamic> data,
+  ) async {
     emit(state.copyWith(status: MenuStatus.loading));
     final result = await _repository.toggleAvailability(itemId, data);
     result.fold(
-          (failure) => emit(
+      (failure) => emit(
         state.copyWith(
           status: MenuStatus.error,
           errorMessage: failure.message,
         ),
       ),
-          (item) {
+      (item) {
         final updated =
-        state.menuItems.map((i) => i.id == item.id ? item : i).toList();
+            state.menuItems.map((i) => i.id == item.id ? item : i).toList();
         emit(state.copyWith(status: MenuStatus.loaded, menuItems: updated));
       },
     );
@@ -249,15 +254,15 @@ class CubitMenu extends Cubit<StateMenu> {
     emit(state.copyWith(status: MenuStatus.loading));
     final result = await _repository.deleteMenuItem(itemId, brandId);
     result.fold(
-          (failure) => emit(
+      (failure) => emit(
         state.copyWith(
           status: MenuStatus.error,
           errorMessage: failure.message,
         ),
       ),
-          (_) {
+      (_) {
         final updated =
-        state.menuItems.where((i) => i.id != itemId).toList();
+            state.menuItems.where((i) => i.id != itemId).toList();
         emit(state.copyWith(status: MenuStatus.loaded, menuItems: updated));
       },
     );
