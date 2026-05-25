@@ -24,6 +24,27 @@ void showLogoutConfirmation(BuildContext context, VoidCallback onConfirm) {
   );
 }
 
+String? _getActiveBrandId(String currentLocation, AppUser? user) {
+  try {
+    final uri = Uri.tryParse(currentLocation);
+    if (uri != null) {
+      final segments = uri.pathSegments;
+      final brandsIndex = segments.indexOf('brands');
+      if (brandsIndex != -1 && brandsIndex + 1 < segments.length) {
+        final candidate = segments[brandsIndex + 1];
+        if (candidate.isNotEmpty && candidate != 'create') {
+          return candidate;
+        }
+      }
+    }
+  } catch (_) {}
+
+  if (user?.brandId != null && user!.brandId.isNotEmpty) {
+    return user.brandId;
+  }
+  return null;
+}
+
 /// Main application shell with responsive sidebar navigation.
 class AppShell extends StatelessWidget {
   const AppShell({
@@ -123,6 +144,13 @@ class _DesktopSidebar extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final cs = theme.colorScheme;
+    final brandId = _getActiveBrandId(currentLocation, user);
+
+    final usersRoute = brandId != null ? '/brands/$brandId/users' : AppRoutes.brandList;
+    final tablesRoute = brandId != null ? '/brands/$brandId/tables' : AppRoutes.brandList;
+    final roomTypesRoute = brandId != null ? '/brands/$brandId/room-types' : AppRoutes.brandList;
+    final menuRoute = brandId != null ? '/brands/$brandId/menu' : AppRoutes.brandList;
+    final posDevicesRoute = brandId != null ? '/brands/$brandId/pos-devices' : AppRoutes.brandList;
 
     return Container(
       width: 260,
@@ -195,7 +223,7 @@ class _DesktopSidebar extends StatelessWidget {
                   icon: Icons.people_outlined,
                   activeIcon: Icons.people,
                   label: 'Users',
-                  route: '/users',
+                  route: usersRoute,
                   currentLocation: currentLocation,
                 ),
 
@@ -205,25 +233,30 @@ class _DesktopSidebar extends StatelessWidget {
                   icon: Icons.table_restaurant_outlined,
                   activeIcon: Icons.table_restaurant,
                   label: 'Tables',
-                  route: '/tables',
+                  route: tablesRoute,
+                  currentLocation: currentLocation,
+                ),
+                _NavItem(
+                  icon: Icons.hotel_outlined,
+                  activeIcon: Icons.hotel,
+                  label: 'Room Types',
+                  route: roomTypesRoute,
                   currentLocation: currentLocation,
                 ),
                 _NavItem(
                   icon: Icons.devices_outlined,
                   activeIcon: Icons.devices,
                   label: 'POS Devices',
-                  route: '/all-pos-devices',
+                  route: posDevicesRoute,
                   currentLocation: currentLocation,
                 ),
                 _NavItem(
                   icon: Icons.menu_book_outlined,
                   activeIcon: Icons.menu_book,
                   label: 'Menu',
-                  route: '/menu',
+                  route: menuRoute,
                   currentLocation: currentLocation,
                 ),
-
-
 
                 SizedBox(height: AppSpacing.lg),
                 _NavSection(title: 'SYSTEM'),
@@ -318,6 +351,13 @@ class _TabletSidebar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
+    final brandId = _getActiveBrandId(currentLocation, user);
+
+    final usersRoute = brandId != null ? '/brands/$brandId/users' : AppRoutes.brandList;
+    final tablesRoute = brandId != null ? '/brands/$brandId/tables' : AppRoutes.brandList;
+    final roomTypesRoute = brandId != null ? '/brands/$brandId/room-types' : AppRoutes.brandList;
+    final menuRoute = brandId != null ? '/brands/$brandId/menu' : AppRoutes.brandList;
+    final posDevicesRoute = brandId != null ? '/brands/$brandId/pos-devices' : AppRoutes.brandList;
 
     return Container(
       width: 72,
@@ -335,33 +375,59 @@ class _TabletSidebar extends StatelessWidget {
           ),
           SizedBox(height: AppSpacing.lg),
           Expanded(
-            child: Column(
-              children: [
-                _TabletNavItem(
-                  icon: Icons.dashboard,
-                  label: 'Home',
-                  route: AppRoutes.home,
-                  currentLocation: currentLocation,
-                ),
-                _TabletNavItem(
-                  icon: Icons.store,
-                  label: 'Brands',
-                  route: AppRoutes.brandList,
-                  currentLocation: currentLocation,
-                ),
-                _TabletNavItem(
-                  icon: Icons.table_restaurant,
-                  label: 'Tables',
-                  route: '/tables',
-                  currentLocation: currentLocation,
-                ),
-                _TabletNavItem(
-                  icon: Icons.settings,
-                  label: 'Settings',
-                  route: AppRoutes.settings,
-                  currentLocation: currentLocation,
-                ),
-              ],
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  _TabletNavItem(
+                    icon: Icons.dashboard,
+                    label: 'Home',
+                    route: AppRoutes.home,
+                    currentLocation: currentLocation,
+                  ),
+                  _TabletNavItem(
+                    icon: Icons.store,
+                    label: 'Brands',
+                    route: AppRoutes.brandList,
+                    currentLocation: currentLocation,
+                  ),
+                  _TabletNavItem(
+                    icon: Icons.people,
+                    label: 'Users',
+                    route: usersRoute,
+                    currentLocation: currentLocation,
+                  ),
+                  _TabletNavItem(
+                    icon: Icons.table_restaurant,
+                    label: 'Tables',
+                    route: tablesRoute,
+                    currentLocation: currentLocation,
+                  ),
+                  _TabletNavItem(
+                    icon: Icons.hotel,
+                    label: 'Room Types',
+                    route: roomTypesRoute,
+                    currentLocation: currentLocation,
+                  ),
+                  _TabletNavItem(
+                    icon: Icons.devices,
+                    label: 'POS Devices',
+                    route: posDevicesRoute,
+                    currentLocation: currentLocation,
+                  ),
+                  _TabletNavItem(
+                    icon: Icons.menu_book,
+                    label: 'Menu',
+                    route: menuRoute,
+                    currentLocation: currentLocation,
+                  ),
+                  _TabletNavItem(
+                    icon: Icons.settings,
+                    label: 'Settings',
+                    route: AppRoutes.settings,
+                    currentLocation: currentLocation,
+                  ),
+                ],
+              ),
             ),
           ),
           _TabletNavItem(
@@ -393,7 +459,20 @@ class _TabletNavItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
-    final isSelected = currentLocation.startsWith(route);
+    final bool isSelected;
+    if (route == AppRoutes.brandList) {
+      isSelected = currentLocation == AppRoutes.brandList ||
+          currentLocation.startsWith('${AppRoutes.brandList}/create') ||
+          (currentLocation.startsWith('/brands/') &&
+              !currentLocation.contains('/users') &&
+              !currentLocation.contains('/tables') &&
+              !currentLocation.contains('/room-types') &&
+              !currentLocation.contains('/pos-devices') &&
+              !currentLocation.contains('/menu') &&
+              !currentLocation.contains('/branches'));
+    } else {
+      isSelected = currentLocation.startsWith(route);
+    }
 
     return Tooltip(
       message: label,
@@ -481,6 +560,13 @@ class _MobileDrawer extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final cs = theme.colorScheme;
+    final brandId = _getActiveBrandId(currentLocation, user);
+
+    final usersRoute = brandId != null ? '/brands/$brandId/users' : AppRoutes.brandList;
+    final tablesRoute = brandId != null ? '/brands/$brandId/tables' : AppRoutes.brandList;
+    final roomTypesRoute = brandId != null ? '/brands/$brandId/room-types' : AppRoutes.brandList;
+    final menuRoute = brandId != null ? '/brands/$brandId/menu' : AppRoutes.brandList;
+    final posDevicesRoute = brandId != null ? '/brands/$brandId/pos-devices' : AppRoutes.brandList;
 
     return Drawer(
       child: ListView(
@@ -510,19 +596,60 @@ class _MobileDrawer extends StatelessWidget {
           ListTile(
             leading: Icon(Icons.store),
             title: Text('Brands'),
-            selected: currentLocation.startsWith('/brands'),
+            selected: currentLocation.startsWith('/brands') &&
+                !currentLocation.contains('/users') &&
+                !currentLocation.contains('/tables') &&
+                !currentLocation.contains('/room-types') &&
+                !currentLocation.contains('/pos-devices') &&
+                !currentLocation.contains('/menu'),
             onTap: () {
               Navigator.pop(context);
               context.go(AppRoutes.brandList);
             },
           ),
           ListTile(
-            leading: Icon(Icons.table_restaurant),
-            title: Text('Tables'),
-            selected: currentLocation.startsWith('/tables'),
+            leading: Icon(Icons.people),
+            title: Text('Users'),
+            selected: currentLocation.startsWith(usersRoute) && brandId != null,
             onTap: () {
               Navigator.pop(context);
-              context.go('/tables');
+              context.go(usersRoute);
+            },
+          ),
+          ListTile(
+            leading: Icon(Icons.table_restaurant),
+            title: Text('Tables'),
+            selected: currentLocation.startsWith(tablesRoute) && brandId != null,
+            onTap: () {
+              Navigator.pop(context);
+              context.go(tablesRoute);
+            },
+          ),
+          ListTile(
+            leading: Icon(Icons.hotel),
+            title: Text('Room Types'),
+            selected: currentLocation.startsWith(roomTypesRoute) && brandId != null,
+            onTap: () {
+              Navigator.pop(context);
+              context.go(roomTypesRoute);
+            },
+          ),
+          ListTile(
+            leading: Icon(Icons.devices),
+            title: Text('POS Devices'),
+            selected: currentLocation.startsWith(posDevicesRoute) && brandId != null,
+            onTap: () {
+              Navigator.pop(context);
+              context.go(posDevicesRoute);
+            },
+          ),
+          ListTile(
+            leading: Icon(Icons.menu_book),
+            title: Text('Menu'),
+            selected: currentLocation.startsWith(menuRoute) && brandId != null,
+            onTap: () {
+              Navigator.pop(context);
+              context.go(menuRoute);
             },
           ),
           ListTile(
@@ -736,7 +863,20 @@ class _NavItem extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final cs = theme.colorScheme;
-    final isSelected = currentLocation.startsWith(route);
+    final bool isSelected;
+    if (route == AppRoutes.brandList) {
+      isSelected = currentLocation == AppRoutes.brandList ||
+          currentLocation.startsWith('${AppRoutes.brandList}/create') ||
+          (currentLocation.startsWith('/brands/') &&
+              !currentLocation.contains('/users') &&
+              !currentLocation.contains('/tables') &&
+              !currentLocation.contains('/room-types') &&
+              !currentLocation.contains('/pos-devices') &&
+              !currentLocation.contains('/menu') &&
+              !currentLocation.contains('/branches'));
+    } else {
+      isSelected = currentLocation.startsWith(route);
+    }
 
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: 2),
