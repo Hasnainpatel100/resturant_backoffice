@@ -172,14 +172,15 @@ class MenuRepositoryImpl implements MenuRepository {
     Map<String, dynamic> data,
   ) async {
     return runTask(() async {
-      // Extract brandId from data to send as query parameter (API contract)
-      final brandId = data.remove('brandId');
+      // Copy the map so we don't mutate the caller's object
+      final body = Map<String, dynamic>.of(data);
+      final brandId = body['brandId'] as String?; // extract brandId for query param but keep in body
       final response = await AppConfig.dio.put<Map<String, dynamic>>(
         '/api/menu/items/$itemId',
         queryParameters: {
           if (brandId != null) 'brandId': brandId,
         },
-        data: data,
+        data: body,
       );
       final responseData = response.data!['data'] as Map<String, dynamic>;
       return MenuItemResponse.fromJson(responseData);

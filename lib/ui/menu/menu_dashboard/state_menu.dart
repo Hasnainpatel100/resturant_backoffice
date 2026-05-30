@@ -1,6 +1,7 @@
 import 'package:equatable/equatable.dart';
 import 'package:back_office/data/models/menu_model.dart';
 import 'package:back_office/data/models/api_response_model.dart';
+import 'package:back_office/data/models/room_type_model.dart';
 
 enum MenuStatus { initial, loading, loaded, error }
 
@@ -12,6 +13,7 @@ class StateMenu extends Equatable {
   final MenuStatus status;
   final List<CategoryModel> categories;
   final List<MenuItemResponse> menuItems;
+  final List<RoomTypeModel> roomTypes;       // ← for room-price dropdowns
   final String? selectedCategoryId;
   final MetaData? meta;
   final String? errorMessage;
@@ -26,6 +28,7 @@ class StateMenu extends Equatable {
     this.status = MenuStatus.initial,
     this.categories = const [],
     this.menuItems = const [],
+    this.roomTypes = const [],
     this.selectedCategoryId,
     this.meta,
     this.errorMessage,
@@ -37,6 +40,7 @@ class StateMenu extends Equatable {
     MenuStatus? status,
     List<CategoryModel>? categories,
     List<MenuItemResponse>? menuItems,
+    List<RoomTypeModel>? roomTypes,
     String? selectedCategoryId,
     MetaData? meta,
     String? errorMessage,
@@ -47,24 +51,26 @@ class StateMenu extends Equatable {
       status: status ?? this.status,
       categories: categories ?? this.categories,
       menuItems: menuItems ?? this.menuItems,
+      roomTypes: roomTypes ?? this.roomTypes,
       selectedCategoryId: selectedCategoryId ?? this.selectedCategoryId,
       meta: meta ?? this.meta,
       errorMessage: errorMessage ?? this.errorMessage,
       categoryOperation: categoryOperation ?? this.categoryOperation,
       lastMutatedCategoryId:
-      lastMutatedCategoryId ?? this.lastMutatedCategoryId,
+          lastMutatedCategoryId ?? this.lastMutatedCategoryId,
     );
   }
 
   @override
   List<Object?> get props => [
-    status,
-    categories,
-    menuItems,
-    selectedCategoryId,
-    meta,
-    errorMessage,
-    categoryOperation,
-    lastMutatedCategoryId,
-  ];
+        status,
+        categories,
+        menuItems,
+        roomTypes,
+        selectedCategoryId,
+        meta,
+        errorMessage,
+        categoryOperation,
+        lastMutatedCategoryId,
+      ];
 }

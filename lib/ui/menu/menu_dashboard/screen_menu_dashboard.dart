@@ -1,10 +1,9 @@
 import 'package:back_office/ui/menu/menu_dashboard/screen_category_items.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:back_office/imports/core_imports.dart';
 import 'package:back_office/data/repositories/menu_repository_impl.dart';
+import 'package:back_office/data/repositories/room_type_repository_impl.dart';
 import 'package:back_office/data/repositories/branch_repository_impl.dart';
 import 'package:back_office/ui/menu/menu_dashboard/cubit_menu.dart';
 import 'package:back_office/ui/menu/menu_dashboard/state_menu.dart';
@@ -34,7 +33,10 @@ class _ScreenMenuDashboardState extends State<ScreenMenuDashboard> {
     return MultiBlocProvider(
       providers: [
         BlocProvider(
-          create: (_) => CubitMenu(repository: MenuRepositoryImpl()),
+          create: (_) => CubitMenu(
+            repository: MenuRepositoryImpl(),
+            roomTypeRepository: RoomTypeRepositoryImpl(),
+          ),
         ),
         BlocProvider(
           create: (_) =>
@@ -108,10 +110,7 @@ class _MenuDashboardView extends StatelessWidget {
   // ── Build ─────────────────────────────────────────────────────────────────
 
   @override
-  @override
   Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
-
     return Scaffold(
       appBar: AppBar(
         title: const Text('Menu'),
@@ -259,7 +258,6 @@ class _MenuDashboardView extends StatelessWidget {
   // ── Category grid ─────────────────────────────────────────────────────────
 
   Widget _buildMenuContent(BuildContext context, StateMenu state) {
-    final cs = Theme.of(context).colorScheme;
     final sortedCategories = [
       ...state.categories,
     ]
@@ -302,7 +300,7 @@ class _MenuDashboardView extends StatelessWidget {
                 state.lastMutatedCategoryId == category.id,
               onTap: () {
                 Navigator.of(context).push(
-                  MaterialPageRoute(
+                  MaterialPageRoute<void>(
                     builder: (_) => ScreenCategoryItems(
                       brandId: brandId,
                       branchId: selectedBranchId!,
@@ -310,7 +308,6 @@ class _MenuDashboardView extends StatelessWidget {
                       categoryName: category.name,
                     ),
                   ),
-
                 );
               },
             onEdit: () => _showEditCategoryDialog(context, category),
@@ -328,7 +325,7 @@ class _MenuDashboardView extends StatelessWidget {
 
   /// CREATE category dialog
   void _showCategoryDialog(BuildContext context) {
-    showDialog(
+    showDialog<void>(
       context: context,
       builder: (_) => _CategoryFormDialog(
         title: 'Add Category',
@@ -353,7 +350,7 @@ class _MenuDashboardView extends StatelessWidget {
       BuildContext context,
       CategoryModel category,
       ) {
-    showDialog(
+    showDialog<void>(
       context: context,
       builder: (_) => _CategoryFormDialog(
         title: 'Edit Category',
@@ -389,7 +386,7 @@ class _MenuDashboardView extends StatelessWidget {
       String categoryId,
       String categoryName,
       ) {
-    showDialog(
+    showDialog<void>(
       context: context,
       builder: (dialogCtx) => AlertDialog(
         icon: Icon(
@@ -521,7 +518,7 @@ class _CategoryCard extends StatelessWidget {
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),
-                  if (category.displayOrder != null)
+                  if (category.displayOrder > 0)
                     Text(
                       'Order: ${category.displayOrder}',
                       style: Theme.of(context).textTheme.labelSmall?.copyWith(
