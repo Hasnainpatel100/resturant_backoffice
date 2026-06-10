@@ -1,4 +1,5 @@
 import 'package:back_office/ui/menu/menu_dashboard/screen_category_items.dart';
+import 'package:back_office/ui/menu/menu_dashboard/widget_csv_import_sheet.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:back_office/imports/core_imports.dart';
@@ -298,21 +299,38 @@ class _MenuDashboardView extends StatelessWidget {
             category: category,
             isUpdating: state.status == MenuStatus.loading &&
                 state.lastMutatedCategoryId == category.id,
-              onTap: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute<void>(
-                    builder: (_) => ScreenCategoryItems(
-                      brandId: brandId,
-                      branchId: selectedBranchId!,
-                      categoryId: category.id,
-                      categoryName: category.name,
-                    ),
+            onTap: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (_) => ScreenCategoryItems(
+                    brandId: brandId,
+                    branchId: selectedBranchId!,
+                    categoryId: category.id,
+                    categoryName: category.name,
                   ),
-                );
-              },
+                ),
+
+              );
+            },
             onEdit: () => _showEditCategoryDialog(context, category),
             onDelete: () =>
                 _showDeleteConfirmation(context, category.id, category.name),
+            onImport: () => showCategoryImportSheet(
+              context: context,
+              cubit: context.read<CubitMenu>(),
+              brandId: brandId,
+              branchId: selectedBranchId!,
+              categoryId: category.id,
+              categoryName: category.name,
+              onSuccess: () {
+                _showSuccessSnack(context, 'Items imported successfully');
+                context.read<CubitMenu>().loadCategories(
+                  brandId,
+                  selectedBranchId!,
+                );
+              },
+              onError: (msg) => _showErrorSnack(context, msg),
+            ),
           );
         },
       ),
@@ -442,6 +460,7 @@ class _CategoryCard extends StatelessWidget {
   final VoidCallback onTap;
   final VoidCallback onEdit;
   final VoidCallback onDelete;
+  final VoidCallback onImport;
 
   const _CategoryCard({
     required this.category,
@@ -449,6 +468,7 @@ class _CategoryCard extends StatelessWidget {
     required this.onTap,
     required this.onEdit,
     required this.onDelete,
+    required this.onImport,
   });
 
   @override
@@ -499,6 +519,7 @@ class _CategoryCard extends StatelessWidget {
                         _CategoryActionMenu(
                           onEdit: onEdit,
                           onDelete: onDelete,
+                          onImport: onImport,
                         )
                       else
                         const SizedBox(
@@ -542,10 +563,13 @@ class _CategoryCard extends StatelessWidget {
 class _CategoryActionMenu extends StatelessWidget {
   final VoidCallback onEdit;
   final VoidCallback onDelete;
+  final VoidCallback onImport;
+
 
   const _CategoryActionMenu({
     required this.onEdit,
     required this.onDelete,
+    required this.onImport,
   });
 
   @override
@@ -581,6 +605,18 @@ class _CategoryActionMenu extends StatelessWidget {
             ],
           ),
         ),
+        const PopupMenuDivider(),
+        const PopupMenuItem(
+          value: _CategoryAction.importCsv,
+          child: Row(
+            children: [
+              Icon(Icons.upload_file_rounded, size: 18),
+              SizedBox(width: 8),
+              Text('Import CSV / Excel'),
+            ],
+          ),
+        ),
+
       ],
       onSelected: (action) {
         switch (action) {
@@ -590,13 +626,16 @@ class _CategoryActionMenu extends StatelessWidget {
           case _CategoryAction.delete:
             onDelete();
             break;
+            case _CategoryAction.importCsv:
+            onImport();
+            break;
         }
       },
     );
   }
 }
 
-enum _CategoryAction { edit, delete }
+enum _CategoryAction { edit, delete, importCsv }
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Reusable: Create / Edit category form dialog

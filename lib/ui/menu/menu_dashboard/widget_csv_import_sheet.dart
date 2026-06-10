@@ -172,9 +172,14 @@ class _CsvImportSheetState extends State<_CsvImportSheet> {
         // xlsx / xls
         final excel = Excel.decodeBytes(bytes);
         final sheet = excel.tables.values.first;
-        rawRows = sheet.rows
-            .map((row) => row.map((cell) => cell?.value ?? '').toList())
-            .toList();
+        rawRows = sheet.rows.map((row) {
+          return row.map((cell) {
+            if (cell == null) return '';
+
+            final value = cell.value;
+            return value?.toString() ?? '';
+          }).toList();
+        }).toList();
       }
 
       final parsed = _parseRows(rawRows);
@@ -182,7 +187,9 @@ class _CsvImportSheetState extends State<_CsvImportSheet> {
         _rows = parsed;
         _step = _SheetStep.preview;
       });
-    } catch (e) {
+    } catch (e,st) {
+      print(e);
+      print(st);
       setState(() {
         _step = _SheetStep.idle;
         _parseError = 'Failed to parse file: ${e.toString()}';
