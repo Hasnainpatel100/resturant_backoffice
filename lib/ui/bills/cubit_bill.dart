@@ -9,7 +9,7 @@ class CubitBill extends Cubit<StateBill> {
       : _repository = repository,
         super(const StateBill());
 
-  Future<void> loadBills(String brandId, String branchId, {int page = 1, int limit = 20}) async {
+  Future<void> loadBills(String brandId, String? branchId, {int page = 1, int limit = 20}) async {
     emit(state.copyWith(status: StateBillStatus.loading, errorMessage: null));
     final result = await _repository.getBills(brandId, branchId, page: page, limit: limit);
     result.fold(

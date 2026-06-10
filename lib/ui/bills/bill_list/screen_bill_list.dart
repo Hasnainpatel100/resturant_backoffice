@@ -40,8 +40,16 @@ class _ScreenBillListState extends State<ScreenBillList> {
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
 
-    return BlocProvider(
-      create: (context) => CubitBranch(repository: BranchRepositoryImpl())..loadBranches(widget.brandId),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider<CubitBranch>(
+          create: (context) => CubitBranch(repository: BranchRepositoryImpl())..loadBranches(widget.brandId),
+        ),
+        BlocProvider<CubitBill>(
+          create: (context) => CubitBill(repository: BillRepositoryImpl())
+            ..loadBills(widget.brandId, _selectedBranchId),
+        ),
+      ],
       child: Scaffold(
         appBar: AppBar(
           title: const Text('Bills'),
@@ -50,312 +58,257 @@ class _ScreenBillListState extends State<ScreenBillList> {
             onPressed: () => context.go('/brands/${widget.brandId}'),
           ),
           actions: [
-            if (_selectedBranchId != null)
-              BlocProvider<CubitBill>(
-                create: (context) => CubitBill(repository: BillRepositoryImpl())
-                  ..loadBills(widget.brandId, _selectedBranchId!),
-                child: Builder(
-                  builder: (context) {
-                    return IconButton(
-                      icon: const Icon(Icons.refresh),
-                      onPressed: () {
-                        context.read<CubitBill>().loadBills(widget.brandId, _selectedBranchId!);
-                      },
-                      tooltip: 'Refresh Bills',
-                    );
+            Builder(
+              builder: (context) {
+                return IconButton(
+                  icon: const Icon(Icons.refresh),
+                  onPressed: () {
+                    context.read<CubitBill>().loadBills(widget.brandId, _selectedBranchId);
                   },
-                ),
-              ),
+                  tooltip: 'Refresh Bills',
+                );
+              },
+            ),
           ],
         ),
-        body: _selectedBranchId == null
-            ? BlocBuilder<CubitBranch, StateBranch>(
-                builder: (context, branchState) {
-                  if (branchState.status == BranchStatus.loading) {
+        body: Column(
+          children: [
+            // Search & Branch selector header (always visible)
+            Padding(
+              padding: EdgeInsets.all(AppSpacing.md),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: _searchController,
+                      decoration: InputDecoration(
+                        hintText: 'Search by bill number, table, waiter...',
+                        prefixIcon: const Icon(Icons.search),
+                        border: const OutlineInputBorder(),
+                        suffixIcon: _searchQuery.isNotEmpty
+                            ? IconButton(
+                                icon: const Icon(Icons.clear),
+                                onPressed: () {
+                                  setState(() {
+                                    _searchController.clear();
+                                    _searchQuery = '';
+                                  });
+                                },
+                              )
+                            : null,
+                      ),
+                      onChanged: (val) {
+                        setState(() {
+                          _searchQuery = val;
+                        });
+                      },
+                    ),
+                  ),
+                  SizedBox(width: AppSpacing.md),
+                  // Quick Branch Switcher (always visible)
+                  BlocBuilder<CubitBranch, StateBranch>(
+                    builder: (context, branchState) {
+                      final hasSelected = branchState.branches.any((b) => b.id == _selectedBranchId);
+                      return SizedBox(
+                        width: 220,
+                        child: DropdownButtonFormField<String>(
+                          decoration: const InputDecoration(
+                            labelText: 'Branch',
+                            contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                            border: OutlineInputBorder(),
+                          ),
+                          value: hasSelected ? (_selectedBranchId ?? '') : '',
+                          items: [
+                            const DropdownMenuItem<String>(
+                              value: '',
+                              child: Text('All Branches'),
+                            ),
+                            ...branchState.branches.map((b) {
+                              return DropdownMenuItem<String>(
+                                value: b.id,
+                                child: Text(b.displayName),
+                              );
+                            }),
+                          ],
+                          onChanged: (value) {
+                            final newValue = value == '' ? null : value;
+                            setState(() {
+                              _selectedBranchId = newValue;
+                            });
+                            context.read<CubitBill>().loadBills(widget.brandId, newValue);
+                          },
+                        ),
+                      );
+                    },
+                  ),
+                ],
+              ),
+            ),
+            // Body Content (loading, error, or list of bills)
+            Expanded(
+              child: BlocBuilder<CubitBill, StateBill>(
+                builder: (context, state) {
+                  if (state.status == StateBillStatus.loading) {
                     return const Center(child: CircularProgressIndicator());
                   }
-                  if (branchState.branches.isEmpty) {
+
+                  if (state.status == StateBillStatus.error) {
                     return Center(
-                      child: Padding(
-                        padding: EdgeInsets.all(AppSpacing.md),
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(Icons.receipt_long_outlined, size: 64, color: cs.outline),
-                            SizedBox(height: AppSpacing.md),
-                            const Text('No branches found'),
-                          ],
-                        ),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.error_outline, size: 48, color: cs.error),
+                          SizedBox(height: AppSpacing.md),
+                          Text(state.errorMessage ?? 'Error loading bills'),
+                          SizedBox(height: AppSpacing.md),
+                          ElevatedButton(
+                            onPressed: () {
+                              context.read<CubitBill>().loadBills(widget.brandId, _selectedBranchId);
+                            },
+                            child: const Text('Retry'),
+                          ),
+                        ],
                       ),
                     );
                   }
-                  return Center(
-                    child: Container(
-                      constraints: const BoxConstraints(maxWidth: 400),
-                      padding: EdgeInsets.all(AppSpacing.lg),
+
+                  final filteredBills = state.bills.where((bill) {
+                    final query = _searchQuery.toLowerCase().trim();
+                    if (query.isEmpty) return true;
+                    return bill.billNumber.toLowerCase().contains(query) ||
+                        (bill.tableName != null && bill.tableName!.toLowerCase().contains(query)) ||
+                        (bill.waiterName != null && bill.waiterName!.toLowerCase().contains(query));
+                  }).toList();
+
+                  if (filteredBills.isEmpty) {
+                    return Center(
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Icon(Icons.receipt_long_outlined, size: 64, color: cs.outline),
                           SizedBox(height: AppSpacing.md),
                           Text(
-                            'Select a branch to view bills',
+                            _searchQuery.isNotEmpty ? 'No matching bills found' : 'No bills found',
                             style: Theme.of(context).textTheme.titleMedium,
-                          ),
-                          SizedBox(height: AppSpacing.lg),
-                          DropdownButtonFormField<String>(
-                            decoration: const InputDecoration(
-                              labelText: 'Branch',
-                              border: OutlineInputBorder(),
-                            ),
-                            hint: const Text('Select branch'),
-                            items: branchState.branches.map((b) {
-                              return DropdownMenuItem(value: b.id, child: Text(b.displayName));
-                            }).toList(),
-                            onChanged: (value) {
-                              if (value != null) {
-                                setState(() => _selectedBranchId = value);
-                              }
-                            },
                           ),
                         ],
                       ),
+                    );
+                  }
+
+                  return RefreshIndicator(
+                    onRefresh: () async {
+                      context.read<CubitBill>().loadBills(widget.brandId, _selectedBranchId);
+                    },
+                    child: ListView.builder(
+                      padding: EdgeInsets.symmetric(horizontal: AppSpacing.md),
+                      itemCount: filteredBills.length,
+                      itemBuilder: (context, index) {
+                        final bill = filteredBills[index];
+                        return Card(
+                          margin: EdgeInsets.only(bottom: AppSpacing.sm),
+                          elevation: 0,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: AppBorders.md,
+                            side: BorderSide(color: cs.outlineVariant.withOpacity(0.5)),
+                          ),
+                          child: InkWell(
+                            onTap: () {
+                              context.go('/brands/${widget.brandId}/bills/${bill.id}');
+                            },
+                            borderRadius: AppBorders.md,
+                            child: Padding(
+                              padding: EdgeInsets.all(AppSpacing.md),
+                              child: Row(
+                                children: [
+                                  CircleAvatar(
+                                    radius: 24,
+                                    backgroundColor: cs.primaryContainer,
+                                    foregroundColor: cs.onPrimaryContainer,
+                                    child: const Icon(Icons.receipt_long),
+                                  ),
+                                  SizedBox(width: AppSpacing.md),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Row(
+                                          children: [
+                                            Text(
+                                              bill.billNumber,
+                                              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                            ),
+                                            const Spacer(),
+                                            _buildStatusBadge(bill.paymentStatus, isPayment: true),
+                                            SizedBox(width: AppSpacing.xs),
+                                            _buildStatusBadge(bill.status),
+                                          ],
+                                        ),
+                                        SizedBox(height: AppSpacing.xs),
+                                        Row(
+                                          children: [
+                                            Text(
+                                              'Date: ${bill.billDate}',
+                                              style: TextStyle(color: cs.outline, fontSize: 13),
+                                            ),
+                                            SizedBox(width: AppSpacing.md),
+                                            if (bill.tableName != null)
+                                              Text(
+                                                'Table: ${bill.tableName}',
+                                                style: TextStyle(color: cs.outline, fontSize: 13),
+                                              ),
+                                            SizedBox(width: AppSpacing.md),
+                                            Text(
+                                              'Type: ${bill.serviceType}',
+                                              style: TextStyle(color: cs.outline, fontSize: 13),
+                                              ),
+                                          ],
+                                        ),
+                                        SizedBox(height: AppSpacing.xs),
+                                        Row(
+                                          children: [
+                                            Text(
+                                              'Mode: ${bill.paymentMode}',
+                                              style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 13),
+                                            ),
+                                            if (bill.waiterName != null) ...[
+                                              SizedBox(width: AppSpacing.md),
+                                              Text(
+                                                'Waiter: ${bill.waiterName}',
+                                                style: TextStyle(color: cs.outline, fontSize: 13),
+                                              ),
+                                            ],
+                                            const Spacer(),
+                                            Text(
+                                              'Total: ₹${formatNumber(bill.totalAmount)}',
+                                              style: TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                                color: cs.primary,
+                                                fontSize: 15,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  SizedBox(width: AppSpacing.sm),
+                                  Icon(Icons.chevron_right, color: cs.outline),
+                                ],
+                              ),
+                            ),
+                          ),
+                        );
+                      },
                     ),
                   );
                 },
-              )
-            : BlocProvider(
-                create: (context) => CubitBill(repository: BillRepositoryImpl())
-                  ..loadBills(widget.brandId, _selectedBranchId!),
-                child: BlocBuilder<CubitBill, StateBill>(
-                  builder: (context, state) {
-                    if (state.status == StateBillStatus.loading) {
-                      return const Center(child: CircularProgressIndicator());
-                    }
-
-                    if (state.status == StateBillStatus.error) {
-                      return Center(
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(Icons.error_outline, size: 48, color: cs.error),
-                            SizedBox(height: AppSpacing.md),
-                            Text(state.errorMessage ?? 'Error loading bills'),
-                            SizedBox(height: AppSpacing.md),
-                            ElevatedButton(
-                              onPressed: () {
-                                context.read<CubitBill>().loadBills(widget.brandId, _selectedBranchId!);
-                              },
-                              child: const Text('Retry'),
-                            ),
-                          ],
-                        ),
-                      );
-                    }
-
-                    final filteredBills = state.bills.where((bill) {
-                      final query = _searchQuery.toLowerCase().trim();
-                      if (query.isEmpty) return true;
-                      return bill.billNumber.toLowerCase().contains(query) ||
-                          (bill.tableName != null && bill.tableName!.toLowerCase().contains(query)) ||
-                          (bill.waiterName != null && bill.waiterName!.toLowerCase().contains(query));
-                    }).toList();
-
-                    return Column(
-                      children: [
-                        // Search & Branch selector header
-                        Padding(
-                          padding: EdgeInsets.all(AppSpacing.md),
-                          child: Row(
-                            children: [
-                              Expanded(
-                                child: TextField(
-                                  controller: _searchController,
-                                  decoration: InputDecoration(
-                                    hintText: 'Search by bill number, table, waiter...',
-                                    prefixIcon: const Icon(Icons.search),
-                                    border: const OutlineInputBorder(),
-                                    suffixIcon: _searchQuery.isNotEmpty
-                                        ? IconButton(
-                                            icon: const Icon(Icons.clear),
-                                            onPressed: () {
-                                              setState(() {
-                                                _searchController.clear();
-                                                _searchQuery = '';
-                                              });
-                                            },
-                                          )
-                                        : null,
-                                  ),
-                                  onChanged: (val) {
-                                    setState(() {
-                                      _searchQuery = val;
-                                    });
-                                  },
-                                ),
-                              ),
-                              SizedBox(width: AppSpacing.md),
-                              // Quick Branch Switcher
-                              BlocBuilder<CubitBranch, StateBranch>(
-                                builder: (context, branchState) {
-                                  if (branchState.branches.isEmpty) return const SizedBox.shrink();
-                                  return SizedBox(
-                                    width: 200,
-                                    child: DropdownButtonFormField<String>(
-                                      decoration: const InputDecoration(
-                                        labelText: 'Branch',
-                                        contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                                        border: OutlineInputBorder(),
-                                      ),
-                                      initialValue: _selectedBranchId,
-                                      items: branchState.branches.map((b) {
-                                        return DropdownMenuItem(value: b.id, child: Text(b.displayName));
-                                      }).toList(),
-                                      onChanged: (value) {
-                                        if (value != null && value != _selectedBranchId) {
-                                          setState(() {
-                                            _selectedBranchId = value;
-                                          });
-                                          context.read<CubitBill>().loadBills(widget.brandId, value);
-                                        }
-                                      },
-                                    ),
-                                  );
-                                },
-                              ),
-                            ],
-                          ),
-                        ),
-                        // List Body
-                        Expanded(
-                          child: filteredBills.isEmpty
-                              ? Center(
-                                  child: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Icon(Icons.receipt_long_outlined, size: 64, color: cs.outline),
-                                      SizedBox(height: AppSpacing.md),
-                                      Text(
-                                        _searchQuery.isNotEmpty ? 'No matching bills found' : 'No bills found',
-                                        style: Theme.of(context).textTheme.titleMedium,
-                                      ),
-                                    ],
-                                  ),
-                                )
-                              : RefreshIndicator(
-                                  onRefresh: () async {
-                                    context.read<CubitBill>().loadBills(widget.brandId, _selectedBranchId!);
-                                  },
-                                  child: ListView.builder(
-                                    padding: EdgeInsets.symmetric(horizontal: AppSpacing.md),
-                                    itemCount: filteredBills.length,
-                                    itemBuilder: (context, index) {
-                                      final bill = filteredBills[index];
-                                      return Card(
-                                        margin: EdgeInsets.only(bottom: AppSpacing.sm),
-                                        elevation: 0,
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: AppBorders.md,
-                                          side: BorderSide(color: cs.outlineVariant.withOpacity(0.5)),
-                                        ),
-                                        child: InkWell(
-                                          onTap: () {
-                                            context.go('/brands/${widget.brandId}/bills/${bill.id}');
-                                          },
-                                          borderRadius: AppBorders.md,
-                                          child: Padding(
-                                            padding: EdgeInsets.all(AppSpacing.md),
-                                            child: Row(
-                                              children: [
-                                                CircleAvatar(
-                                                  radius: 24,
-                                                  backgroundColor: cs.primaryContainer,
-                                                  foregroundColor: cs.onPrimaryContainer,
-                                                  child: const Icon(Icons.receipt_long),
-                                                ),
-                                                SizedBox(width: AppSpacing.md),
-                                                Expanded(
-                                                  child: Column(
-                                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                                    children: [
-                                                      Row(
-                                                        children: [
-                                                          Text(
-                                                            bill.billNumber,
-                                                            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                                                  fontWeight: FontWeight.bold,
-                                                                ),
-                                                          ),
-                                                          const Spacer(),
-                                                          _buildStatusBadge(bill.paymentStatus, isPayment: true),
-                                                          SizedBox(width: AppSpacing.xs),
-                                                          _buildStatusBadge(bill.status),
-                                                        ],
-                                                      ),
-                                                      SizedBox(height: AppSpacing.xs),
-                                                      Row(
-                                                        children: [
-                                                          Text(
-                                                            'Date: ${bill.billDate}',
-                                                            style: TextStyle(color: cs.outline, fontSize: 13),
-                                                          ),
-                                                          SizedBox(width: AppSpacing.md),
-                                                          if (bill.tableName != null)
-                                                            Text(
-                                                              'Table: ${bill.tableName}',
-                                                              style: TextStyle(color: cs.outline, fontSize: 13),
-                                                            ),
-                                                          SizedBox(width: AppSpacing.md),
-                                                          Text(
-                                                            'Type: ${bill.serviceType}',
-                                                            style: TextStyle(color: cs.outline, fontSize: 13),
-                                                          ),
-                                                        ],
-                                                      ),
-                                                      SizedBox(height: AppSpacing.xs),
-                                                      Row(
-                                                        children: [
-                                                          Text(
-                                                            'Mode: ${bill.paymentMode}',
-                                                            style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 13),
-                                                          ),
-                                                          if (bill.waiterName != null) ...[
-                                                            SizedBox(width: AppSpacing.md),
-                                                            Text(
-                                                              'Waiter: ${bill.waiterName}',
-                                                              style: TextStyle(color: cs.outline, fontSize: 13),
-                                                            ),
-                                                          ],
-                                                          const Spacer(),
-                                                          Text(
-                                                            'Total: ₹${formatNumber(bill.totalAmount)}',
-                                                            style: TextStyle(
-                                                              fontWeight: FontWeight.bold,
-                                                              color: cs.primary,
-                                                              fontSize: 15,
-                                                            ),
-                                                          ),
-                                                        ],
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ),
-                                                SizedBox(width: AppSpacing.sm),
-                                                Icon(Icons.chevron_right, color: cs.outline),
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                      );
-                                    },
-                                  ),
-                                ),
-                        ),
-                      ],
-                    );
-                  },
-                ),
               ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -395,5 +348,5 @@ class _ScreenBillListState extends State<ScreenBillList> {
         ),
       ),
     );
-  }
-}
+  } }
+
