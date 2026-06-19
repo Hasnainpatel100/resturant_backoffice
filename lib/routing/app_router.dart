@@ -39,6 +39,8 @@ import 'package:back_office/ui/shell/placeholder_screens.dart';
 import '../ui/room_types/screen_room_type_dashboard.dart';
 import '../ui/branch/branch_plan/screen_branch_plan_history.dart';
 import '../ui/branch/branch_plan/screen_branch_plan_form.dart';
+import '../ui/bills/bill_list/screen_bill_list.dart';
+import '../ui/bills/bill_detail/screen_bill_detail.dart';
 
 final GoRouter appRouter = GoRouter(
   navigatorKey: rootNavigatorKey,
@@ -249,6 +251,25 @@ final GoRouter appRouter = GoRouter(
             return ScreenBranchPlanForm(
                 brandId: brandId, branchId: branchId);
           },
+        ),
+        GoRoute(
+          path: AppRoutes.billList,
+          name: 'billList',
+          builder: (context, state) {
+            final brandId = state.pathParameters['brandId']!;
+            return ScreenBillList(brandId: brandId);
+          },
+          routes: [
+            GoRoute(
+              path: ':billId',
+              name: 'billDetail',
+              builder: (context, state) {
+                final brandId = state.pathParameters['brandId']!;
+                final billId = state.pathParameters['billId']!;
+                return ScreenBillDetail(brandId: brandId, billId: billId);
+              },
+            ),
+          ],
         ),
         // Placeholder routes
         GoRoute(

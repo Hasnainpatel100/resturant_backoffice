@@ -56,6 +56,10 @@ abstract final class AppRoutes {
   static const String branchPlanForm =
       '/brands/:brandId/branches/:branchId/plan';
 
+  // Bills routes
+  static const String billList = '/brands/:brandId/bills';
+  static const String billDetail = '/brands/:brandId/bills/:billId';
+
   // Settings
   static const String settings = '/settings';
   static const String profile = '/profile';
