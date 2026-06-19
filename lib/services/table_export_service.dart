@@ -21,7 +21,7 @@ as platform_download;
 class TableExportService {
   static const _templateColumns = [
     'tableNumber',
-    'roomTypeId',
+    'roomTypeName',   // ← was 'roomTypeId'; users enter the name, not the Mongo ID
     'displayName',
     'capacity',
     'description',
@@ -33,7 +33,7 @@ class TableExportService {
 
   static const _sampleRow = [
     'T1',
-    'ROOM001',
+    'VIP Room',       // ← human-readable room-type name
     'Window Table',
     '4',
     'Near entrance',
@@ -46,7 +46,7 @@ class TableExportService {
   static const _instructionLines = [
     'IMPORT INSTRUCTIONS',
     '',
-    'Required columns:  tableNumber, roomTypeId, capacity',
+    'Required columns:  tableNumber, roomTypeName, capacity',
     'Optional columns:  displayName, description, status, isActive, positionX, positionY',
     '',
     'Status allowed values:  available | occupied | reserved | blocked',
@@ -69,10 +69,11 @@ class TableExportService {
           'table_import_format_${DateFormat('yyyyMMdd').format(DateTime.now())}.xlsx';
       await platform_download.downloadBytes(bytes, filename);
       return true;
-    } catch (e) {
-      debugPrint('[TableExportService] download error: $e');
-      return false;
-    }
+    } catch (e, st) {
+  debugPrint('[TableExportService] download error: $e');
+  debugPrintStack(stackTrace: st);
+  return false;
+}
   }
 
   // ── Builder ────────────────────────────────────────────────────────────────
@@ -88,15 +89,15 @@ class TableExportService {
     final headerStyle = CellStyle(
       bold: true,
       horizontalAlign: HorizontalAlign.Center,
-      backgroundColorHex: ExcelColor.fromHexString('#1F3864'),
-      fontColorHex: ExcelColor.fromHexString('#FFFFFF'),
+      backgroundColorHex: '#1F3864',
+      fontColorHex: '#FFFFFF',
     );
 
     // Write headers
     for (var col = 0; col < _templateColumns.length; col++) {
       final cell = templateSheet
           .cell(CellIndex.indexByColumnRow(columnIndex: col, rowIndex: 0));
-      cell.value = TextCellValue(_templateColumns[col]);
+      cell.value = _templateColumns[col];
       cell.cellStyle = headerStyle;
       templateSheet.setColumnWidth(col, 20);
     }
@@ -104,12 +105,12 @@ class TableExportService {
     // Write sample row
     final sampleStyle = CellStyle(
       italic: true,
-      fontColorHex: ExcelColor.fromHexString('#555555'),
+      fontColorHex: '#555555',
     );
     for (var col = 0; col < _sampleRow.length; col++) {
       final cell = templateSheet
           .cell(CellIndex.indexByColumnRow(columnIndex: col, rowIndex: 1));
-      cell.value = TextCellValue(_sampleRow[col]);
+      cell.value = _sampleRow[col];
       cell.cellStyle = sampleStyle;
     }
 
@@ -119,35 +120,23 @@ class TableExportService {
     final titleStyle = CellStyle(
       bold: true,
       fontSize: 14,
-      fontColorHex: ExcelColor.fromHexString('#1F3864'),
+      fontColorHex: '#1F3864',
     );
     final bodyStyle = CellStyle(fontSize: 11);
 
     for (var i = 0; i < _instructionLines.length; i++) {
       final cell = instrSheet
           .cell(CellIndex.indexByColumnRow(columnIndex: 0, rowIndex: i));
-      cell.value = TextCellValue(_instructionLines[i]);
+      cell.value = _instructionLines[i];
       cell.cellStyle = i == 0 ? titleStyle : bodyStyle;
     }
     instrSheet.setColumnWidth(0, 70);
-
-    // Remove the default "Sheet1" created by the excel package
-    excel.delete('Sheet1');
 
     final encoded = excel.encode();
     if (encoded == null) throw Exception('Excel encoding returned null');
     return Uint8List.fromList(encoded);
   }
 }
-
-
-
-
-
-
-
-
-
 
 
 

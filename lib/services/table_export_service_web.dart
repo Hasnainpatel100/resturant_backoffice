@@ -13,4 +13,4 @@ Future<void> downloadBytes(Uint8List bytes, String filename) async {
   anchor.click();
   anchor.remove();
   html.Url.revokeObjectUrl(url);
-}
+}                            

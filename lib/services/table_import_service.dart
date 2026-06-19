@@ -9,8 +9,13 @@ import '../imports/imports.dart';
 class TableImportRow {
   final String tableNumber;
 
-  // User enters this from Excel
+  /// The name exactly as the user typed it in the Excel/CSV file.
+  /// Used for display in the preview dialog.
   final String roomTypeName;
+
+  /// The resolved MongoDB ObjectId, populated after room-type lookup.
+  /// This is what the API receives.
+  final String roomTypeId;
 
   final String displayName;
   final int capacity;
@@ -23,6 +28,7 @@ class TableImportRow {
   const TableImportRow({
     required this.tableNumber,
     required this.roomTypeName,
+    required this.roomTypeId,
     required this.displayName,
     required this.capacity,
     required this.description,
@@ -32,18 +38,19 @@ class TableImportRow {
     this.positionY,
   });
 
-  /// Converts to final API map
+  /// Converts to the final API payload.
+  /// [roomTypeId] is already the resolved Mongo ObjectId – no lookup needed here.
   Map<String, dynamic> toApiMap({
     required String brandId,
     required String branchId,
   }) {
     return {
       'tableNumber': tableNumber,
-      //'roomTypeId': roomTypeId,
+      'roomTypeId': roomTypeId,
       'displayName': displayName,
       'capacity': capacity,
       'description': description,
-      'status': status,
+      'status': status.toUpperCase(),
       'isActive': isActive,
       'positionX': positionX ?? 0,
       'positionY': positionY ?? 0,
@@ -78,14 +85,22 @@ class TableImportService {
     'blocked',
   };
 
-  // ── Required headers (case-insensitive) ────────────────────────────────────
-  static const _requiredHeaders = {'tablenumber', 'roomtypeid', 'capacity'};
+  // ── Required headers (case-insensitive) ───────────────────────────────────
+  // NOTE: header is now "roomtypename", NOT "roomtypeid".
+  static const _requiredHeaders = {'tablenumber', 'roomtypename', 'capacity'};
 
-  // ── Public API ─────────────────────────────────────────────────────────────
+  // ── Public API ────────────────────────────────────────────────────────────
 
   /// Opens the OS file picker and parses the selected file.
+  ///
+  /// [roomTypeNameToId] must be pre-built by the caller:
+  ///   key   = room-type name, lower-cased & trimmed
+  ///   value = MongoDB ObjectId string
+  ///
   /// Returns null if the user cancels, or a [TableImportResult] on success.
-  Future<TableImportResult?> pickAndParse() async {
+  Future<TableImportResult?> pickAndParse({
+    required Map<String, String> roomTypeNameToId,
+  }) async {
     final result = await FilePicker.platform.pickFiles(
       type: FileType.custom,
       allowedExtensions: ['xlsx', 'xls', 'csv'],
@@ -100,39 +115,41 @@ class TableImportService {
 
     final ext = (file.extension ?? '').toLowerCase();
     if (ext == 'csv') {
-      return _parseCsv(bytes);
+      return _parseCsv(bytes, roomTypeNameToId);
     } else if (ext == 'xlsx' || ext == 'xls') {
-      return _parseExcel(bytes);
+      return _parseExcel(bytes, roomTypeNameToId);
     } else {
-      return TableImportResult(
+      return const TableImportResult(
         rows: [],
         errors: ['Unsupported file format. Please use .xlsx, .xls, or .csv.'],
       );
     }
   }
 
-  // ── Parsers ────────────────────────────────────────────────────────────────
+  // ── Parsers ───────────────────────────────────────────────────────────────
 
-  TableImportResult _parseExcel(Uint8List bytes) {
+  TableImportResult _parseExcel(
+      Uint8List bytes,
+      Map<String, String> roomTypeNameToId,
+      ) {
     final excel = Excel.decodeBytes(bytes);
     final sheet = excel.tables[excel.tables.keys.first];
     if (sheet == null || sheet.rows.isEmpty) {
-      return TableImportResult(rows: [], errors: ['Excel sheet is empty.']);
+      return const TableImportResult(rows: [], errors: ['Excel sheet is empty.']);
     }
 
-    // First row = headers
     final headers = sheet.rows.first
         .map((c) => (c?.value?.toString() ?? '').trim().toLowerCase())
         .toList();
 
     final missingHeaders =
-        _requiredHeaders.where((h) => !headers.contains(h)).toList();
+    _requiredHeaders.where((h) => !headers.contains(h)).toList();
     if (missingHeaders.isNotEmpty) {
       return TableImportResult(
         rows: [],
         errors: [
           'Missing required columns: ${missingHeaders.join(', ')}. '
-              'Please use the Download Format template.'
+              'Please use the Download Format template.',
         ],
       );
     }
@@ -141,47 +158,52 @@ class TableImportService {
       return row.map((c) => c?.value?.toString() ?? '').toList();
     }).toList();
 
-    return _validateAndBuild(headers, rawRows);
+    return _validateAndBuild(headers, rawRows, roomTypeNameToId);
   }
 
-  TableImportResult _parseCsv(Uint8List bytes) {
+  TableImportResult _parseCsv(
+      Uint8List bytes,
+      Map<String, String> roomTypeNameToId,
+      ) {
     final csvString = String.fromCharCodes(bytes);
-    final rows = CsvToListConverter().convert(csvString);
+    final rows = const CsvToListConverter().convert(csvString);
     if (rows.isEmpty) {
-      return TableImportResult(rows: [], errors: ['CSV file is empty.']);
+      return const TableImportResult(rows: [], errors: ['CSV file is empty.']);
     }
 
     final headers =
-        rows.first.map((e) => e.toString().trim().toLowerCase()).toList();
+    rows.first.map((e) => e.toString().trim().toLowerCase()).toList();
 
     final missingHeaders =
-        _requiredHeaders.where((h) => !headers.contains(h)).toList();
+    _requiredHeaders.where((h) => !headers.contains(h)).toList();
     if (missingHeaders.isNotEmpty) {
       return TableImportResult(
         rows: [],
         errors: [
           'Missing required columns: ${missingHeaders.join(', ')}. '
-              'Please use the Download Format template.'
+              'Please use the Download Format template.',
         ],
       );
     }
 
     final rawRows =
-        rows.skip(1).map((r) => r.map((e) => e.toString()).toList()).toList();
+    rows.skip(1).map((r) => r.map((e) => e.toString()).toList()).toList();
 
-    return _validateAndBuild(headers, rawRows);
+    return _validateAndBuild(headers, rawRows, roomTypeNameToId);
   }
 
-  // ── Core Validator ─────────────────────────────────────────────────────────
+  // ── Core Validator ────────────────────────────────────────────────────────
 
   TableImportResult _validateAndBuild(
-    List<String> headers,
-    List<List<String>> rawRows,
-  ) {
+      List<String> headers,
+      List<List<String>> rawRows,
+      Map<String, String> roomTypeNameToId,
+      ) {
     final rows = <TableImportRow>[];
     final errors = <String>[];
     final seenTableNumbers = <String>{};
 
+    // Helper: read a column value by its lower-cased header name.
     String col(List<String> row, String name) {
       final idx = headers.indexOf(name);
       if (idx == -1 || idx >= row.length) return '';
@@ -195,17 +217,18 @@ class TableImportService {
       // Skip fully empty rows
       if (raw.every((cell) => cell.isEmpty)) continue;
 
-      final tableNumber = col(raw, 'tablenumber');
-      final roomTypeName = col(raw, 'roomtypeid');
-      final capacityStr = col(raw, 'capacity');
-      final displayName = col(raw, 'displayname');
-      final description = col(raw, 'description');
-      final statusRaw = col(raw, 'status');
-      final isActiveRaw = col(raw, 'isactive');
-      final posXRaw = col(raw, 'positionx');
-      final posYRaw = col(raw, 'positiony');
+      final tableNumber  = col(raw, 'tablenumber');
+      // Read from the "roomTypeName" column (was previously "roomTypeId")
+      final roomTypeName = col(raw, 'roomtypename');
+      final capacityStr  = col(raw, 'capacity');
+      final displayName  = col(raw, 'displayname');
+      final description  = col(raw, 'description');
+      final statusRaw    = col(raw, 'status');
+      final isActiveRaw  = col(raw, 'isactive');
+      final posXRaw      = col(raw, 'positionx');
+      final posYRaw      = col(raw, 'positiony');
 
-      // ── Required field checks ──────────────────────────────────────────────
+      // ── Required field checks ─────────────────────────────────────────────
       if (tableNumber.isEmpty) {
         errors.add('Row $rowNum: tableNumber is required.');
         continue;
@@ -220,12 +243,12 @@ class TableImportService {
       if (capacity == null || capacity < 0) {
         errors.add(
           'Row $rowNum ($tableNumber): capacity must be a non-negative integer '
-          '(got "$capacityStr").',
+              '(got "$capacityStr").',
         );
         continue;
       }
 
-      // ── Duplicate check ────────────────────────────────────────────────────
+      // ── Duplicate check ───────────────────────────────────────────────────
       if (seenTableNumbers.contains(tableNumber.toLowerCase())) {
         errors.add(
           'Row $rowNum: duplicate tableNumber "$tableNumber" in the import file.',
@@ -234,25 +257,38 @@ class TableImportService {
       }
       seenTableNumbers.add(tableNumber.toLowerCase());
 
-      // ── Optional field defaults & validation ───────────────────────────────
+      // ── Room-type name → ID resolution ────────────────────────────────────
+      // Normalise: lower-case + trim (trim already applied by col()).
+      final lookupKey = roomTypeName.toLowerCase();
+      final resolvedRoomTypeId = roomTypeNameToId[lookupKey];
+
+      if (resolvedRoomTypeId == null) {
+        errors.add(
+          "Row $rowNum ($tableNumber): Room Type '$roomTypeName' does not exist.",
+        );
+        continue;
+      }
+
+      // ── Optional field defaults & validation ──────────────────────────────
       final status = statusRaw.isEmpty ? 'available' : statusRaw.toLowerCase();
       if (!_allowedStatuses.contains(status)) {
         errors.add(
           'Row $rowNum ($tableNumber): invalid status "$statusRaw". '
-          'Allowed values: ${_allowedStatuses.join(', ')}.',
+              'Allowed values: ${_allowedStatuses.join(', ')}.',
         );
         continue;
       }
 
       final isActive =
-          isActiveRaw.isEmpty ? true : isActiveRaw.toLowerCase() != 'false';
+      isActiveRaw.isEmpty ? true : isActiveRaw.toLowerCase() != 'false';
 
       final posX = posXRaw.isEmpty ? null : double.tryParse(posXRaw);
       final posY = posYRaw.isEmpty ? null : double.tryParse(posYRaw);
 
       rows.add(TableImportRow(
         tableNumber: tableNumber,
-        roomTypeName: roomTypeName,
+        roomTypeName: roomTypeName,         // kept for preview display
+        roomTypeId: resolvedRoomTypeId,     // resolved ID goes to the API
         displayName: displayName.isEmpty ? tableNumber : displayName,
         capacity: capacity,
         description: description,
@@ -300,7 +336,7 @@ class ImportPreviewDialog extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // ── Title ─────────────────────────────────────────────────────
+              // ── Title ──────────────────────────────────────────────────────
               Row(
                 children: [
                   Icon(Icons.preview_outlined, color: colorScheme.primary),
@@ -319,7 +355,7 @@ class ImportPreviewDialog extends StatelessWidget {
                     const SizedBox(width: 8),
                     _Chip(
                       label:
-                          '${result.errors.length} error${result.errors.length == 1 ? '' : 's'}',
+                      '${result.errors.length} error${result.errors.length == 1 ? '' : 's'}',
                       color: Colors.red,
                     ),
                   ],
@@ -327,7 +363,7 @@ class ImportPreviewDialog extends StatelessWidget {
               ),
               const SizedBox(height: 16),
 
-              // ── Errors ────────────────────────────────────────────────────
+              // ── Errors ─────────────────────────────────────────────────────
               if (result.hasErrors) ...[
                 Container(
                   width: double.infinity,
@@ -337,7 +373,7 @@ class ImportPreviewDialog extends StatelessWidget {
                     border: Border.all(color: Colors.red.shade200),
                   ),
                   padding:
-                      const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                  const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -346,7 +382,7 @@ class ImportPreviewDialog extends StatelessWidget {
                               ?.copyWith(color: Colors.red.shade700)),
                       const SizedBox(height: 6),
                       ...result.errors.map(
-                        (e) => Padding(
+                            (e) => Padding(
                           padding: const EdgeInsets.only(bottom: 2),
                           child: Text('• $e',
                               style: TextStyle(
@@ -359,7 +395,7 @@ class ImportPreviewDialog extends StatelessWidget {
                 const SizedBox(height: 14),
               ],
 
-              // ── Valid rows table ───────────────────────────────────────────
+              // ── Valid rows table ────────────────────────────────────────────
               if (result.rows.isNotEmpty) ...[
                 Text('Valid Rows (${result.rows.length})',
                     style: theme.textTheme.labelLarge
@@ -389,7 +425,7 @@ class ImportPreviewDialog extends StatelessWidget {
 
               const SizedBox(height: 20),
 
-              // ── Actions ───────────────────────────────────────────────────
+              // ── Actions ────────────────────────────────────────────────────
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
@@ -405,12 +441,13 @@ class ImportPreviewDialog extends StatelessWidget {
                     onPressed: result.rows.isEmpty
                         ? null
                         : () {
-                            Navigator.pop(context);
-                            onConfirm();
-                          },
+                      Navigator.pop(context);
+                      onConfirm();
+                    },
                     icon: const Icon(Icons.upload_rounded, size: 18),
                     label: Text(
-                      'Import ${result.rows.length} Table${result.rows.length == 1 ? '' : 's'}',
+                      'Import ${result.rows.length} '
+                          'Table${result.rows.length == 1 ? '' : 's'}',
                     ),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: colorScheme.primary,
@@ -465,7 +502,7 @@ class _PreviewTable extends StatelessWidget {
     return Table(
       columnWidths: const {
         0: FlexColumnWidth(1.4),
-        1: FlexColumnWidth(1.6),
+        1: FlexColumnWidth(1.8), // wider – room-type names can be long
         2: FlexColumnWidth(1.6),
         3: FlexColumnWidth(0.7),
         4: FlexColumnWidth(1),
@@ -475,24 +512,24 @@ class _PreviewTable extends StatelessWidget {
         horizontalInside: BorderSide(color: Colors.grey.shade200),
       ),
       children: [
-        // Header
+        // Header – now shows "Room Type Name" instead of "Room Type ID"
         TableRow(
           decoration: BoxDecoration(color: Colors.grey.shade100),
           children: [
             _cell('Table #', headerStyle),
-            _cell('Room Type ID', headerStyle),
+            _cell('Room Type Name', headerStyle), // ← updated label
             _cell('Display Name', headerStyle),
             _cell('Cap.', headerStyle),
             _cell('Status', headerStyle),
             _cell('Active', headerStyle),
           ],
         ),
-        // Data rows
+        // Data rows – display the human-readable name, not the raw ID
         ...rows.map(
-          (r) => TableRow(
+              (r) => TableRow(
             children: [
               _cell(r.tableNumber, cellStyle),
-              _cell(r.roomTypeName, cellStyle),
+              _cell(r.roomTypeName, cellStyle), // ← show name, not resolved ID
               _cell(r.displayName, cellStyle),
               _cell(r.capacity.toString(), cellStyle),
               _cell(r.status, cellStyle),
@@ -505,8 +542,10 @@ class _PreviewTable extends StatelessWidget {
   }
 
   Widget _cell(String text, TextStyle style) => Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-        child: Text(text,
-            style: style, maxLines: 1, overflow: TextOverflow.ellipsis),
-      );
+    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+    child: Text(text,
+        style: style, maxLines: 1, overflow: TextOverflow.ellipsis),
+  );
 }
+
+// TableExportService lives in table_export_service.dart — do not duplicate here.

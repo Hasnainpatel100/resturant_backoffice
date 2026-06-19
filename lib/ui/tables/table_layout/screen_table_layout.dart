@@ -14,7 +14,6 @@ import '../../../data/models/room_type_model.dart';
 import '../../../data/repositories/room_type_repository_impl.dart';
 import '../../../services/table_import_service.dart';
 
-// Import / Export services (created alongside this file)
 // ---------------------------------------------------------------------------
 // ScreenTableLayout
 // ---------------------------------------------------------------------------
@@ -31,8 +30,15 @@ class ScreenTableLayout extends StatefulWidget {
 
 class _ScreenTableLayoutState extends State<ScreenTableLayout> {
   late String? _selectedBranchId = widget.branchId;
+
+  /// Full list of room types for the selected branch.
   List<RoomTypeModel> _roomTypes = [];
   bool _roomTypesLoading = false;
+
+  /// Case-insensitive lookup: trimmed-lower-name → Mongo ObjectId.
+  /// Built once after [_roomTypes] is loaded and reused by every import.
+  Map<String, String> _roomTypeNameToId = {};
+
   CubitTable? _cubitTable;
 
   // Services
@@ -69,6 +75,7 @@ class _ScreenTableLayoutState extends State<ScreenTableLayout> {
 
   Future<void> _loadRoomTypes() async {
     if (_selectedBranchId == null) return;
+    // Always refresh when the branch changes (list cleared on branch switch).
     if (_roomTypes.isNotEmpty) return;
 
     setState(() => _roomTypesLoading = true);
@@ -82,8 +89,14 @@ class _ScreenTableLayoutState extends State<ScreenTableLayout> {
         setState(() => _roomTypesLoading = false);
       },
           (response) {
+        // Build the lookup map: lower-cased name → Mongo ID.
+        final nameToId = <String, String>{
+          for (final rt in response.items) rt.name.trim().toLowerCase(): rt.id,
+        };
+
         setState(() {
           _roomTypes = response.items;
+          _roomTypeNameToId = nameToId;
           _roomTypesLoading = false;
         });
       },
@@ -98,11 +111,38 @@ class _ScreenTableLayoutState extends State<ScreenTableLayout> {
       return;
     }
 
+    // Make sure room types are available before opening the file picker.
+    // If they haven't loaded yet, wait for them now.
+    if (_roomTypes.isEmpty && !_roomTypesLoading) {
+      await _loadRoomTypes();
+    }
+
+    if (!mounted) return;
+
+    // If room types are still loading, block the import with a user-facing message.
+    if (_roomTypesLoading) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text(
+              'Room types are still loading. Please try again in a moment.'),
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: Colors.orange.shade700,
+          shape:
+          RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        ),
+      );
+      return;
+    }
+
     setState(() => _isImporting = true);
 
     TableImportResult? result;
     try {
-      result = await _importService.pickAndParse();
+      // Pass the pre-built lookup map so the parser can resolve names → IDs
+      // without any extra async calls.
+      result = await _importService.pickAndParse(
+        roomTypeNameToId: _roomTypeNameToId,
+      );
     } finally {
       if (mounted) setState(() => _isImporting = false);
     }
@@ -123,6 +163,7 @@ class _ScreenTableLayoutState extends State<ScreenTableLayout> {
   void _submitImport(BuildContext context, TableImportResult result) {
     if (_cubitTable == null) return;
 
+    // toApiMap() now includes roomTypeId (the resolved Mongo ObjectId).
     final rows = result.rows
         .map((r) => r.toApiMap(
       brandId: widget.brandId,
@@ -135,7 +176,8 @@ class _ScreenTableLayoutState extends State<ScreenTableLayout> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
-          '${result.rows.length} table${result.rows.length == 1 ? '' : 's'} imported successfully.',
+          '${result.rows.length} table${result.rows.length == 1 ? '' : 's'} '
+              'imported successfully.',
         ),
         behavior: SnackBarBehavior.floating,
         backgroundColor: Colors.green.shade700,
@@ -170,6 +212,25 @@ class _ScreenTableLayoutState extends State<ScreenTableLayout> {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       ),
     );
+  }
+
+  // ── Bulk numbering helper ────────────────────────────────────────────────
+
+  /// Returns the next available numeric suffix for [prefix], based on the
+  /// currently loaded tables in `_cubitTable.state.tables`.
+  /// e.g. if A1..A5 exist, returns 6. If no matching tables exist, returns 1.
+  int _nextNumberForPrefix(String prefix) {
+    final tables = _cubitTable?.state.tables ?? [];
+    final regex = RegExp('^${RegExp.escape(prefix)}(\\d+)\$');
+
+    int maxSuffix = 0;
+    for (final t in tables) {
+      final match = regex.firstMatch(t.tableNumber);
+      if (match == null) continue;
+      final n = int.tryParse(match.group(1)!) ?? 0;
+      if (n > maxSuffix) maxSuffix = n;
+    }
+    return maxSuffix + 1;
   }
 
   // ── Add Table dialog ───────────────────────────────────────────────────────
@@ -288,8 +349,7 @@ class _ScreenTableLayoutState extends State<ScreenTableLayout> {
                       child: SizedBox(
                         width: 16,
                         height: 16,
-                        child:
-                        CircularProgressIndicator(strokeWidth: 2),
+                        child: CircularProgressIndicator(strokeWidth: 2),
                       ),
                     )
                   else if (_roomTypes.isEmpty)
@@ -297,8 +357,7 @@ class _ScreenTableLayoutState extends State<ScreenTableLayout> {
                       padding: EdgeInsets.only(top: 6),
                       child: Text(
                         'No room types found. Please add a room type first.',
-                        style:
-                        TextStyle(fontSize: 11, color: Colors.orange),
+                        style: TextStyle(fontSize: 11, color: Colors.orange),
                       ),
                     ),
                 ],
@@ -331,14 +390,23 @@ class _ScreenTableLayoutState extends State<ScreenTableLayout> {
                     final count =
                         int.tryParse(bulkCountController.text) ?? 1;
                     if (count < 1) return;
+
+                    // ✅ Auto-continue numbering: find the highest existing
+                    // numeric suffix for this prefix and start after it,
+                    // instead of always restarting at 1 (which caused dupes).
+                    final startNumber = _nextNumberForPrefix(prefix);
+
                     tables = List.generate(
                       count,
-                          (i) => {
-                        'tableNumber': '$prefix${i + 1}',
-                        'displayName': '$prefix${i + 1}',
-                        'capacity': capacity,
-                        'branchId': _selectedBranchId,
-                        'roomTypeId': selectedRoomTypeId,
+                          (i) {
+                        final number = startNumber + i;
+                        return {
+                          'tableNumber': '$prefix$number',
+                          'displayName': '$prefix$number',
+                          'capacity': capacity,
+                          'branchId': _selectedBranchId,
+                          'roomTypeId': selectedRoomTypeId,
+                        };
                       },
                     );
                   } else {
@@ -357,7 +425,9 @@ class _ScreenTableLayoutState extends State<ScreenTableLayout> {
                     ];
                   }
 
+                  debugPrint('TABLES SENT: $tables');
                   _cubitTable?.createTables(widget.brandId, tables);
+                  debugPrint('TABLES SENT: $tables');
                   Navigator.pop(dialogContext);
                 },
                 child: Text(isBulk ? 'Add Tables' : 'Add Table'),
@@ -412,6 +482,9 @@ class _ScreenTableLayoutState extends State<ScreenTableLayout> {
         onBranchSelected: (branchId) {
           setState(() {
             _selectedBranchId = branchId;
+            // Clear room types so they are re-fetched for the new branch.
+            _roomTypes = [];
+            _roomTypeNameToId = {};
             _initTableCubit(branchId);
           });
           _loadRoomTypes();
@@ -455,55 +528,43 @@ class _TableLayoutBody extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Tables'),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => context.go('/brands/$brandId'),
-        ),
+        title: const Text('Table Layout'),
         actions: [
-          // ── Upload button ─────────────────────────────────────────────────
-          Tooltip(
-            message: 'Bulk import tables from Excel or CSV',
-            child: _HeaderButton(
-              label: 'Upload',
-              icon: isImporting
-                  ? const SizedBox(
-                width: 16,
-                height: 16,
-                child: CircularProgressIndicator(
-                    strokeWidth: 2, color: Colors.blueGrey),
-              )
-                  : const Icon(Icons.upload_file_outlined, size: 18),
-              outlined: true,
-              disabled: isImporting,
-              onPressed: () => onUpload(context),
-            ),
-          ),
-          const SizedBox(width: 8),
-
           // ── Download Format button ────────────────────────────────────────
-          Tooltip(
-            message: 'Download Excel import template',
+          Padding(
+            padding: const EdgeInsets.only(right: 4),
             child: _HeaderButton(
-              label: 'Download Format',
+              label: isDownloading ? 'Downloading…' : 'Download Format',
               icon: isDownloading
                   ? const SizedBox(
-                width: 16,
-                height: 16,
-                child: CircularProgressIndicator(
-                    strokeWidth: 2, color: Colors.blueGrey),
-              )
-                  : const Icon(Icons.download_outlined, size: 18),
+                  width: 16,
+                  height: 16,
+                  child: CircularProgressIndicator(strokeWidth: 2))
+                  : const Icon(Icons.download_rounded),
               outlined: true,
               disabled: isDownloading,
               onPressed: () => onDownloadFormat(context),
             ),
           ),
-          const SizedBox(width: 8),
-
-          // ── Add Table button (primary / filled) ───────────────────────────
-          Tooltip(
-            message: 'Add a new table',
+          // ── Upload button ─────────────────────────────────────────────────
+          Padding(
+            padding: const EdgeInsets.only(right: 4),
+            child: _HeaderButton(
+              label: isImporting ? 'Importing…' : 'Upload',
+              icon: isImporting
+                  ? const SizedBox(
+                  width: 16,
+                  height: 16,
+                  child: CircularProgressIndicator(strokeWidth: 2))
+                  : const Icon(Icons.upload_rounded),
+              outlined: true,
+              disabled: isImporting,
+              onPressed: () => onUpload(context),
+            ),
+          ),
+          // ── Add Table button ──────────────────────────────────────────────
+          Padding(
+            padding: const EdgeInsets.only(right: 12),
             child: _HeaderButton(
               label: 'Add Table',
               icon: const Icon(Icons.add_rounded, size: 18),
@@ -524,8 +585,7 @@ class _TableLayoutBody extends StatelessWidget {
               child: BlocBuilder<CubitBranch, StateBranch>(
                 builder: (context, branchState) {
                   if (branchState.status == BranchStatus.loading) {
-                    return const Center(
-                        child: CircularProgressIndicator());
+                    return const Center(child: CircularProgressIndicator());
                   }
                   if (branchState.branches.isEmpty) {
                     return Card(
@@ -534,9 +594,7 @@ class _TableLayoutBody extends StatelessWidget {
                         child: Text(
                           'No branches found',
                           style: TextStyle(
-                              color: Theme.of(context)
-                                  .colorScheme
-                                  .outline),
+                              color: Theme.of(context).colorScheme.outline),
                         ),
                       ),
                     );
@@ -568,14 +626,12 @@ class _TableLayoutBody extends StatelessWidget {
                           const Icon(Icons.error_outline,
                               size: 48, color: Colors.red),
                           SizedBox(height: AppSpacing.md),
-                          Text(state.errorMessage ??
-                              'An error occurred'),
+                          Text(state.errorMessage ?? 'An error occurred'),
                           SizedBox(height: AppSpacing.md),
                           ElevatedButton(
                             onPressed: () => context
                                 .read<CubitTable>()
-                                .loadTables(
-                                brandId, selectedBranchId!),
+                                .loadTables(brandId, selectedBranchId!),
                             child: const Text('Retry'),
                           ),
                         ],
@@ -584,8 +640,7 @@ class _TableLayoutBody extends StatelessWidget {
                   }
 
                   if (state.status == StateTableStatus.loading) {
-                    return const Center(
-                        child: CircularProgressIndicator());
+                    return const Center(child: CircularProgressIndicator());
                   }
 
                   if (state.tables.isEmpty) {
@@ -596,8 +651,7 @@ class _TableLayoutBody extends StatelessWidget {
                           Icon(
                             Icons.table_restaurant_outlined,
                             size: 64,
-                            color:
-                            Theme.of(context).colorScheme.outline,
+                            color: Theme.of(context).colorScheme.outline,
                           ),
                           SizedBox(height: AppSpacing.md),
                           const Text('No tables configured'),
@@ -616,8 +670,7 @@ class _TableLayoutBody extends StatelessWidget {
                     padding: EdgeInsets.all(AppSpacing.md),
                     gridDelegate:
                     SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount:
-                      _crossAxisCount(context),
+                      crossAxisCount: _crossAxisCount(context),
                       mainAxisSpacing: AppSpacing.sm,
                       crossAxisSpacing: AppSpacing.sm,
                     ),
@@ -693,8 +746,7 @@ class _TableLayoutBody extends StatelessWidget {
               context.read<CubitTable>().updateTable(table.id, {
                 'displayName': displayNameController.text,
                 'capacity':
-                int.tryParse(capacityController.text) ??
-                    table.capacity,
+                int.tryParse(capacityController.text) ?? table.capacity,
                 'tableNumber': table.tableNumber,
                 'brandId': table.brandId,
                 'branchId': table.branchId,
@@ -890,8 +942,7 @@ class _TableCard extends StatelessWidget {
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16)),
               title: Text('Delete Table ${table.tableNumber}?'),
-              content:
-              const Text('This action cannot be undone.'),
+              content: const Text('This action cannot be undone.'),
               actions: [
                 TextButton(
                   onPressed: () => Navigator.pop(dialogContext),
@@ -902,8 +953,8 @@ class _TableCard extends StatelessWidget {
                     Navigator.pop(dialogContext);
                     onDelete();
                   },
-                  style: TextButton.styleFrom(
-                      foregroundColor: Colors.red),
+                  style:
+                  TextButton.styleFrom(foregroundColor: Colors.red),
                   child: const Text('Delete'),
                 ),
               ],
@@ -919,8 +970,7 @@ class _TableCard extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(Icons.table_restaurant,
-                  color: statusColor, size: 24),
+              Icon(Icons.table_restaurant, color: statusColor, size: 24),
               const SizedBox(height: 4),
               Text(
                 table.displayName.isNotEmpty
@@ -946,8 +996,7 @@ class _TableCard extends StatelessWidget {
                   ),
                   child: const Text(
                     'Inactive',
-                    style:
-                    TextStyle(fontSize: 9, color: Colors.red),
+                    style: TextStyle(fontSize: 9, color: Colors.red),
                   ),
                 ),
             ],

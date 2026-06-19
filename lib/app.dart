@@ -5,6 +5,7 @@ import 'package:back_office/shared/wrappers/skeleton_wrapper.dart';
 import 'package:back_office/ui/auth/login/cubit_auth.dart';
 import 'package:back_office/ui/auth/login/cubit_session.dart';
 import 'package:back_office/ui/auth/login/state_session.dart';
+import 'package:back_office/ui/settings/settings/cubit_theme.dart';
 import 'package:flutter/scheduler.dart';
 
 class App extends StatelessWidget {
@@ -19,6 +20,7 @@ class App extends StatelessWidget {
       providers: [
         BlocProvider(create: (_) => CubitAuth(repository: authRepository)),
         BlocProvider(create: (_) => CubitSession(repository: authRepository)),
+        BlocProvider(create: (_) => CubitTheme()),
       ],
       child: Builder(builder: (context) => _buildApp(context)),
     );
@@ -37,11 +39,18 @@ class App extends StatelessWidget {
         Widget current = child ?? const SizedBox.shrink();
         current = SkeletonWrapper(child: current);
         current = _SessionListenerWrapper(child: current);
-        current = Theme(
-          data: (MediaQuery.of(context).platformBrightness == Brightness.dark)
-              ? buildDarkTheme(primaryColorHex: '#007ea8')
-              : buildLightTheme(primaryColorHex: '#007ea8'),
-          child: current,
+
+        final content = current;
+
+        current = BlocBuilder<CubitTheme, bool>(
+          builder: (context, isDark) {
+            return Theme(
+              data: isDark
+                  ? buildDarkTheme(primaryColorHex: '#007ea8')
+                  : buildLightTheme(primaryColorHex: '#007ea8'),
+              child: content,
+            );
+          },
         );
         return current;
       },
