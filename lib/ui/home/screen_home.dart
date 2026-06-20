@@ -447,7 +447,7 @@ class _DashboardViewState extends State<DashboardView> {
       Colors.pink.shade600,
       Colors.amber.shade600,
       Colors.indigo.shade600,
-    ];
+  ];
 
     final sections = List.generate(report.serviceTypes.length, (index) {
       final st = report.serviceTypes[index];
