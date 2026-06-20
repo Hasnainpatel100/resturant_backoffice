@@ -20,9 +20,11 @@ import 'package:back_office/ui/brand/brand_form/screen_brand_form.dart';
 
 import 'package:back_office/ui/branch/branch_list/screen_branch_list.dart';
 import 'package:back_office/ui/branch/branch_detail/screen_branch_detail.dart';
+import 'package:back_office/ui/branch/branch_form/screen_branch_form.dart';
 
 import 'package:back_office/ui/users/user_list/screen_user_list.dart';
 import 'package:back_office/ui/users/user_form/screen_user_form.dart';
+import 'package:back_office/ui/users/user_detail/screen_user_detail.dart';
 
 import 'package:back_office/ui/menu/menu_dashboard/screen_menu_dashboard.dart';
 
@@ -33,6 +35,12 @@ import 'package:back_office/ui/pos_devices/pos_device_list/screen_pos_device_lis
 import 'package:back_office/ui/settings/settings/screen_settings.dart';
 import 'package:back_office/ui/profile/screen_profile.dart';
 import 'package:back_office/ui/shell/placeholder_screens.dart';
+
+import '../ui/room_types/screen_room_type_dashboard.dart';
+import '../ui/branch/branch_plan/screen_branch_plan_history.dart';
+import '../ui/branch/branch_plan/screen_branch_plan_form.dart';
+import '../ui/bills/bill_list/screen_bill_list.dart';
+import '../ui/bills/bill_detail/screen_bill_detail.dart';
 
 final GoRouter appRouter = GoRouter(
   navigatorKey: rootNavigatorKey,
@@ -73,9 +81,9 @@ final GoRouter appRouter = GoRouter(
         final sessionCubit = context.watch<CubitSession>();
         final user = sessionCubit.state.user;
         return AppShell(
-          child: child,
           currentLocation: state.matchedLocation,
           user: user,
+          child: child,
         );
       },
       routes: [
@@ -119,6 +127,14 @@ final GoRouter appRouter = GoRouter(
           },
         ),
         GoRoute(
+          path: AppRoutes.branchCreate,
+          name: 'branchCreate',
+          builder: (context, state) {
+            final brandId = state.pathParameters['brandId']!;
+            return ScreenBranchForm(brandId: brandId);
+          },
+        ),
+        GoRoute(
           path: AppRoutes.branchDetail,
           name: 'branchDetail',
           builder: (context, state) {
@@ -128,20 +144,51 @@ final GoRouter appRouter = GoRouter(
           },
         ),
         GoRoute(
+          path: AppRoutes.branchEdit,
+          name: 'branchEdit',
+          builder: (context, state) {
+            final brandId = state.pathParameters['brandId']!;
+            final branchId = state.pathParameters['branchId']!;
+            return ScreenBranchForm(brandId: brandId, branchId: branchId);
+          },
+        ),
+        GoRoute(
           path: AppRoutes.userList,
           name: 'userList',
           builder: (context, state) {
             final brandId = state.pathParameters['brandId']!;
             return ScreenUserList(brandId: brandId);
           },
-        ),
-        GoRoute(
-          path: AppRoutes.userCreate,
-          name: 'userCreate',
-          builder: (context, state) {
-            final brandId = state.pathParameters['brandId']!;
-            return ScreenUserForm(brandId: brandId);
-          },
+          routes: [
+            GoRoute(
+              path: 'create',
+              name: 'userCreate',
+              builder: (context, state) {
+                final brandId = state.pathParameters['brandId']!;
+                return ScreenUserForm(brandId: brandId);
+              },
+            ),
+            GoRoute(
+              path: ':userId',
+              name: 'userDetail',
+              builder: (context, state) {
+                final brandId = state.pathParameters['brandId']!;
+                final userId = state.pathParameters['userId']!;
+                return ScreenUserDetail(brandId: brandId, userId: userId);
+              },
+              routes: [
+                GoRoute(
+                  path: 'edit',
+                  name: 'userEdit',
+                  builder: (context, state) {
+                    final brandId = state.pathParameters['brandId']!;
+                    final userId = state.pathParameters['userId']!;
+                    return ScreenUserForm(brandId: brandId, userId: userId);
+                  },
+                ),
+              ],
+            ),
+          ],
         ),
         GoRoute(
           path: AppRoutes.menuDashboard,
@@ -157,6 +204,14 @@ final GoRouter appRouter = GoRouter(
           builder: (context, state) {
             final brandId = state.pathParameters['brandId']!;
             return ScreenTableLayout(brandId: brandId);
+          },
+        ),
+        GoRoute(
+          path: AppRoutes.roomTypes,
+          name: 'roomTypes',
+          builder: (context, state) {
+            final brandId = state.pathParameters['brandId']!;
+            return ScreenRoomTypeDashboard(brandId: brandId);
           },
         ),
         GoRoute(
@@ -176,6 +231,45 @@ final GoRouter appRouter = GoRouter(
           path: AppRoutes.profile,
           name: 'profile',
           builder: (context, state) => const ScreenProfile(),
+        ),
+        GoRoute(
+          path: AppRoutes.branchPlanHistory,
+          name: 'branchPlanHistory',
+          builder: (context, state) {
+            final brandId = state.pathParameters['brandId']!;
+            final branchId = state.pathParameters['branchId']!;
+            return ScreenBranchPlanHistory(
+                brandId: brandId, branchId: branchId);
+          },
+        ),
+        GoRoute(
+          path: AppRoutes.branchPlanForm,
+          name: 'branchPlanForm',
+          builder: (context, state) {
+            final brandId = state.pathParameters['brandId']!;
+            final branchId = state.pathParameters['branchId']!;
+            return ScreenBranchPlanForm(
+                brandId: brandId, branchId: branchId);
+          },
+        ),
+        GoRoute(
+          path: AppRoutes.billList,
+          name: 'billList',
+          builder: (context, state) {
+            final brandId = state.pathParameters['brandId']!;
+            return ScreenBillList(brandId: brandId);
+          },
+          routes: [
+            GoRoute(
+              path: ':billId',
+              name: 'billDetail',
+              builder: (context, state) {
+                final brandId = state.pathParameters['brandId']!;
+                final billId = state.pathParameters['billId']!;
+                return ScreenBillDetail(brandId: brandId, billId: billId);
+              },
+            ),
+          ],
         ),
         // Placeholder routes
         GoRoute(

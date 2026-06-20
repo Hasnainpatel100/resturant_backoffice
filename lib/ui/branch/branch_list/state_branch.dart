@@ -2,7 +2,7 @@ import 'package:equatable/equatable.dart';
 import 'package:back_office/data/models/branch_model.dart';
 import 'package:back_office/data/models/api_response_model.dart';
 
-enum BranchStatus { initial, loading, loaded, error }
+enum BranchStatus { initial, loading, loaded, success, error }
 
 class StateBranch extends Equatable {
   final BranchStatus status;

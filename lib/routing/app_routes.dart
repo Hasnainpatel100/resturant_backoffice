@@ -50,6 +50,16 @@ abstract final class AppRoutes {
   static const String deviceRegistration =
       '/brands/:brandId/pos-devices/register';
 
+  // Branch Plan routes
+  static const String branchPlanHistory =
+      '/brands/:brandId/branches/:branchId/plan-history';
+  static const String branchPlanForm =
+      '/brands/:brandId/branches/:branchId/plan';
+
+  // Bills routes
+  static const String billList = '/brands/:brandId/bills';
+  static const String billDetail = '/brands/:brandId/bills/:billId';
+
   // Settings
   static const String settings = '/settings';
   static const String profile = '/profile';

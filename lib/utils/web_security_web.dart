@@ -14,34 +14,27 @@ class WebSecurity {
     if (!kIsWeb) return;
 
     // Disable right-click context menu
-    web.document.body?.addEventListener('contextmenu', (event) {
+    web.document.body?.addEventListener('contextmenu', ((web.Event event) {
       event.preventDefault();
-    }.toJS);
+    }).toJS);
 
     // Block common DevTools keyboard shortcuts
-    web.window.addEventListener('keydown', (event) {
+    web.window.addEventListener('keydown', ((web.Event event) {
       final keyEvent = event as web.KeyboardEvent;
 
       // F12
       if (keyEvent.keyCode == 123) {
         event.preventDefault();
-        return;
-      }
-      // Ctrl+Shift+I (DevTools)
-      if (keyEvent.ctrlKey && keyEvent.shiftKey && keyEvent.key == 'I') {
+      } else if (keyEvent.ctrlKey && keyEvent.shiftKey && keyEvent.key == 'I') {
+        // Ctrl+Shift+I (DevTools)
         event.preventDefault();
-        return;
-      }
-      // Ctrl+Shift+J (Console)
-      if (keyEvent.ctrlKey && keyEvent.shiftKey && keyEvent.key == 'J') {
+      } else if (keyEvent.ctrlKey && keyEvent.shiftKey && keyEvent.key == 'J') {
+        // Ctrl+Shift+J (Console)
         event.preventDefault();
-        return;
-      }
-      // Ctrl+U (View source)
-      if (keyEvent.ctrlKey && keyEvent.key == 'u') {
+      } else if (keyEvent.ctrlKey && keyEvent.key == 'u') {
+        // Ctrl+U (View source)
         event.preventDefault();
-        return;
       }
-    }.toJS);
+    }).toJS);
   }
 }

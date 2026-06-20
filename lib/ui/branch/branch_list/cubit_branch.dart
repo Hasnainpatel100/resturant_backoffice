@@ -36,7 +36,7 @@ class CubitBranch extends Cubit<StateBranch> {
     final result = await _repository.createBranch(brandId, data);
     result.fold(
       (failure) => emit(state.copyWith(status: BranchStatus.error, errorMessage: failure.message)),
-      (branch) => emit(state.copyWith(status: BranchStatus.loaded, branch: branch)),
+      (branch) => emit(state.copyWith(status: BranchStatus.success, branch: branch)),
     );
   }
 
@@ -45,7 +45,7 @@ class CubitBranch extends Cubit<StateBranch> {
     final result = await _repository.updateBranch(branchId, data);
     result.fold(
       (failure) => emit(state.copyWith(status: BranchStatus.error, errorMessage: failure.message)),
-      (branch) => emit(state.copyWith(status: BranchStatus.loaded, branch: branch)),
+      (branch) => emit(state.copyWith(status: BranchStatus.success, branch: branch)),
     );
   }
 
@@ -54,7 +54,7 @@ class CubitBranch extends Cubit<StateBranch> {
     final result = await _repository.deleteBranch(branchId);
     result.fold(
       (failure) => emit(state.copyWith(status: BranchStatus.error, errorMessage: failure.message)),
-      (_) => emit(state.copyWith(status: BranchStatus.loaded, branch: null)),
+      (_) => emit(state.copyWith(status: BranchStatus.success, branch: null)),
     );
   }
 

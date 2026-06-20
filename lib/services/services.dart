@@ -3,4 +3,5 @@ export 'internet_connection_service.dart';
 export 'dio_service.dart';
 export 'storage_service.dart';
 export 'secure_storage_service.dart';
+export 'table_export_service.dart';
 

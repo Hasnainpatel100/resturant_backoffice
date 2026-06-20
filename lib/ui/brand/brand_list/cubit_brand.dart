@@ -36,7 +36,7 @@ class CubitBrand extends Cubit<StateBrand> {
     final result = await _repository.createBrand(data);
     result.fold(
       (failure) => emit(state.copyWith(status: BrandStatus.error, errorMessage: failure.message)),
-      (brand) => emit(state.copyWith(status: BrandStatus.loaded, brand: brand)),
+      (brand) => emit(state.copyWith(status: BrandStatus.success, brand: brand)),
     );
   }
 
@@ -46,7 +46,7 @@ class CubitBrand extends Cubit<StateBrand> {
     final result = await _repository.updateBrand(brandId, data);
     result.fold(
       (failure) => emit(state.copyWith(status: BrandStatus.error, errorMessage: failure.message)),
-      (brand) => emit(state.copyWith(status: BrandStatus.loaded, brand: brand)),
+      (brand) => emit(state.copyWith(status: BrandStatus.success, brand: brand)),
     );
   }
 
@@ -55,7 +55,7 @@ class CubitBrand extends Cubit<StateBrand> {
     final result = await _repository.deleteBrand(brandId);
     result.fold(
       (failure) => emit(state.copyWith(status: BrandStatus.error, errorMessage: failure.message)),
-      (_) => emit(state.copyWith(status: BrandStatus.loaded, brand: null)),
+      (_) => emit(state.copyWith(status: BrandStatus.success, brand: null)),
     );
   }
 

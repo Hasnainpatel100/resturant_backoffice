@@ -61,24 +61,46 @@ class MenuRepositoryImpl implements MenuRepository {
   }
 
   @override
+  @override
   FutureEither<CategoryModel> updateCategory(
-    String categoryId,
-    Map<String, dynamic> data,
-  ) async {
+      String brandId,
+      String categoryId,
+      Map<String, dynamic> data,
+      ) async {
+
     return runTask(() async {
-      final response = await AppConfig.dio.put<Map<String, dynamic>>(
+
+      final response =
+      await AppConfig.dio.put<Map<String, dynamic>>(
+
         '/api/menu/categories/$categoryId',
-        data: data,
+
+        data: {
+          'brandId': brandId,
+          ...data,
+        },
       );
-      final responseData = response.data!['data'] as Map<String, dynamic>;
+
+      final responseData =
+      response.data!['data'] as Map<String, dynamic>;
+
       return CategoryModel.fromJson(responseData);
+
     }, requiresNetwork: true);
   }
 
   @override
-  FutureEither<void> deleteCategory(String categoryId) async {
+  FutureEither<void> deleteCategory(
+      String brandId,
+      String categoryId,
+      ) async {
     return runTask(() async {
-      await AppConfig.dio.delete<void>('/api/menu/categories/$categoryId');
+      await AppConfig.dio.delete<void>(
+        '/api/menu/categories/$categoryId',
+        queryParameters: {
+          'brandId': brandId,
+        },
+      );
     }, requiresNetwork: true);
   }
 
@@ -90,8 +112,13 @@ class MenuRepositoryImpl implements MenuRepository {
     List<Map<String, dynamic>> data,
   ) async {
     return runTask(() async {
+      // Extract branchId from the first item's data for the query parameter
+      final branchId = data.isNotEmpty ? data.first['branchId'] as String? : null;
       final response = await AppConfig.dio.post<Map<String, dynamic>>(
         '/api/menu/items',
+        queryParameters: {
+          if (branchId != null) 'branchId': branchId,
+        },
         data: data.map((e) => {'brandId': brandId, ...e}).toList(),
       );
       final responseData = response.data!['data'] as List;
@@ -145,9 +172,15 @@ class MenuRepositoryImpl implements MenuRepository {
     Map<String, dynamic> data,
   ) async {
     return runTask(() async {
+      // Copy the map so we don't mutate the caller's object
+      final body = Map<String, dynamic>.of(data);
+      final brandId = body['brandId'] as String?; // extract brandId for query param but keep in body
       final response = await AppConfig.dio.put<Map<String, dynamic>>(
         '/api/menu/items/$itemId',
-        data: data,
+        queryParameters: {
+          if (brandId != null) 'brandId': brandId,
+        },
+        data: body,
       );
       final responseData = response.data!['data'] as Map<String, dynamic>;
       return MenuItemResponse.fromJson(responseData);
@@ -170,9 +203,12 @@ class MenuRepositoryImpl implements MenuRepository {
   }
 
   @override
-  FutureEither<void> deleteMenuItem(String itemId) async {
+  FutureEither<void> deleteMenuItem(String itemId, String brandId) async {
     return runTask(() async {
-      await AppConfig.dio.delete<void>('/api/menu/items/$itemId');
+      await AppConfig.dio.delete<void>(
+        '/api/menu/items/$itemId',
+        queryParameters: {'brandId': brandId},
+      );
     }, requiresNetwork: true);
   }
 }

@@ -198,7 +198,7 @@ class UserDetailsData extends Equatable {
 
   factory UserDetailsData.fromJson(Map<String, dynamic> json) {
     return UserDetailsData(
-      id: json['id'] as String? ?? '',
+      id: json['id'] as String? ?? json['_id'] as String? ?? '',
       userId: json['userId'] as String? ?? '',
       brandId: json['brandId'] as String? ?? '',
       firstName: json['firstName'] as String? ?? '',
@@ -296,7 +296,7 @@ class UserData extends Equatable {
 
   factory UserData.fromJson(Map<String, dynamic> json) {
     return UserData(
-      id: json['id'] as String? ?? '',
+      id: json['id'] as String? ?? json['_id'] as String? ?? json['userId'] as String? ?? '',
       brandId: json['brandId'] as String? ?? '',
       branchId: json['branchId'] as String? ?? '',
       firstName: json['firstName'] as String? ?? '',

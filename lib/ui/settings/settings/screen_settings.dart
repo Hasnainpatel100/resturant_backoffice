@@ -1,3 +1,5 @@
+import 'package:back_office/imports/imports.dart';
+import 'package:back_office/ui/settings/settings/cubit_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:back_office/imports/core_imports.dart';
 
@@ -21,16 +23,55 @@ class ScreenSettings extends StatelessWidget {
                   title: const Text('Dark Mode'),
                   trailing: Switch(
                     value: Theme.of(context).brightness == Brightness.dark,
-                    onChanged: (value) {},
+                    onChanged: (value) {
+                      context.read<CubitTheme>().setDarkMode(value);
+                    },
                   ),
                 ),
                 const Divider(height: 1),
                 ListTile(
                   leading: const Icon(Icons.language),
                   title: const Text('Language'),
-                  subtitle: const Text('English'),
+                  subtitle: Text(
+                    context.locale.languageCode == 'hi'
+                        ? 'Hindi'
+                        : 'English',
+                  ),
                   trailing: const Icon(Icons.chevron_right),
-                  onTap: () {},
+                  onTap: () {
+                    showDialog(
+                      context: context,
+                      builder: (context) => AlertDialog(
+                        title: const Text('Select Language'),
+                        content: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            ListTile(
+                              title: const Text('English'),
+                              onTap: () {
+                                context.setLocale(const Locale('en'));
+                                Navigator.pop(context);
+                              },
+                            ),
+                            ListTile(
+                              title: const Text('हिन्दी'),
+                              onTap: () {
+                                context.setLocale(const Locale('hi'));
+                                Navigator.pop(context);
+                              },
+                            ),
+                            ListTile(
+                              title: const Text('اردو'),
+                              onTap: () {
+                                context.setLocale(const Locale('ur'));
+                                Navigator.pop(context);
+                              },
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
                 ),
               ],
             ),
