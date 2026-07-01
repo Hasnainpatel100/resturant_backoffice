@@ -1,0 +1,49 @@
+{
+	"sources" : 
+	[
+		{
+			"file" : "H:/POS/restaurant_backoffice/backoffice_300426/build/windows/x64/_deps/nuget-subbuild/CMakeFiles/nuget-populate"
+		},
+		{
+			"file" : "H:/POS/restaurant_backoffice/backoffice_300426/build/windows/x64/_deps/nuget-subbuild/CMakeFiles/268e9d40dd4bb87156bd9b04694d04e2/nuget-populate.rule"
+		},
+		{
+			"file" : "H:/POS/restaurant_backoffice/backoffice_300426/build/windows/x64/_deps/nuget-subbuild/CMakeFiles/60832893a78654bbb8e8cd5d7d2ce87c/nuget-populate-complete.rule"
+		},
+		{
+			"file" : "H:/POS/restaurant_backoffice/backoffice_300426/build/windows/x64/_deps/nuget-subbuild/CMakeFiles/351ef367c61e2dd7f794bd9668a53646/nuget-populate-build.rule"
+		},
+		{
+			"file" : "H:/POS/restaurant_backoffice/backoffice_300426/build/windows/x64/_deps/nuget-subbuild/CMakeFiles/351ef367c61e2dd7f794bd9668a53646/nuget-populate-configure.rule"
+		},
+		{
+			"file" : "H:/POS/restaurant_backoffice/backoffice_300426/build/windows/x64/_deps/nuget-subbuild/CMakeFiles/351ef367c61e2dd7f794bd9668a53646/nuget-populate-copyfile.rule"
+		},
+		{
+			"file" : "H:/POS/restaurant_backoffice/backoffice_300426/build/windows/x64/_deps/nuget-subbuild/CMakeFiles/351ef367c61e2dd7f794bd9668a53646/nuget-populate-download.rule"
+		},
+		{
+			"file" : "H:/POS/restaurant_backoffice/backoffice_300426/build/windows/x64/_deps/nuget-subbuild/CMakeFiles/351ef367c61e2dd7f794bd9668a53646/nuget-populate-install.rule"
+		},
+		{
+			"file" : "H:/POS/restaurant_backoffice/backoffice_300426/build/windows/x64/_deps/nuget-subbuild/CMakeFiles/351ef367c61e2dd7f794bd9668a53646/nuget-populate-mkdir.rule"
+		},
+		{
+			"file" : "H:/POS/restaurant_backoffice/backoffice_300426/build/windows/x64/_deps/nuget-subbuild/CMakeFiles/351ef367c61e2dd7f794bd9668a53646/nuget-populate-patch.rule"
+		},
+		{
+			"file" : "H:/POS/restaurant_backoffice/backoffice_300426/build/windows/x64/_deps/nuget-subbuild/CMakeFiles/351ef367c61e2dd7f794bd9668a53646/nuget-populate-test.rule"
+		},
+		{
+			"file" : "H:/POS/restaurant_backoffice/backoffice_300426/build/windows/x64/_deps/nuget-subbuild/CMakeFiles/351ef367c61e2dd7f794bd9668a53646/nuget-populate-update.rule"
+		}
+	],
+	"target" : 
+	{
+		"labels" : 
+		[
+			"nuget-populate"
+		],
+		"name" : "nuget-populate"
+	}
+}

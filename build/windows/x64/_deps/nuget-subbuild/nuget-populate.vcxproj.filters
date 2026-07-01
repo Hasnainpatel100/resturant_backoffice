@@ -1,0 +1,47 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <CustomBuild Include="H:\POS\restaurant_backoffice\backoffice_300426\build\windows\x64\_deps\nuget-subbuild\CMakeFiles\351ef367c61e2dd7f794bd9668a53646\nuget-populate-mkdir.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="H:\POS\restaurant_backoffice\backoffice_300426\build\windows\x64\_deps\nuget-subbuild\CMakeFiles\351ef367c61e2dd7f794bd9668a53646\nuget-populate-download.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="H:\POS\restaurant_backoffice\backoffice_300426\build\windows\x64\_deps\nuget-subbuild\CMakeFiles\351ef367c61e2dd7f794bd9668a53646\nuget-populate-update.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="H:\POS\restaurant_backoffice\backoffice_300426\build\windows\x64\_deps\nuget-subbuild\CMakeFiles\351ef367c61e2dd7f794bd9668a53646\nuget-populate-patch.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="H:\POS\restaurant_backoffice\backoffice_300426\build\windows\x64\_deps\nuget-subbuild\CMakeFiles\351ef367c61e2dd7f794bd9668a53646\nuget-populate-copyfile.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="H:\POS\restaurant_backoffice\backoffice_300426\build\windows\x64\_deps\nuget-subbuild\CMakeFiles\351ef367c61e2dd7f794bd9668a53646\nuget-populate-configure.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="H:\POS\restaurant_backoffice\backoffice_300426\build\windows\x64\_deps\nuget-subbuild\CMakeFiles\351ef367c61e2dd7f794bd9668a53646\nuget-populate-build.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="H:\POS\restaurant_backoffice\backoffice_300426\build\windows\x64\_deps\nuget-subbuild\CMakeFiles\351ef367c61e2dd7f794bd9668a53646\nuget-populate-install.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="H:\POS\restaurant_backoffice\backoffice_300426\build\windows\x64\_deps\nuget-subbuild\CMakeFiles\351ef367c61e2dd7f794bd9668a53646\nuget-populate-test.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="H:\POS\restaurant_backoffice\backoffice_300426\build\windows\x64\_deps\nuget-subbuild\CMakeFiles\60832893a78654bbb8e8cd5d7d2ce87c\nuget-populate-complete.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="H:\POS\restaurant_backoffice\backoffice_300426\build\windows\x64\_deps\nuget-subbuild\CMakeFiles\268e9d40dd4bb87156bd9b04694d04e2\nuget-populate.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="H:\POS\restaurant_backoffice\backoffice_300426\build\windows\x64\_deps\nuget-subbuild\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="H:\POS\restaurant_backoffice\backoffice_300426\build\windows\x64\_deps\nuget-subbuild\CMakeFiles\nuget-populate" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="CMake Rules">
+      <UniqueIdentifier>{3425A0A1-8A20-32F0-A6FB-0EFC953794E9}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

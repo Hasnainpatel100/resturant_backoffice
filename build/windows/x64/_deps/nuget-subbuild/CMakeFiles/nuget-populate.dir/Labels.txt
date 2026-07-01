@@ -1,0 +1,15 @@
+# Target labels
+ nuget-populate
+# Source files and their labels
+H:/POS/restaurant_backoffice/backoffice_300426/build/windows/x64/_deps/nuget-subbuild/CMakeFiles/nuget-populate
+H:/POS/restaurant_backoffice/backoffice_300426/build/windows/x64/_deps/nuget-subbuild/CMakeFiles/268e9d40dd4bb87156bd9b04694d04e2/nuget-populate.rule
+H:/POS/restaurant_backoffice/backoffice_300426/build/windows/x64/_deps/nuget-subbuild/CMakeFiles/60832893a78654bbb8e8cd5d7d2ce87c/nuget-populate-complete.rule
+H:/POS/restaurant_backoffice/backoffice_300426/build/windows/x64/_deps/nuget-subbuild/CMakeFiles/351ef367c61e2dd7f794bd9668a53646/nuget-populate-build.rule
+H:/POS/restaurant_backoffice/backoffice_300426/build/windows/x64/_deps/nuget-subbuild/CMakeFiles/351ef367c61e2dd7f794bd9668a53646/nuget-populate-configure.rule
+H:/POS/restaurant_backoffice/backoffice_300426/build/windows/x64/_deps/nuget-subbuild/CMakeFiles/351ef367c61e2dd7f794bd9668a53646/nuget-populate-copyfile.rule
+H:/POS/restaurant_backoffice/backoffice_300426/build/windows/x64/_deps/nuget-subbuild/CMakeFiles/351ef367c61e2dd7f794bd9668a53646/nuget-populate-download.rule
+H:/POS/restaurant_backoffice/backoffice_300426/build/windows/x64/_deps/nuget-subbuild/CMakeFiles/351ef367c61e2dd7f794bd9668a53646/nuget-populate-install.rule
+H:/POS/restaurant_backoffice/backoffice_300426/build/windows/x64/_deps/nuget-subbuild/CMakeFiles/351ef367c61e2dd7f794bd9668a53646/nuget-populate-mkdir.rule
+H:/POS/restaurant_backoffice/backoffice_300426/build/windows/x64/_deps/nuget-subbuild/CMakeFiles/351ef367c61e2dd7f794bd9668a53646/nuget-populate-patch.rule
+H:/POS/restaurant_backoffice/backoffice_300426/build/windows/x64/_deps/nuget-subbuild/CMakeFiles/351ef367c61e2dd7f794bd9668a53646/nuget-populate-test.rule
+H:/POS/restaurant_backoffice/backoffice_300426/build/windows/x64/_deps/nuget-subbuild/CMakeFiles/351ef367c61e2dd7f794bd9668a53646/nuget-populate-update.rule
