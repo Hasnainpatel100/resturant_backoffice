@@ -42,6 +42,28 @@ import '../ui/branch/branch_plan/screen_branch_plan_form.dart';
 import '../ui/bills/bill_list/screen_bill_list.dart';
 import '../ui/bills/bill_detail/screen_bill_detail.dart';
 
+import '../ui/inventory/screen_inventory_dashboard.dart';
+import '../ui/inventory/categories/screen_category_list.dart';
+import '../ui/inventory/categories/screen_category_form.dart';
+import '../ui/inventory/units/screen_unit_list.dart';
+import '../ui/inventory/units/screen_unit_form.dart';
+import '../ui/inventory/warehouses/screen_warehouse_list.dart';
+import '../ui/inventory/warehouses/screen_warehouse_form.dart';
+import '../ui/inventory/items/screen_item_list.dart';
+import '../ui/inventory/items/screen_item_form.dart';
+import '../ui/inventory/items/screen_item_detail.dart';
+import '../ui/inventory/suppliers/screen_supplier_list.dart';
+import '../ui/inventory/suppliers/screen_supplier_form.dart';
+import '../ui/inventory/suppliers/screen_supplier_ledger.dart';
+import '../ui/inventory/purchases/screen_purchase_list.dart';
+import '../ui/inventory/purchases/screen_purchase_form.dart';
+import '../ui/inventory/purchases/screen_purchase_detail.dart';
+import '../ui/inventory/adjustments/screen_adjustment_list.dart';
+import '../ui/inventory/adjustments/screen_adjustment_form.dart';
+import '../ui/inventory/transfers/screen_transfer_list.dart';
+import '../ui/inventory/transfers/screen_transfer_form.dart';
+import '../ui/inventory/reports/screen_inventory_reports.dart';
+
 final GoRouter appRouter = GoRouter(
   navigatorKey: rootNavigatorKey,
   initialLocation: AppRoutes.login,
@@ -271,11 +293,253 @@ final GoRouter appRouter = GoRouter(
             ),
           ],
         ),
-        // Placeholder routes
+        // ── Inventory ──────────────────────────────────────────────────
         GoRoute(
-          path: '/inventory',
-          name: 'inventory',
-          builder: (context, state) => const InventoryScreen(),
+          path: AppRoutes.inventoryDashboard,
+          name: 'inventoryDashboard',
+          builder: (context, state) {
+            final brandId = state.pathParameters['brandId']!;
+            return ScreenInventoryDashboard(brandId: brandId);
+          },
+          routes: [
+            // Items
+            GoRoute(
+              path: 'items',
+              name: 'itemList',
+              builder: (context, state) {
+                final brandId = state.pathParameters['brandId']!;
+                return ScreenItemList(brandId: brandId);
+              },
+              routes: [
+                GoRoute(
+                  path: 'create',
+                  name: 'itemCreate',
+                  builder: (context, state) {
+                    final brandId = state.pathParameters['brandId']!;
+                    return ScreenItemForm(brandId: brandId);
+                  },
+                ),
+                GoRoute(
+                  path: ':itemId',
+                  name: 'itemDetail',
+                  builder: (context, state) {
+                    final brandId = state.pathParameters['brandId']!;
+                    final itemId = state.pathParameters['itemId']!;
+                    return ScreenItemDetail(brandId: brandId, itemId: itemId);
+                  },
+                  routes: [
+                    GoRoute(
+                      path: 'edit',
+                      name: 'itemEdit',
+                      builder: (context, state) {
+                        final brandId = state.pathParameters['brandId']!;
+                        final itemId = state.pathParameters['itemId']!;
+                        return ScreenItemForm(brandId: brandId, itemId: itemId);
+                      },
+                    ),
+                  ],
+                ),
+              ],
+            ),
+            // Categories
+            GoRoute(
+              path: 'categories',
+              name: 'invCategoryList',
+              builder: (context, state) {
+                final brandId = state.pathParameters['brandId']!;
+                return ScreenCategoryList(brandId: brandId);
+              },
+              routes: [
+                GoRoute(
+                  path: 'create',
+                  name: 'invCategoryCreate',
+                  builder: (context, state) {
+                    final brandId = state.pathParameters['brandId']!;
+                    return ScreenCategoryForm(brandId: brandId);
+                  },
+                ),
+                GoRoute(
+                  path: ':categoryId/edit',
+                  name: 'invCategoryEdit',
+                  builder: (context, state) {
+                    final brandId = state.pathParameters['brandId']!;
+                    final categoryId = state.pathParameters['categoryId']!;
+                    return ScreenCategoryForm(
+                        brandId: brandId, categoryId: categoryId);
+                  },
+                ),
+              ],
+            ),
+            // Units
+            GoRoute(
+              path: 'units',
+              name: 'unitList',
+              builder: (context, state) {
+                final brandId = state.pathParameters['brandId']!;
+                return ScreenUnitList(brandId: brandId);
+              },
+              routes: [
+                GoRoute(
+                  path: 'create',
+                  name: 'unitCreate',
+                  builder: (context, state) {
+                    final brandId = state.pathParameters['brandId']!;
+                    return ScreenUnitForm(brandId: brandId);
+                  },
+                ),
+                GoRoute(
+                  path: ':unitId/edit',
+                  name: 'unitEdit',
+                  builder: (context, state) {
+                    final brandId = state.pathParameters['brandId']!;
+                    final unitId = state.pathParameters['unitId']!;
+                    return ScreenUnitForm(brandId: brandId, unitId: unitId);
+                  },
+                ),
+              ],
+            ),
+            // Warehouses
+            GoRoute(
+              path: 'warehouses',
+              name: 'warehouseList',
+              builder: (context, state) {
+                final brandId = state.pathParameters['brandId']!;
+                return ScreenWarehouseList(brandId: brandId);
+              },
+              routes: [
+                GoRoute(
+                  path: 'create',
+                  name: 'warehouseCreate',
+                  builder: (context, state) {
+                    final brandId = state.pathParameters['brandId']!;
+                    return ScreenWarehouseForm(brandId: brandId);
+                  },
+                ),
+                GoRoute(
+                  path: ':warehouseId/edit',
+                  name: 'warehouseEdit',
+                  builder: (context, state) {
+                    final brandId = state.pathParameters['brandId']!;
+                    final warehouseId = state.pathParameters['warehouseId']!;
+                    return ScreenWarehouseForm(
+                        brandId: brandId, warehouseId: warehouseId);
+                  },
+                ),
+              ],
+            ),
+            // Suppliers
+            GoRoute(
+              path: 'suppliers',
+              name: 'supplierList',
+              builder: (context, state) {
+                final brandId = state.pathParameters['brandId']!;
+                return ScreenSupplierList(brandId: brandId);
+              },
+              routes: [
+                GoRoute(
+                  path: 'create',
+                  name: 'supplierCreate',
+                  builder: (context, state) {
+                    final brandId = state.pathParameters['brandId']!;
+                    return ScreenSupplierForm(brandId: brandId);
+                  },
+                ),
+                GoRoute(
+                  path: ':supplierId/edit',
+                  name: 'supplierEdit',
+                  builder: (context, state) {
+                    final brandId = state.pathParameters['brandId']!;
+                    final supplierId = state.pathParameters['supplierId']!;
+                    return ScreenSupplierForm(brandId: brandId, supplierId: supplierId);
+                  },
+                ),
+                GoRoute(
+                  path: ':supplierId/ledger',
+                  name: 'supplierLedger',
+                  builder: (context, state) {
+                    final brandId = state.pathParameters['brandId']!;
+                    final supplierId = state.pathParameters['supplierId']!;
+                    return ScreenSupplierLedger(brandId: brandId, supplierId: supplierId);
+                  },
+                ),
+              ],
+            ),
+            // Purchases
+            GoRoute(
+              path: 'purchases',
+              name: 'purchaseList',
+              builder: (context, state) {
+                final brandId = state.pathParameters['brandId']!;
+                return ScreenPurchaseList(brandId: brandId);
+              },
+              routes: [
+                GoRoute(
+                  path: 'create',
+                  name: 'purchaseCreate',
+                  builder: (context, state) {
+                    final brandId = state.pathParameters['brandId']!;
+                    return ScreenPurchaseForm(brandId: brandId);
+                  },
+                ),
+                GoRoute(
+                  path: ':purchaseId',
+                  name: 'purchaseDetail',
+                  builder: (context, state) {
+                    final brandId = state.pathParameters['brandId']!;
+                    final purchaseId = state.pathParameters['purchaseId']!;
+                    return ScreenPurchaseDetail(brandId: brandId, purchaseId: purchaseId);
+                  },
+                ),
+              ],
+            ),
+            // Adjustments
+            GoRoute(
+              path: 'adjustments',
+              name: 'adjustmentList',
+              builder: (context, state) {
+                final brandId = state.pathParameters['brandId']!;
+                return ScreenAdjustmentList(brandId: brandId);
+              },
+              routes: [
+                GoRoute(
+                  path: 'create',
+                  name: 'adjustmentCreate',
+                  builder: (context, state) {
+                    final brandId = state.pathParameters['brandId']!;
+                    return ScreenAdjustmentForm(brandId: brandId);
+                  },
+                ),
+              ],
+            ),
+            // Transfers
+            GoRoute(
+              path: 'transfers',
+              name: 'transferList',
+              builder: (context, state) {
+                final brandId = state.pathParameters['brandId']!;
+                return ScreenTransferList(brandId: brandId);
+              },
+              routes: [
+                GoRoute(
+                  path: 'create',
+                  name: 'transferCreate',
+                  builder: (context, state) {
+                    final brandId = state.pathParameters['brandId']!;
+                    return ScreenTransferForm(brandId: brandId);
+                  },
+                ),
+              ],
+            ),
+            // Reports
+            GoRoute(
+              path: 'reports',
+              name: 'inventoryReports',
+              builder: (context, state) {
+                final brandId = state.pathParameters['brandId']!;
+                return ScreenInventoryReports(brandId: brandId);
+              },
+            ),
+          ],
         ),
         GoRoute(
           path: '/users',

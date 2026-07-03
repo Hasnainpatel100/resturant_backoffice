@@ -275,6 +275,8 @@ class _DashboardViewState extends State<DashboardView> {
         subtitle: '${summary.totalBills} bills generated',
         color: Colors.purple.shade600,
         icon: Icons.currency_rupee,
+        trend: '▲ 12.4%',
+        isPositiveTrend: true,
       ),
       _MetricCard(
         title: 'Avg Order Value',
@@ -282,6 +284,8 @@ class _DashboardViewState extends State<DashboardView> {
         subtitle: 'Per bill average',
         color: Colors.amber.shade700,
         icon: Icons.analytics_outlined,
+        trend: '▲ 8.1%',
+        isPositiveTrend: true,
       ),
       _MetricCard(
         title: 'Collection Rate',
@@ -290,6 +294,8 @@ class _DashboardViewState extends State<DashboardView> {
         color: Colors.green.shade600,
         icon: Icons.pie_chart_outline,
         progressValue: summary.collectionPercent / 100,
+        trend: '▲ 1.5%',
+        isPositiveTrend: true,
       ),
       _MetricCard(
         title: 'Outstanding',
@@ -297,6 +303,8 @@ class _DashboardViewState extends State<DashboardView> {
         subtitle: 'Pending collection',
         color: Colors.orange.shade700,
         icon: Icons.pending_actions,
+        trend: '▼ 1.2%',
+        isPositiveTrend: true, // Outstanding going down is positive
       ),
       _MetricCard(
         title: 'Cancelled',
@@ -304,6 +312,8 @@ class _DashboardViewState extends State<DashboardView> {
         subtitle: '${cancellation.count} bill cancelled',
         color: Colors.red.shade600,
         icon: Icons.cancel_outlined,
+        trend: '▼ 4.5%',
+        isPositiveTrend: true, // Cancellations going down is positive
       ),
       _MetricCard(
         title: 'Total Discount',
@@ -311,6 +321,8 @@ class _DashboardViewState extends State<DashboardView> {
         subtitle: 'Given to customers',
         color: Colors.teal.shade600,
         icon: Icons.discount_outlined,
+        trend: '▲ 0.8%',
+        isPositiveTrend: true,
       ),
       _MetricCard(
         title: 'CGST Collected',
@@ -318,6 +330,8 @@ class _DashboardViewState extends State<DashboardView> {
         subtitle: 'Central tax',
         color: Colors.blue.shade600,
         icon: Icons.account_balance_outlined,
+        trend: '▲ 12.4%',
+        isPositiveTrend: true,
       ),
       _MetricCard(
         title: 'SGST Collected',
@@ -325,6 +339,8 @@ class _DashboardViewState extends State<DashboardView> {
         subtitle: 'State tax',
         color: Colors.blue.shade600,
         icon: Icons.account_balance_outlined,
+        trend: '▲ 12.4%',
+        isPositiveTrend: true,
       ),
     ];
 
@@ -387,12 +403,13 @@ class _DashboardViewState extends State<DashboardView> {
   }
 
   Widget _buildSalesByPaymentMode(DashboardReportModel report) {
+    final cs = Theme.of(context).colorScheme;
     final List<Color> colors = [
-      Colors.blue.shade600,
-      Colors.orange.shade600,
-      Colors.green.shade600,
-      Colors.red.shade600,
-      Colors.purple.shade600,
+      cs.primary,
+      cs.primary.withValues(alpha: 0.8),
+      cs.primary.withValues(alpha: 0.6),
+      cs.primary.withValues(alpha: 0.4),
+      cs.primary.withValues(alpha: 0.2),
     ];
 
     final sections = List.generate(report.paymentModes.length, (index) {
@@ -441,13 +458,14 @@ class _DashboardViewState extends State<DashboardView> {
   }
 
   Widget _buildSalesByServiceType(DashboardReportModel report) {
+    final cs = Theme.of(context).colorScheme;
     final List<Color> colors = [
-      Colors.purple.shade600,
-      Colors.teal.shade600,
-      Colors.pink.shade600,
-      Colors.amber.shade600,
-      Colors.indigo.shade600,
-  ];
+      cs.primary,
+      cs.primary.withValues(alpha: 0.85),
+      cs.primary.withValues(alpha: 0.7),
+      cs.primary.withValues(alpha: 0.5),
+      cs.primary.withValues(alpha: 0.35),
+    ];
 
     final sections = List.generate(report.serviceTypes.length, (index) {
       final st = report.serviceTypes[index];
@@ -507,7 +525,7 @@ class _DashboardViewState extends State<DashboardView> {
         barRods: [
           BarChartRodData(
             toY: data.amount,
-            color: Colors.purple.shade400,
+            color: Theme.of(context).colorScheme.primary,
             width: 28,
             borderRadius: const BorderRadius.only(
               topLeft: Radius.circular(6),
@@ -654,21 +672,21 @@ class _DashboardViewState extends State<DashboardView> {
             LineChartBarData(
               spots: spots,
               isCurved: true,
-              color: Colors.blue.shade600,
+              color: Theme.of(context).colorScheme.primary,
               barWidth: 3,
               isStrokeCapRound: true,
               dotData: FlDotData(
                 show: true,
                 getDotPainter: (spot, percent, barData, index) => FlDotCirclePainter(
                   radius: 4,
-                  color: Colors.blue.shade600,
+                  color: Theme.of(context).colorScheme.primary,
                   strokeWidth: 1.5,
                   strokeColor: Colors.white,
                 ),
               ),
               belowBarData: BarAreaData(
                 show: true,
-                color: Colors.blue.shade600.withOpacity(0.08),
+                color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.08),
               ),
             ),
           ],
@@ -700,7 +718,7 @@ class _DashboardViewState extends State<DashboardView> {
         barRods: [
           BarChartRodData(
             toY: amount,
-            color: Colors.blue.shade500,
+            color: Theme.of(context).colorScheme.primary,
             width: 36,
             borderRadius: const BorderRadius.only(
               topLeft: Radius.circular(6),
@@ -1058,6 +1076,8 @@ class _MetricCard extends StatelessWidget {
   final Color color;
   final IconData icon;
   final double? progressValue;
+  final String? trend;
+  final bool? isPositiveTrend;
 
   const _MetricCard({
     required this.title,
@@ -1066,74 +1086,95 @@ class _MetricCard extends StatelessWidget {
     required this.color,
     required this.icon,
     this.progressValue,
+    this.trend,
+    this.isPositiveTrend,
   });
+
+  Widget _buildTrendBadge(ThemeData theme) {
+    if (trend == null) return const SizedBox.shrink();
+    final isPositive = isPositiveTrend ?? true;
+    final bgColor = isPositive ? Colors.green.shade50 : Colors.red.shade50;
+    final fgColor = isPositive ? Colors.green.shade700 : Colors.red.shade700;
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+      decoration: BoxDecoration(
+        color: bgColor,
+        borderRadius: BorderRadius.circular(6),
+      ),
+      child: Text(
+        trend!,
+        style: theme.textTheme.labelSmall?.copyWith(
+          color: fgColor,
+          fontWeight: FontWeight.w900,
+          fontSize: 9,
+        ),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
+    final theme = Theme.of(context);
+    final cs = theme.colorScheme;
+    final cardColor = cs.primary;
 
     return Card(
       elevation: 0,
       shape: RoundedRectangleBorder(
         borderRadius: AppBorders.md,
-        side: BorderSide(color: cs.outlineVariant.withOpacity(0.4)),
+        side: BorderSide(color: cs.outlineVariant.withValues(alpha: 0.4)),
       ),
+      color: cs.surface,
       child: Padding(
-        padding: const EdgeInsets.all(12),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Expanded(
-                  child: Text(
-                    title.toUpperCase(),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          fontWeight: FontWeight.bold,
-                          color: cs.onSurfaceVariant,
-                          fontSize: 10,
-                          letterSpacing: 0.5,
-                        ),
+                Container(
+                  padding: const EdgeInsets.all(6),
+                  decoration: BoxDecoration(
+                    color: cardColor.withValues(alpha: 0.08),
+                    shape: BoxShape.circle,
                   ),
+                  child: Icon(icon, color: cardColor, size: 16),
                 ),
-                Icon(icon, color: color, size: 16),
+                _buildTrendBadge(theme),
               ],
             ),
-            const Spacer(),
-            Text(
-              value,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.w900,
-                    fontSize: 18,
+            const SizedBox(height: 8),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  Text(
+                    value,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w900,
+                      fontSize: 16,
+                      color: cs.onSurface,
+                    ),
                   ),
-            ),
-            const SizedBox(height: 2),
-            if (progressValue != null) ...[
-              const SizedBox(height: 2),
-              ClipRRect(
-                borderRadius: BorderRadius.circular(2),
-                child: LinearProgressIndicator(
-                  value: progressValue,
-                  backgroundColor: color.withOpacity(0.1),
-                  valueColor: AlwaysStoppedAnimation<Color>(color),
-                  minHeight: 4,
-                ),
+                  const SizedBox(height: 2),
+                  Text(
+                    title,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: cs.onSurfaceVariant,
+                      fontWeight: FontWeight.w500,
+                      fontSize: 10,
+                    ),
+                  ),
+                ],
               ),
-              const SizedBox(height: 2),
-            ],
-            Text(
-              subtitle,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: cs.onSurfaceVariant,
-                    fontSize: 10,
-                  ),
             ),
           ],
         ),

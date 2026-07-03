@@ -60,6 +60,52 @@ abstract final class AppRoutes {
   static const String billList = '/brands/:brandId/bills';
   static const String billDetail = '/brands/:brandId/bills/:billId';
 
+  // Inventory routes
+  static const String inventoryDashboard = '/brands/:brandId/inventory';
+
+  // Items
+  static const String itemList   = '/brands/:brandId/inventory/items';
+  static const String itemCreate = '/brands/:brandId/inventory/items/create';
+  static const String itemDetail = '/brands/:brandId/inventory/items/:itemId';
+  static const String itemEdit   = '/brands/:brandId/inventory/items/:itemId/edit';
+
+  // Categories
+  static const String invCategoryList   = '/brands/:brandId/inventory/categories';
+  static const String invCategoryCreate = '/brands/:brandId/inventory/categories/create';
+  static const String invCategoryEdit   = '/brands/:brandId/inventory/categories/:categoryId/edit';
+
+  // Units
+  static const String unitList   = '/brands/:brandId/inventory/units';
+  static const String unitCreate = '/brands/:brandId/inventory/units/create';
+  static const String unitEdit   = '/brands/:brandId/inventory/units/:unitId/edit';
+
+  // Warehouses
+  static const String warehouseList   = '/brands/:brandId/inventory/warehouses';
+  static const String warehouseCreate = '/brands/:brandId/inventory/warehouses/create';
+  static const String warehouseEdit   = '/brands/:brandId/inventory/warehouses/:warehouseId/edit';
+
+  // Suppliers
+  static const String supplierList   = '/brands/:brandId/inventory/suppliers';
+  static const String supplierCreate = '/brands/:brandId/inventory/suppliers/create';
+  static const String supplierEdit   = '/brands/:brandId/inventory/suppliers/:supplierId/edit';
+  static const String supplierLedger = '/brands/:brandId/inventory/suppliers/:supplierId/ledger';
+
+  // Purchases
+  static const String purchaseList   = '/brands/:brandId/inventory/purchases';
+  static const String purchaseCreate = '/brands/:brandId/inventory/purchases/create';
+  static const String purchaseDetail = '/brands/:brandId/inventory/purchases/:purchaseId';
+
+  // Adjustments
+  static const String adjustmentList   = '/brands/:brandId/inventory/adjustments';
+  static const String adjustmentCreate = '/brands/:brandId/inventory/adjustments/create';
+
+  // Transfers
+  static const String transferList   = '/brands/:brandId/inventory/transfers';
+  static const String transferCreate = '/brands/:brandId/inventory/transfers/create';
+
+  // Reports
+  static const String inventoryReports = '/brands/:brandId/inventory/reports';
+
   // Settings
   static const String settings = '/settings';
   static const String profile = '/profile';

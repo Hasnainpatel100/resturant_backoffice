@@ -147,11 +147,23 @@ class _DesktopSidebar extends StatelessWidget {
     final brandId = _getActiveBrandId(currentLocation, user);
 
     final usersRoute = brandId != null ? '/brands/$brandId/users' : AppRoutes.brandList;
-    final tablesRoute = brandId != null ? '/brands/$brandId/tables' : AppRoutes.brandList;
-    final roomTypesRoute = brandId != null ? '/brands/$brandId/room-types' : AppRoutes.brandList;
-    final menuRoute = brandId != null ? '/brands/$brandId/menu' : AppRoutes.brandList;
-    final posDevicesRoute = brandId != null ? '/brands/$brandId/pos-devices' : AppRoutes.brandList;
     final billsRoute = brandId != null ? '/brands/$brandId/bills' : AppRoutes.brandList;
+    final branchesRoute = brandId != null ? '/brands/$brandId/branches' : AppRoutes.brandList;
+    final branchCreateRoute = brandId != null ? '/brands/$brandId/branches/create' : AppRoutes.brandList;
+
+    final String userInitials;
+    if (user?.name != null && user!.name!.isNotEmpty) {
+      final parts = user!.name!.trim().split(RegExp(r'\s+'));
+      if (parts.length > 1) {
+        userInitials = '${parts[0][0]}${parts[parts.length - 1][0]}'.toUpperCase();
+      } else {
+        userInitials = parts[0][0].toUpperCase();
+      }
+    } else {
+      userInitials = 'RK';
+    }
+    final String displayName = user?.name ?? 'Rohan Kale';
+    final String displayEmail = user?.email ?? 'owner@rhpos.app';
 
     return Container(
       width: 260,
@@ -164,12 +176,21 @@ class _DesktopSidebar extends StatelessWidget {
             child: Row(
               children: [
                 Container(
-                  padding: EdgeInsets.all(AppSpacing.sm),
+                  width: 40,
+                  height: 40,
+                  alignment: Alignment.center,
                   decoration: BoxDecoration(
-                    color: cs.primaryContainer,
-                    borderRadius: AppBorders.md,
+                    color: cs.primary,
+                    borderRadius: BorderRadius.circular(10),
                   ),
-                  child: Icon(Icons.restaurant, color: cs.onPrimaryContainer, size: 24),
+                  child: const Text(
+                    'R',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 20,
+                      fontWeight: FontWeight.w900,
+                    ),
+                  ),
                 ),
                 SizedBox(width: AppSpacing.md),
                 Expanded(
@@ -177,12 +198,21 @@ class _DesktopSidebar extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'BackOffice',
-                        style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+                        'RH POS',
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.w900,
+                          letterSpacing: 0.2,
+                          color: cs.onSurface,
+                        ),
                       ),
                       Text(
-                        user?.role ?? 'Admin',
-                        style: theme.textTheme.bodySmall?.copyWith(color: cs.onSurfaceVariant),
+                        'BACKOFFICE',
+                        style: theme.textTheme.labelSmall?.copyWith(
+                          color: cs.onSurfaceVariant.withOpacity(0.6),
+                          fontSize: 9,
+                          letterSpacing: 1.2,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ],
                   ),
@@ -198,88 +228,68 @@ class _DesktopSidebar extends StatelessWidget {
             child: ListView(
               padding: EdgeInsets.symmetric(vertical: AppSpacing.md),
               children: [
-                _NavSection(title: 'MAIN'),
+                const _NavSection(title: 'OVERVIEW'),
                 _NavItem(
-                  icon: Icons.dashboard_outlined,
-                  activeIcon: Icons.dashboard,
+                  icon: Icons.grid_view_outlined,
+                  activeIcon: Icons.grid_view,
                   label: 'Dashboard',
                   route: AppRoutes.home,
                   currentLocation: currentLocation,
                 ),
+
+                SizedBox(height: AppSpacing.md),
+                const _NavSection(title: 'NETWORK'),
                 _NavItem(
-                  icon: Icons.store_outlined,
-                  activeIcon: Icons.store,
-                  label: 'Brands',
+                  icon: Icons.storefront_outlined,
+                  activeIcon: Icons.storefront,
+                  label: 'Restaurants',
                   route: AppRoutes.brandList,
                   currentLocation: currentLocation,
                 ),
                 _NavItem(
-                  icon: Icons.inventory_2_outlined,
-                  activeIcon: Icons.inventory_2,
-                  label: 'Inventory',
-                  route: '/inventory',
+                  icon: Icons.add_circle_outline,
+                  activeIcon: Icons.add_circle,
+                  label: 'Add restaurant',
+                  route: AppRoutes.brandCreate,
                   currentLocation: currentLocation,
                 ),
                 _NavItem(
-                  icon: Icons.people_outlined,
+                  icon: Icons.device_hub_outlined,
+                  activeIcon: Icons.device_hub,
+                  label: 'Branches',
+                  route: branchesRoute,
+                  currentLocation: currentLocation,
+                ),
+                _NavItem(
+                  icon: Icons.add_circle_outline,
+                  activeIcon: Icons.add_circle,
+                  label: 'Add branch',
+                  route: branchCreateRoute,
+                  currentLocation: currentLocation,
+                ),
+
+                SizedBox(height: AppSpacing.md),
+                const _NavSection(title: 'OPERATIONS'),
+                _NavItem(
+                  icon: Icons.assignment_outlined,
+                  activeIcon: Icons.assignment,
+                  label: 'Orders',
+                  route: billsRoute,
+                  currentLocation: currentLocation,
+                  badge: '12',
+                ),
+                _NavItem(
+                  icon: Icons.people_outline,
                   activeIcon: Icons.people,
-                  label: 'Users',
+                  label: 'Staff',
                   route: usersRoute,
                   currentLocation: currentLocation,
                 ),
-
-                SizedBox(height: AppSpacing.lg),
-                _NavSection(title: 'MANAGEMENT'),
-                _NavItem(
-                  icon: Icons.table_restaurant_outlined,
-                  activeIcon: Icons.table_restaurant,
-                  label: 'Tables',
-                  route: tablesRoute,
-                  currentLocation: currentLocation,
-                ),
-                _NavItem(
-                  icon: Icons.receipt_long_outlined,
-                  activeIcon: Icons.receipt_long,
-                  label: 'Bills',
-                  route: billsRoute,
-                  currentLocation: currentLocation,
-                ),
-                _NavItem(
-                  icon: Icons.hotel_outlined,
-                  activeIcon: Icons.hotel,
-                  label: 'Room Types',
-                  route: roomTypesRoute,
-                  currentLocation: currentLocation,
-                ),
-                _NavItem(
-                  icon: Icons.devices_outlined,
-                  activeIcon: Icons.devices,
-                  label: 'POS Devices',
-                  route: posDevicesRoute,
-                  currentLocation: currentLocation,
-                ),
-                _NavItem(
-                  icon: Icons.menu_book_outlined,
-                  activeIcon: Icons.menu_book,
-                  label: 'Menu',
-                  route: menuRoute,
-                  currentLocation: currentLocation,
-                ),
-
-                SizedBox(height: AppSpacing.lg),
-                _NavSection(title: 'SYSTEM'),
                 _NavItem(
                   icon: Icons.settings_outlined,
                   activeIcon: Icons.settings,
                   label: 'Settings',
                   route: AppRoutes.settings,
-                  currentLocation: currentLocation,
-                ),
-                _NavItem(
-                  icon: Icons.notifications_outlined,
-                  activeIcon: Icons.notifications,
-                  label: 'Notifications',
-                  route: '/notifications',
                   currentLocation: currentLocation,
                 ),
               ],
@@ -288,22 +298,107 @@ class _DesktopSidebar extends StatelessWidget {
 
           const Divider(height: 1),
 
-          // Footer
-          Builder(
-            builder: (ctx) => _NavItem(
-              icon: Icons.logout_outlined,
-              activeIcon: Icons.logout,
-              label: 'Logout',
-              route: AppRoutes.login,
-              currentLocation: currentLocation,
-              isFooter: true,
-              onLogout: () => showLogoutConfirmation(context, () {
-                    ctx.read<CubitSession>().logout();
-                    context.go(AppRoutes.login);
-                  }),
+          // Footer Profile Card
+          Padding(
+            padding: EdgeInsets.all(AppSpacing.md),
+            child: Builder(
+              builder: (ctx) => PopupMenuButton<String>(
+                offset: const Offset(0, -120),
+                shape: RoundedRectangleBorder(borderRadius: AppBorders.md),
+                child: Row(
+                  children: [
+                    CircleAvatar(
+                      radius: 18,
+                      backgroundColor: cs.primary,
+                      child: Text(
+                        userInitials,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 13,
+                        ),
+                      ),
+                    ),
+                    SizedBox(width: AppSpacing.sm),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            displayName,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: theme.textTheme.bodyMedium?.copyWith(
+                              fontWeight: FontWeight.bold,
+                              color: cs.onSurface,
+                            ),
+                          ),
+                          Text(
+                            displayEmail,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color: cs.onSurfaceVariant,
+                              fontSize: 10,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                itemBuilder: (context) => [
+                  PopupMenuItem(
+                    value: 'profile',
+                    child: Row(
+                      children: [
+                        const Icon(Icons.person_outline, size: 20),
+                        SizedBox(width: AppSpacing.sm),
+                        const Text('Profile'),
+                      ],
+                    ),
+                  ),
+                  PopupMenuItem(
+                    value: 'settings',
+                    child: Row(
+                      children: [
+                        const Icon(Icons.settings_outlined, size: 20),
+                        SizedBox(width: AppSpacing.sm),
+                        const Text('Settings'),
+                      ],
+                    ),
+                  ),
+                  const PopupMenuDivider(),
+                  PopupMenuItem(
+                    value: 'logout',
+                    child: Row(
+                      children: [
+                        const Icon(Icons.logout, size: 20, color: Colors.red),
+                        SizedBox(width: AppSpacing.sm),
+                        const Text('Logout', style: TextStyle(color: Colors.red)),
+                      ],
+                    ),
+                  ),
+                ],
+                onSelected: (value) {
+                  switch (value) {
+                    case 'profile':
+                      context.go(AppRoutes.profile);
+                      break;
+                    case 'settings':
+                      context.go(AppRoutes.settings);
+                      break;
+                    case 'logout':
+                      showLogoutConfirmation(context, () {
+                        ctx.read<CubitSession>().logout();
+                        context.go(AppRoutes.login);
+                      });
+                      break;
+                  }
+                },
+              ),
             ),
           ),
-          SizedBox(height: AppSpacing.md),
         ],
       ),
     );
@@ -375,12 +470,21 @@ class _TabletSidebar extends StatelessWidget {
         children: [
           SizedBox(height: AppSpacing.md),
           Container(
-            padding: EdgeInsets.all(AppSpacing.sm),
+            width: 40,
+            height: 40,
+            alignment: Alignment.center,
             decoration: BoxDecoration(
-              color: cs.primaryContainer,
+              color: cs.primary,
               borderRadius: AppBorders.sm,
             ),
-            child: Icon(Icons.restaurant, color: cs.onPrimaryContainer, size: 24),
+            child: const Text(
+              'R',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 18,
+                fontWeight: FontWeight.w900,
+              ),
+            ),
           ),
           SizedBox(height: AppSpacing.lg),
           Expanded(
@@ -558,7 +662,7 @@ class _MobileShell extends StatelessWidget {
     if (location == '/profile') return 'Profile';
     if (location == '/home') return 'Home';
     if (location == '/users') return 'Users';
-    if (location == '/inventory') return 'Inventory';
+    if (location == '/inventory' || location.contains('/inventory')) return 'Inventory';
     if (location == '/pos-devices' || location == '/all-pos-devices') return 'POS Devices';
     if (location.contains('/bills')) return 'Bills';
     if (location == '/notifications') return 'Notifications';
@@ -873,8 +977,7 @@ class _NavItem extends StatelessWidget {
     required this.label,
     required this.route,
     required this.currentLocation,
-    this.isFooter = false,
-    this.onLogout,
+    this.badge,
   });
 
   final IconData icon;
@@ -882,8 +985,7 @@ class _NavItem extends StatelessWidget {
   final String label;
   final String route;
   final String currentLocation;
-  final bool isFooter;
-  final VoidCallback? onLogout;
+  final String? badge;
 
   @override
   Widget build(BuildContext context) {
@@ -910,12 +1012,7 @@ class _NavItem extends StatelessWidget {
         color: isSelected ? cs.primaryContainer : Colors.transparent,
         borderRadius: AppBorders.md,
         child: InkWell(
-          onTap: isFooter && onLogout != null
-              ? () {
-                  onLogout!();
-                  context.go(route);
-                }
-              : () => context.go(route),
+          onTap: () => context.go(route),
           borderRadius: AppBorders.md,
           child: Padding(
             padding: EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.sm + 4),
@@ -924,18 +1021,35 @@ class _NavItem extends StatelessWidget {
                 Icon(
                   isSelected ? activeIcon : icon,
                   size: 20,
-                  color: isSelected ? cs.onPrimaryContainer : (isFooter ? cs.error : cs.onSurfaceVariant),
+                  color: isSelected ? cs.onPrimaryContainer : cs.onSurfaceVariant,
                 ),
                 SizedBox(width: AppSpacing.md),
                 Expanded(
                   child: Text(
                     label,
                     style: theme.textTheme.bodyMedium?.copyWith(
-                      color: isSelected ? cs.onPrimaryContainer : (isFooter ? cs.error : cs.onSurface),
+                      color: isSelected ? cs.onPrimaryContainer : cs.onSurface,
                       fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
                     ),
                   ),
                 ),
+                if (badge != null) ...[
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: cs.primary,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Text(
+                      badge!,
+                      style: theme.textTheme.labelSmall?.copyWith(
+                        color: cs.onPrimary,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 10,
+                      ),
+                    ),
+                  ),
+                ],
               ],
             ),
           ),
