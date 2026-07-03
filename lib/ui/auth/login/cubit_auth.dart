@@ -1,4 +1,3 @@
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:back_office/data/repositories/auth_repository.dart';
 import 'package:back_office/imports/core_imports.dart';
 import 'package:back_office/imports/packages_imports.dart';

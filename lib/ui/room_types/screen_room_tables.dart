@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:back_office/imports/core_imports.dart';
 import 'package:back_office/data/models/table_model.dart';
@@ -67,11 +66,11 @@ class _RoomTablesBody extends StatelessWidget {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                _LegendDot(color: Colors.green, label: 'Free'),
+                _LegendDot(color: Colors.green, label: 'common.free'.tr()),
                 const SizedBox(width: 8),
-                _LegendDot(color: Colors.orange, label: 'Busy'),
+                _LegendDot(color: Colors.orange, label: 'common.busy'.tr()),
                 const SizedBox(width: 8),
-                _LegendDot(color: Colors.blue, label: 'Reserved'),
+                _LegendDot(color: Colors.blue, label: 'common.reserved'.tr()),
               ],
             ),
           ),
@@ -95,7 +94,7 @@ class _RoomTablesBody extends StatelessWidget {
                   ElevatedButton(
                     onPressed: () =>
                         context.read<CubitTable>().loadTables(brandId, branchId),
-                    child: const Text('Retry'),
+                    child: Text('common.retry'.tr()),
                   ),
                 ],
               ),
@@ -120,8 +119,7 @@ class _RoomTablesBody extends StatelessWidget {
                     style: Theme.of(context).textTheme.titleMedium,
                   ),
                   const SizedBox(height: 8),
-                  Text(
-                    'Add tables from the Tables menu and assign them to this room type.',
+                  Text('common.add_tables_from_the_tables_men'.tr(),
                     style: TextStyle(color: cs.outline),
                     textAlign: TextAlign.center,
                   ),
@@ -142,7 +140,7 @@ class _RoomTablesBody extends StatelessWidget {
             children: [
               // ── Summary strip ──
               Container(
-                color: cs.surfaceVariant,
+                color: cs.surfaceContainerHighest,
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                 child: Row(
                   children: [
@@ -337,9 +335,8 @@ class _RoomTableCard extends StatelessWidget {
                   color: Colors.red.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(4),
                 ),
-                child: const Text(
-                  'Inactive',
-                  style: TextStyle(fontSize: 9, color: Colors.red),
+                child: Text('common.inactive'.tr(),
+                  style: const TextStyle(fontSize: 9, color: Colors.red),
                 ),
               ),
             ],
@@ -451,9 +448,8 @@ class _NewOrderSheet extends StatelessWidget {
                     borderRadius: BorderRadius.circular(20),
                     border: Border.all(color: Colors.green),
                   ),
-                  child: const Text(
-                    'Available',
-                    style: TextStyle(
+                  child: Text('common.available'.tr(),
+                    style: const TextStyle(
                         color: Colors.green, fontWeight: FontWeight.w600),
                   ),
                 ),
@@ -464,7 +460,7 @@ class _NewOrderSheet extends StatelessWidget {
             const Divider(),
             const SizedBox(height: 16),
 
-            Text('What would you like to do?',
+            Text('common.what_would_you_like_to_do'.tr(),
                 style: Theme.of(context).textTheme.titleMedium),
             const SizedBox(height: 16),
 
@@ -474,7 +470,7 @@ class _NewOrderSheet extends StatelessWidget {
                 Expanded(
                   child: _ActionButton(
                     icon: Icons.receipt_long,
-                    label: 'New Order',
+                    label: 'common.new_order'.tr(),
                     color: cs.primary,
                     onTap: () {
                       Navigator.pop(context);
@@ -494,7 +490,7 @@ class _NewOrderSheet extends StatelessWidget {
                 Expanded(
                   child: _ActionButton(
                     icon: Icons.bookmark_outline,
-                    label: 'Reserve',
+                    label: 'common.reserve'.tr(),
                     color: Colors.blue,
                     onTap: () {
                       Navigator.pop(context);
@@ -518,7 +514,7 @@ class _NewOrderSheet extends StatelessWidget {
               width: double.infinity,
               child: OutlinedButton(
                 onPressed: () => Navigator.pop(context),
-                child: const Text('Cancel'),
+                child: Text('common.cancel'.tr()),
               ),
             ),
             const SizedBox(height: 8),
@@ -598,9 +594,8 @@ class _OccupiedTableSheet extends StatelessWidget {
                   borderRadius: BorderRadius.circular(20),
                   border: Border.all(color: Colors.orange),
                 ),
-                child: const Text(
-                  'Occupied',
-                  style: TextStyle(
+                child: Text('common.occupied'.tr(),
+                  style: const TextStyle(
                       color: Colors.orange, fontWeight: FontWeight.w600),
                 ),
               ),
@@ -611,10 +606,10 @@ class _OccupiedTableSheet extends StatelessWidget {
           const Divider(),
           const SizedBox(height: 16),
 
-          Text('Table is occupied',
+          Text('common.table_is_occupied'.tr(),
               style: Theme.of(context).textTheme.titleMedium),
           const SizedBox(height: 4),
-          Text('Choose an action for this table.',
+          Text('common.choose_an_action_for_this_tabl'.tr(),
               style: TextStyle(color: cs.outline)),
           const SizedBox(height: 16),
 
@@ -623,7 +618,7 @@ class _OccupiedTableSheet extends StatelessWidget {
               Expanded(
                 child: _ActionButton(
                   icon: Icons.visibility,
-                  label: 'View Order',
+                  label: 'common.view_order'.tr(),
                   color: cs.primary,
                   onTap: () {
                     Navigator.pop(context);
@@ -636,7 +631,7 @@ class _OccupiedTableSheet extends StatelessWidget {
               Expanded(
                 child: _ActionButton(
                   icon: Icons.add_circle_outline,
-                  label: 'Add Items',
+                  label: 'common.add_items'.tr(),
                   color: Colors.green,
                   onTap: () {
                     Navigator.pop(context);
@@ -652,7 +647,7 @@ class _OccupiedTableSheet extends StatelessWidget {
               Expanded(
                 child: _ActionButton(
                   icon: Icons.payment,
-                  label: 'Bill / Pay',
+                  label: 'common.bill_pay'.tr(),
                   color: Colors.purple,
                   onTap: () {
                     Navigator.pop(context);
@@ -664,7 +659,7 @@ class _OccupiedTableSheet extends StatelessWidget {
               Expanded(
                 child: _ActionButton(
                   icon: Icons.swap_horiz,
-                  label: 'Move Table',
+                  label: 'common.move_table'.tr(),
                   color: Colors.teal,
                   onTap: () {
                     Navigator.pop(context);
@@ -680,7 +675,7 @@ class _OccupiedTableSheet extends StatelessWidget {
             width: double.infinity,
             child: OutlinedButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text('Close'),
+              child: Text('common.close'.tr()),
             ),
           ),
           const SizedBox(height: 8),

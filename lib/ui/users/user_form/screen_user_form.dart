@@ -242,16 +242,14 @@ class _UserFormViewState extends State<_UserFormView> {
                       if (_isEditing)
                         Padding(
                           padding: EdgeInsets.only(bottom: AppSpacing.lg),
-                          child: Text(
-                            'Update Permissions',
+                          child: Text('common.update_permissions'.tr(),
                             style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
                           ),
                         ),
                       if (_isEditing)
                         Padding(
                           padding: EdgeInsets.only(bottom: AppSpacing.md),
-                          child: Text(
-                            'You can only modify the permissions for this user.',
+                          child: Text('common.you_can_only_modify_the_permis'.tr(),
                             style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Theme.of(context).colorScheme.outline),
                           ),
                         ),
@@ -269,7 +267,7 @@ class _UserFormViewState extends State<_UserFormView> {
                   Expanded(
                     child: OutlinedButton(
                       onPressed: () => context.go('/brands/${widget.brandId}/users'),
-                      child: const Text('Cancel'),
+                      child: Text('common.cancel'.tr()),
                     ),
                   ),
                   SizedBox(width: AppSpacing.md),
@@ -294,13 +292,11 @@ class _UserFormViewState extends State<_UserFormView> {
     final cs = Theme.of(context).colorScheme;
 
     return [
-      Text(
-        'Basic Information',
+      Text('common.basic_information'.tr(),
         style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
       ),
       SizedBox(height: AppSpacing.sm),
-      Text(
-        'Enter the fundamental details for this user.',
+      Text('common.enter_the_fundamental_details'.tr(),
         style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: cs.outline),
       ),
       SizedBox(height: AppSpacing.md),
@@ -323,7 +319,7 @@ class _UserFormViewState extends State<_UserFormView> {
                       value: _selectedUserType,
                       decoration: InputDecoration(
                         labelText: 'User Type',
-                        border: OutlineInputBorder(borderRadius: AppBorders.sm),
+                        border: const OutlineInputBorder(borderRadius: AppBorders.sm),
                         filled: true,
                         fillColor: cs.surfaceContainerLowest,
                       ),
@@ -340,7 +336,7 @@ class _UserFormViewState extends State<_UserFormView> {
                       value: _selectedRole,
                       decoration: InputDecoration(
                         labelText: 'Role',
-                        border: OutlineInputBorder(borderRadius: AppBorders.sm),
+                        border: const OutlineInputBorder(borderRadius: AppBorders.sm),
                         filled: true,
                         fillColor: cs.surfaceContainerLowest,
                       ),
@@ -359,7 +355,7 @@ class _UserFormViewState extends State<_UserFormView> {
                   Expanded(
                     child: AppTextField(
                       controller: _firstNameCtrl,
-                      label: 'First Name',
+                      label: 'common.first_name'.tr(),
                       readOnly: _isEditing,
                       validator: (v) => (v?.isEmpty ?? true) ? 'Required' : null,
                     ),
@@ -368,7 +364,7 @@ class _UserFormViewState extends State<_UserFormView> {
                   Expanded(
                     child: AppTextField(
                       controller: _lastNameCtrl,
-                      label: 'Last Name',
+                      label: 'common.last_name'.tr(),
                       readOnly: _isEditing,
                       validator: (v) => (v?.isEmpty ?? true) ? 'Required' : null,
                     ),
@@ -378,7 +374,7 @@ class _UserFormViewState extends State<_UserFormView> {
               SizedBox(height: AppSpacing.lg),
               AppTextField(
                 controller: _usernameCtrl,
-                label: 'Username',
+                label: 'common.username'.tr(),
                 readOnly: _isEditing,
                 validator: (v) => (v?.isEmpty ?? true) ? 'Required' : null,
               ),
@@ -386,7 +382,7 @@ class _UserFormViewState extends State<_UserFormView> {
                 SizedBox(height: AppSpacing.lg),
                 AppTextField(
                   controller: _pinCtrl,
-                  label: 'Login PIN (6 digits)',
+                  label: 'common.login_pin_6_digits'.tr(),
                   keyboardType: TextInputType.number,
                   obscureText: true,
                   readOnly: _isEditing,
@@ -399,7 +395,7 @@ class _UserFormViewState extends State<_UserFormView> {
                   Expanded(
                     child: AppTextField(
                       controller: _emailCtrl,
-                      label: 'Email',
+                      label: 'common.email'.tr(),
                       keyboardType: TextInputType.emailAddress,
                       readOnly: _isEditing,
                       validator: (v) => (v?.isEmpty ?? true) ? 'Required' : null,
@@ -409,7 +405,7 @@ class _UserFormViewState extends State<_UserFormView> {
                   Expanded(
                     child: AppTextField(
                       controller: _phoneCtrl,
-                      label: 'Phone Number',
+                      label: 'common.phone_number'.tr(),
                       keyboardType: TextInputType.phone,
                       readOnly: _isEditing,
                     ),
@@ -429,13 +425,12 @@ class _UserFormViewState extends State<_UserFormView> {
     final cs = Theme.of(context).colorScheme;
     if (state.status == UserStatus.loading && state.branches.isEmpty) {
       return const Padding(
-        padding: EdgeInsets.all(8.0),
+        padding: EdgeInsets.all(8),
         child: Center(child: CircularProgressIndicator()),
       );
     }
     if (state.branches.isEmpty) {
-      return Text(
-        'No branches found. Create a branch first.',
+      return Text('common.no_branches_found_create_a_bra'.tr(),
         style: TextStyle(color: cs.error),
       );
     }
@@ -449,13 +444,13 @@ class _UserFormViewState extends State<_UserFormView> {
       value: _selectedBranchId,
       decoration: InputDecoration(
         labelText: 'Branch (Optional)',
-        border: OutlineInputBorder(borderRadius: AppBorders.sm),
+        border: const OutlineInputBorder(borderRadius: AppBorders.sm),
         filled: true,
         fillColor: cs.surfaceContainerLowest,
       ),
-      hint: const Text('Select branch'),
+      hint: Text('common.select_branch'.tr()),
       items: [
-        const DropdownMenuItem<String>(value: null, child: Text('None (Brand Level)')),
+        DropdownMenuItem<String>(value: null, child: Text('common.none_brand_level'.tr())),
         ...state.branches.map((b) => DropdownMenuItem(value: b.id, child: Text(b.displayName))),
       ],
       onChanged: _isEditing ? null : (value) => setState(() => _selectedBranchId = value),
@@ -473,8 +468,7 @@ class _UserFormViewState extends State<_UserFormView> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
-              'Permissions',
+            Text('common.permissions'.tr(),
               style: Theme.of(context).textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
@@ -487,7 +481,7 @@ class _UserFormViewState extends State<_UserFormView> {
                       _selectedPermissions = List<String>.from(_allPermissions);
                     });
                   },
-                  child: const Text('Select All'),
+                  child: Text('common.select_all'.tr()),
                 ),
                 TextButton(
                   onPressed: () {
@@ -495,7 +489,7 @@ class _UserFormViewState extends State<_UserFormView> {
                       _selectedPermissions = [];
                     });
                   },
-                  child: const Text('Clear All'),
+                  child: Text('common.clear_all'.tr()),
                 ),
               ],
             ),
@@ -574,7 +568,7 @@ class _UserFormViewState extends State<_UserFormView> {
 
                         return FilterChip(
                           selected: isSelected,
-                          label: Text(displayName, style: TextStyle(fontSize: 13)),
+                          label: Text(displayName, style: const TextStyle(fontSize: 13)),
                           onSelected: (selected) {
                             setState(() {
                               if (selected) {
@@ -587,7 +581,7 @@ class _UserFormViewState extends State<_UserFormView> {
                           backgroundColor: cs.surfaceContainerHigh,
                           selectedColor: cs.primaryContainer,
                           checkmarkColor: cs.onPrimaryContainer,
-                          shape: RoundedRectangleBorder(borderRadius: AppBorders.sm),
+                          shape: const RoundedRectangleBorder(borderRadius: AppBorders.sm),
                         );
                       }).toList(),
                     ),

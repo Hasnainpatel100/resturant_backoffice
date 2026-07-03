@@ -31,7 +31,7 @@ class _UserListView extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Users'),
+        title: Text('common.users'.tr()),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => context.go('/brands/$brandId'),
@@ -58,7 +58,7 @@ class _UserListView extends StatelessWidget {
                   SizedBox(height: AppSpacing.md),
                   ElevatedButton(
                     onPressed: () => context.read<CubitUser>().loadUsers(brandId),
-                    child: const Text('Retry'),
+                    child: Text('common.retry'.tr()),
                   ),
                 ],
               ),
@@ -72,12 +72,12 @@ class _UserListView extends StatelessWidget {
                 children: [
                   Icon(Icons.people_outline, size: 64, color: cs.outline),
                   SizedBox(height: AppSpacing.md),
-                  Text('No users found', style: Theme.of(context).textTheme.titleMedium),
+                  Text('common.no_users_found'.tr(), style: Theme.of(context).textTheme.titleMedium),
                   SizedBox(height: AppSpacing.sm),
                   ElevatedButton.icon(
                     onPressed: () => context.go('/brands/$brandId/users/create'),
                     icon: const Icon(Icons.add),
-                    label: const Text('Add User'),
+                    label: Text('common.add_user'.tr()),
                   ),
                 ],
               ),
@@ -158,25 +158,25 @@ class _UserListView extends StatelessWidget {
                                     ),
                                   ],
                                 ),
-                                SizedBox(height: 4),
+                                const SizedBox(height: 4),
                                 Text(
                                   user.email,
                                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: cs.outline),
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
                                 ),
-                                SizedBox(height: 8),
+                                const SizedBox(height: 8),
                                 Row(
                                   children: [
                                     Icon(Icons.badge_outlined, size: 14, color: cs.primary),
-                                    SizedBox(width: 4),
+                                    const SizedBox(width: 4),
                                     Text(
                                       '${user.role} • ${user.userType}',
                                       style: TextStyle(fontSize: 12, color: cs.onSurfaceVariant, fontWeight: FontWeight.w500),
                                     ),
                                     const Spacer(),
                                     Icon(Icons.security_outlined, size: 14, color: cs.secondary),
-                                    SizedBox(width: 4),
+                                    const SizedBox(width: 4),
                                     Text(
                                       '${user.permissions.length} perms',
                                       style: TextStyle(fontSize: 12, color: cs.onSurfaceVariant),

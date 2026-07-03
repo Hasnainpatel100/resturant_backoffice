@@ -1,6 +1,4 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:go_router/go_router.dart';
 import 'package:back_office/imports/core_imports.dart';
 import 'package:back_office/data/models/table_model.dart';
 import 'package:back_office/data/repositories/table_repository_impl.dart';
@@ -123,8 +121,7 @@ class _ScreenTableLayoutState extends State<ScreenTableLayout> {
     if (_roomTypesLoading) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: const Text(
-              'Room types are still loading. Please try again in a moment.'),
+          content: Text('common.room_types_are_still_loading_p'.tr()),
           behavior: SnackBarBehavior.floating,
           backgroundColor: Colors.orange.shade700,
           shape:
@@ -255,7 +252,7 @@ class _ScreenTableLayoutState extends State<ScreenTableLayout> {
           return AlertDialog(
             shape:
             RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-            title: const Text('Add Table'),
+            title: Text('common.add_table'.tr()),
             content: SingleChildScrollView(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -265,8 +262,8 @@ class _ScreenTableLayoutState extends State<ScreenTableLayout> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text('Bulk Add',
-                          style: TextStyle(fontWeight: FontWeight.w600)),
+                      Text('common.bulk_add'.tr(),
+                          style: const TextStyle(fontWeight: FontWeight.w600)),
                       Switch(
                         value: isBulk,
                         onChanged: (val) =>
@@ -280,19 +277,19 @@ class _ScreenTableLayoutState extends State<ScreenTableLayout> {
                   if (!isBulk) ...[
                     TextField(
                       controller: tableNumberController,
-                      decoration: const InputDecoration(
+                      decoration: InputDecoration(
                         labelText: 'Table Number *',
-                        hintText: 'e.g. T01',
-                        border: OutlineInputBorder(),
+                        hintText: 'common.e_g_t01'.tr(),
+                        border: const OutlineInputBorder(),
                       ),
                     ),
                     const SizedBox(height: 12),
                     TextField(
                       controller: displayNameController,
-                      decoration: const InputDecoration(
+                      decoration: InputDecoration(
                         labelText: 'Display Name',
-                        hintText: 'e.g. Window Table',
-                        border: OutlineInputBorder(),
+                        hintText: 'common.e_g_window_table'.tr(),
+                        border: const OutlineInputBorder(),
                       ),
                     ),
                   ] else ...[
@@ -307,10 +304,10 @@ class _ScreenTableLayoutState extends State<ScreenTableLayout> {
                     const SizedBox(height: 12),
                     TextField(
                       controller: bulkCountController,
-                      decoration: const InputDecoration(
+                      decoration: InputDecoration(
                         labelText: 'Number of Tables *',
-                        hintText: 'e.g. 10',
-                        border: OutlineInputBorder(),
+                        hintText: 'common.e_g_10'.tr(),
+                        border: const OutlineInputBorder(),
                       ),
                       keyboardType: TextInputType.number,
                     ),
@@ -320,10 +317,10 @@ class _ScreenTableLayoutState extends State<ScreenTableLayout> {
 
                   TextField(
                     controller: capacityController,
-                    decoration: const InputDecoration(
+                    decoration: InputDecoration(
                       labelText: 'Capacity *',
-                      hintText: 'e.g. 4',
-                      border: OutlineInputBorder(),
+                      hintText: 'common.e_g_4'.tr(),
+                      border: const OutlineInputBorder(),
                     ),
                     keyboardType: TextInputType.number,
                   ),
@@ -334,7 +331,7 @@ class _ScreenTableLayoutState extends State<ScreenTableLayout> {
                       labelText: 'Room Type *',
                       border: OutlineInputBorder(),
                     ),
-                    value: selectedRoomTypeId,
+                    initialValue: selectedRoomTypeId,
                     items: _roomTypes.map((room) {
                       return DropdownMenuItem(
                           value: room.id, child: Text(room.name));
@@ -353,11 +350,10 @@ class _ScreenTableLayoutState extends State<ScreenTableLayout> {
                       ),
                     )
                   else if (_roomTypes.isEmpty)
-                    const Padding(
-                      padding: EdgeInsets.only(top: 6),
-                      child: Text(
-                        'No room types found. Please add a room type first.',
-                        style: TextStyle(fontSize: 11, color: Colors.orange),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 6),
+                      child: Text('common.no_room_types_found_please_add'.tr(),
+                        style: const TextStyle(fontSize: 11, color: Colors.orange),
                       ),
                     ),
                 ],
@@ -366,7 +362,7 @@ class _ScreenTableLayoutState extends State<ScreenTableLayout> {
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(dialogContext),
-                child: const Text('Cancel'),
+                child: Text('common.cancel'.tr()),
               ),
               ElevatedButton(
                 onPressed: () {
@@ -376,9 +372,8 @@ class _ScreenTableLayoutState extends State<ScreenTableLayout> {
 
                   if (prefix.isEmpty || selectedRoomTypeId == null) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text(
-                            'Table number and room type are required.'),
+                      SnackBar(
+                        content: Text('common.table_number_and_room_type_are'.tr()),
                       ),
                     );
                     return;
@@ -447,13 +442,13 @@ class _ScreenTableLayoutState extends State<ScreenTableLayout> {
       builder: (ctx) => AlertDialog(
         shape:
         RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: const Text('Branch Required'),
+        title: Text('common.branch_required'.tr()),
         content:
-        const Text('Please select a branch before managing tables.'),
+        Text('common.please_select_a_branch_before'.tr()),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('OK'),
+            child: Text('common.ok'.tr()),
           ),
         ],
       ),
@@ -528,7 +523,7 @@ class _TableLayoutBody extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Table Layout'),
+        title: Text('common.table_layout'.tr()),
         actions: [
           // ── Download Format button ────────────────────────────────────────
           Padding(
@@ -566,7 +561,7 @@ class _TableLayoutBody extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.only(right: 12),
             child: _HeaderButton(
-              label: 'Add Table',
+              label: 'common.add_table'.tr(),
               icon: const Icon(Icons.add_rounded, size: 18),
               outlined: false,
               onPressed: () => onAddTable(context),
@@ -591,8 +586,7 @@ class _TableLayoutBody extends StatelessWidget {
                     return Card(
                       child: Padding(
                         padding: EdgeInsets.all(AppSpacing.lg),
-                        child: Text(
-                          'No branches found',
+                        child: Text('common.no_branches_found'.tr(),
                           style: TextStyle(
                               color: Theme.of(context).colorScheme.outline),
                         ),
@@ -602,7 +596,7 @@ class _TableLayoutBody extends StatelessWidget {
                   return DropdownButtonFormField<String>(
                     decoration:
                     const InputDecoration(labelText: 'Branch'),
-                    hint: const Text('Select branch'),
+                    hint: Text('common.select_branch'.tr()),
                     items: branchState.branches.map((b) {
                       return DropdownMenuItem(
                           value: b.id, child: Text(b.displayName));
@@ -632,7 +626,7 @@ class _TableLayoutBody extends StatelessWidget {
                             onPressed: () => context
                                 .read<CubitTable>()
                                 .loadTables(brandId, selectedBranchId!),
-                            child: const Text('Retry'),
+                            child: Text('common.retry'.tr()),
                           ),
                         ],
                       ),
@@ -654,12 +648,12 @@ class _TableLayoutBody extends StatelessWidget {
                             color: Theme.of(context).colorScheme.outline,
                           ),
                           SizedBox(height: AppSpacing.md),
-                          const Text('No tables configured'),
+                          Text('common.no_tables_configured'.tr()),
                           SizedBox(height: AppSpacing.md),
                           ElevatedButton.icon(
                             onPressed: () => onAddTable(context),
                             icon: const Icon(Icons.add),
-                            label: const Text('Add Table'),
+                            label: Text('common.add_table'.tr()),
                           ),
                         ],
                       ),
@@ -739,7 +733,7 @@ class _TableLayoutBody extends StatelessWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
-            child: const Text('Cancel'),
+            child: Text('common.cancel'.tr()),
           ),
           ElevatedButton(
             onPressed: () {
@@ -754,7 +748,7 @@ class _TableLayoutBody extends StatelessWidget {
               });
               Navigator.pop(dialogContext);
             },
-            child: const Text('Save'),
+            child: Text('common.save'.tr()),
           ),
         ],
       ),
@@ -942,11 +936,11 @@ class _TableCard extends StatelessWidget {
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16)),
               title: Text('Delete Table ${table.tableNumber}?'),
-              content: const Text('This action cannot be undone.'),
+              content: Text('common.this_action_cannot_be_undone'.tr()),
               actions: [
                 TextButton(
                   onPressed: () => Navigator.pop(dialogContext),
-                  child: const Text('Cancel'),
+                  child: Text('common.cancel'.tr()),
                 ),
                 TextButton(
                   onPressed: () {
@@ -955,14 +949,14 @@ class _TableCard extends StatelessWidget {
                   },
                   style:
                   TextButton.styleFrom(foregroundColor: Colors.red),
-                  child: const Text('Delete'),
+                  child: Text('common.delete'.tr()),
                 ),
               ],
             ),
           );
         },
         borderRadius: BorderRadius.circular(12),
-        child: Container(
+        child: DecoratedBox(
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(12),
             border: Border.all(color: statusColor, width: 2),
@@ -994,9 +988,8 @@ class _TableCard extends StatelessWidget {
                     color: Colors.red.withOpacity(0.15),
                     borderRadius: BorderRadius.circular(4),
                   ),
-                  child: const Text(
-                    'Inactive',
-                    style: TextStyle(fontSize: 9, color: Colors.red),
+                  child: Text('common.inactive'.tr(),
+                    style: const TextStyle(fontSize: 9, color: Colors.red),
                   ),
                 ),
             ],

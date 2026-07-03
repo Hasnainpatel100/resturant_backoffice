@@ -43,13 +43,11 @@ class ScreenForgotPassword extends HookWidget {
                   color: cs.primary,
                 ),
                 SizedBox(height: AppSpacing.lg),
-                Text(
-                  'auth.forgot_password'.tr(),
+                Text('common.auth_forgot_password'.tr().tr(),
                   style: tt.headlineMedium?.copyWith(fontWeight: FontWeight.bold),
                 ),
                 SizedBox(height: AppSpacing.sm),
-                Text(
-                  'auth.reset_instructions'.tr(),
+                Text('common.auth_reset_instructions'.tr().tr(),
                   textAlign: TextAlign.center,
                   style: tt.bodyMedium?.copyWith(color: cs.onSurfaceVariant),
                 ),
@@ -59,7 +57,7 @@ class ScreenForgotPassword extends HookWidget {
                   child: AppTextField(
                     controller: emailController,
                     enabled: !isLoading,
-                    label: 'auth.email_label'.tr(),
+                    label: 'common.auth_email_label'.tr().tr(),
                     prefixIcon: const Icon(Icons.email_outlined),
                     keyboardType: TextInputType.emailAddress,
                     textInputAction: TextInputAction.done,
@@ -77,7 +75,7 @@ class ScreenForgotPassword extends HookWidget {
                 ),
                 SizedBox(height: AppSpacing.lg),
                 AppButton(
-                  label: 'auth.send_reset_link'.tr(),
+                  label: 'common.auth_send_reset_link'.tr().tr(),
                   isLoading: isLoading,
                   onPressed: isLoading ? null : handleReset,
                   width: ButtonSize.large,
@@ -86,8 +84,7 @@ class ScreenForgotPassword extends HookWidget {
                 SizedBox(height: AppSpacing.xl),
                 TextButton(
                   onPressed: isLoading ? null : () => Navigator.pop(context),
-                  child: Text(
-                    'auth.back_to_login'.tr(),
+                  child: Text('common.auth_back_to_login'.tr().tr(),
                     style: tt.labelLarge?.copyWith(
                       color: cs.primary,
                       fontWeight: FontWeight.bold,

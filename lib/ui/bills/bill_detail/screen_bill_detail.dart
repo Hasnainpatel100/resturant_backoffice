@@ -20,7 +20,7 @@ class ScreenBillDetail extends StatelessWidget {
       create: (context) => CubitBill(repository: BillRepositoryImpl())..loadBillDetail(billId),
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('Bill Detail'),
+          title: Text('common.bill_detail'.tr()),
           leading: IconButton(
             icon: const Icon(Icons.arrow_back),
             onPressed: () => context.go('/brands/$brandId/bills'),
@@ -45,7 +45,7 @@ class ScreenBillDetail extends StatelessWidget {
                       onPressed: () {
                         context.read<CubitBill>().loadBillDetail(billId);
                       },
-                      child: const Text('Retry'),
+                      child: Text('common.retry'.tr()),
                     ),
                   ],
                 ),
@@ -54,7 +54,7 @@ class ScreenBillDetail extends StatelessWidget {
 
             final bill = state.activeBill;
             if (bill == null) {
-              return const Center(child: Text('Bill not found'));
+              return Center(child: Text('common.bill_not_found'.tr()));
             }
 
             return Center(
@@ -80,8 +80,7 @@ class ScreenBillDetail extends StatelessWidget {
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(
-                                    'INVOICE',
+                                  Text('common.invoice'.tr(),
                                     style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                                           fontWeight: FontWeight.bold,
                                           color: cs.primary,
@@ -141,8 +140,7 @@ class ScreenBillDetail extends StatelessWidget {
                           const SizedBox(height: 24),
 
                           // Itemized Table Header
-                          Text(
-                            'ORDER ITEMS',
+                          Text('common.order_items'.tr(),
                             style: Theme.of(context).textTheme.titleSmall?.copyWith(
                                   fontWeight: FontWeight.bold,
                                   color: cs.outline,
@@ -264,8 +262,7 @@ class ScreenBillDetail extends StatelessWidget {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Text(
-                                'TOTAL AMOUNT',
+                              Text('common.total_amount'.tr(),
                                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
                                       fontWeight: FontWeight.bold,
                                     ),

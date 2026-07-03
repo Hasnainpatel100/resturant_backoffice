@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 
 /// Web security utilities to discourage casual inspection.
 ///

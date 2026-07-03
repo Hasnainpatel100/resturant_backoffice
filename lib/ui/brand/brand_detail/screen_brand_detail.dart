@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:back_office/imports/core_imports.dart';
@@ -8,7 +7,6 @@ import 'package:back_office/ui/brand/brand_list/cubit_brand.dart';
 import 'package:back_office/ui/brand/brand_list/state_brand.dart';
 import 'package:back_office/ui/branch/branch_list/cubit_branch.dart';
 import 'package:back_office/ui/branch/branch_list/state_branch.dart';
-import 'package:back_office/routing/app_routes.dart';
 import 'package:back_office/data/models/brand_model.dart';
 import 'package:back_office/shared/shared.dart';
 
@@ -56,7 +54,7 @@ class _BrandDetailView extends StatelessWidget {
       builder: (context, state) {
         return Scaffold(
           appBar: AppBar(
-            title: const Text('Brand Details'),
+            title: Text('common.brand_details'.tr()),
             leading: IconButton(
               icon: const Icon(Icons.arrow_back),
               onPressed: () => context.go(AppRoutes.brandList),
@@ -99,7 +97,7 @@ class _BrandDetailView extends StatelessWidget {
             FilledButton.icon(
               onPressed: () => context.read<CubitBrand>().loadBrand(brandId),
               icon: const Icon(Icons.refresh),
-              label: const Text('Retry'),
+              label: Text('common.retry'.tr()),
             ),
           ],
         ),
@@ -108,7 +106,7 @@ class _BrandDetailView extends StatelessWidget {
 
     final brand = state.brand;
     if (brand == null) {
-      return const Center(child: Text('Brand not found'));
+      return Center(child: Text('common.brand_not_found'.tr()));
     }
 
     return SingleChildScrollView(
@@ -127,9 +125,9 @@ class _BrandDetailView extends StatelessWidget {
             title: 'Contact Information',
             color: Colors.teal,
             children: [
-              _InfoRow(icon: Icons.email_outlined, label: 'Email', value: brand.contact.email),
-              _InfoRow(icon: Icons.phone_outlined, label: 'Phone', value: brand.contact.phones.primary),
-              _InfoRow(icon: Icons.language, label: 'Website', value: brand.contact.website),
+              _InfoRow(icon: Icons.email_outlined, label: 'common.email'.tr(), value: brand.contact.email),
+              _InfoRow(icon: Icons.phone_outlined, label: 'common.phone'.tr(), value: brand.contact.phones.primary),
+              _InfoRow(icon: Icons.language, label: 'common.website'.tr(), value: brand.contact.website),
             ],
           ),
 
@@ -141,10 +139,10 @@ class _BrandDetailView extends StatelessWidget {
             title: 'Registration',
             color: Colors.orange,
             children: [
-              _InfoRow(icon: Icons.receipt_long, label: 'GST No', value: brand.registration.gstNo),
-              _InfoRow(icon: Icons.verified_outlined, label: 'FSSAI No', value: brand.registration.fssaiNo),
+              _InfoRow(icon: Icons.receipt_long, label: 'common.gst_no'.tr(), value: brand.registration.gstNo),
+              _InfoRow(icon: Icons.verified_outlined, label: 'common.fssai_no'.tr(), value: brand.registration.fssaiNo),
               if (brand.registration.cin.isNotEmpty)
-                _InfoRow(icon: Icons.business_center, label: 'CIN', value: brand.registration.cin),
+                _InfoRow(icon: Icons.business_center, label: 'common.cin'.tr(), value: brand.registration.cin),
             ],
           ),
 
@@ -156,8 +154,8 @@ class _BrandDetailView extends StatelessWidget {
             title: 'Settings',
             color: Colors.purple,
             children: [
-              _InfoRow(icon: Icons.currency_rupee, label: 'Currency', value: brand.settings.currency),
-              _InfoRow(icon: Icons.schedule, label: 'Timezone', value: brand.settings.timezone),
+              _InfoRow(icon: Icons.currency_rupee, label: 'common.currency'.tr(), value: brand.settings.currency),
+              _InfoRow(icon: Icons.schedule, label: 'common.timezone'.tr(), value: brand.settings.timezone),
             ],
           ),
 
@@ -169,7 +167,7 @@ class _BrandDetailView extends StatelessWidget {
           SizedBox(height: AppSpacing.md),
 
           // ── Quick Actions ──
-          Text('Quick Actions',
+          Text('common.quick_actions'.tr(),
               style: Theme.of(context)
                   .textTheme
                   .titleMedium
@@ -180,7 +178,7 @@ class _BrandDetailView extends StatelessWidget {
               Expanded(
                 child: _QuickActionCard(
                   icon: Icons.people,
-                  label: 'Users',
+                  label: 'common.users'.tr(),
                   color: Colors.indigo,
                   onTap: () => context.go('/brands/$brandId/users'),
                 ),
@@ -189,7 +187,7 @@ class _BrandDetailView extends StatelessWidget {
               Expanded(
                 child: _QuickActionCard(
                   icon: Icons.restaurant_menu,
-                  label: 'Menu',
+                  label: 'common.menu'.tr(),
                   color: Colors.deepOrange,
                   onTap: () => context.go('/brands/$brandId/menu'),
                 ),
@@ -202,7 +200,7 @@ class _BrandDetailView extends StatelessWidget {
               Expanded(
                 child: _QuickActionCard(
                   icon: Icons.table_restaurant,
-                  label: 'Tables',
+                  label: 'common.tables'.tr(),
                   color: Colors.teal,
                   onTap: () => context.go('/brands/$brandId/tables'),
                 ),
@@ -211,7 +209,7 @@ class _BrandDetailView extends StatelessWidget {
               Expanded(
                 child: _QuickActionCard(
                   icon: Icons.bed,
-                  label: 'Room Types',
+                  label: 'common.room_types'.tr(),
                   color: Colors.purple,
                   onTap: () => context.go('/brands/$brandId/room-types'),
                 ),
@@ -220,7 +218,7 @@ class _BrandDetailView extends StatelessWidget {
               Expanded(
                 child: _QuickActionCard(
                   icon: Icons.tablet_android,
-                  label: 'POS Devices',
+                  label: 'common.pos_devices'.tr(),
                   color: Colors.blue,
                   onTap: () => context.go('/brands/$brandId/pos-devices'),
                 ),
@@ -240,14 +238,13 @@ class _BrandDetailView extends StatelessWidget {
       context: context,
       builder: (dialogContext) => AlertDialog(
         icon: Icon(Icons.warning_amber_rounded, color: cs.error, size: 40),
-        title: const Text('Delete Brand?'),
-        content: const Text(
-          'This will permanently delete this brand and all associated data.\n\nThis action cannot be undone.',
+        title: Text('common.delete_brand'.tr()),
+        content: Text('common.this_will_permanently_delete_t'.tr(),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
-            child: const Text('Cancel'),
+            child: Text('common.cancel'.tr()),
           ),
           FilledButton(
             onPressed: () {
@@ -255,7 +252,7 @@ class _BrandDetailView extends StatelessWidget {
               context.read<CubitBrand>().deleteBrand(brandId);
             },
             style: FilledButton.styleFrom(backgroundColor: cs.error),
-            child: const Text('Delete Brand'),
+            child: Text('common.delete_brand'.tr()),
           ),
         ],
       ),
@@ -486,8 +483,7 @@ class _BranchesSection extends StatelessWidget {
                 ),
                 const SizedBox(width: 8),
                 Expanded(
-                  child: Text(
-                    'Branches',
+                  child: Text('common.branches'.tr(),
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
                           fontWeight: FontWeight.w600,
                         ),
@@ -496,7 +492,7 @@ class _BranchesSection extends StatelessWidget {
                 TextButton.icon(
                   onPressed: () => context.go('/brands/$brandId/branches'),
                   icon: const Icon(Icons.visibility, size: 16),
-                  label: const Text('View All'),
+                  label: Text('common.view_all'.tr()),
                 ),
               ],
             ),
@@ -505,7 +501,7 @@ class _BranchesSection extends StatelessWidget {
               builder: (context, branchState) {
                 if (branchState.status == BranchStatus.loading) {
                   return const Padding(
-                    padding: EdgeInsets.all(16.0),
+                    padding: EdgeInsets.all(16),
                     child: Center(child: CircularProgressIndicator()),
                   );
                 }
@@ -517,12 +513,12 @@ class _BranchesSection extends StatelessWidget {
                       children: [
                         Icon(Icons.location_city_outlined, size: 32, color: cs.outline),
                         const SizedBox(height: 8),
-                        Text('No branches', style: TextStyle(color: cs.outline)),
+                        Text('common.no_branches'.tr(), style: TextStyle(color: cs.outline)),
                         const SizedBox(height: 8),
                         OutlinedButton.icon(
                           onPressed: () => context.go('/brands/$brandId/branches/create'),
                           icon: const Icon(Icons.add, size: 16),
-                          label: const Text('Add Branch'),
+                          label: Text('common.add_branch'.tr()),
                         ),
                       ],
                     ),

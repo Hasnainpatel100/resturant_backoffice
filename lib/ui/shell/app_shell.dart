@@ -5,19 +5,19 @@ void showLogoutConfirmation(BuildContext context, VoidCallback onConfirm) {
   showDialog(
     context: context,
     builder: (dialogContext) => AlertDialog(
-      title: const Text('Logout'),
-      content: const Text('Are you sure you want to logout?'),
+      title: Text('common.logout'.tr()),
+      content: Text('common.are_you_sure_you_want_to_logou'.tr()),
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(dialogContext),
-          child: const Text('Cancel'),
+          child: Text('common.cancel'.tr()),
         ),
         ElevatedButton(
           onPressed: () {
             Navigator.pop(dialogContext);
             onConfirm();
           },
-          child: const Text('Logout'),
+          child: Text('common.logout'.tr()),
         ),
       ],
     ),
@@ -67,24 +67,24 @@ class AppShell extends StatelessWidget {
 
         if (isDesktop) {
           return _DesktopShell(
-            child: child,
             currentLocation: currentLocation,
             user: user,
+            child: child,
           );
         }
 
         if (isTablet) {
           return _TabletShell(
-            child: child,
             currentLocation: currentLocation,
             user: user,
+            child: child,
           );
         }
 
         return _MobileShell(
-          child: child,
           currentLocation: currentLocation,
           user: user,
+          child: child,
         );
       },
     );
@@ -176,8 +176,7 @@ class _DesktopSidebar extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        'BackOffice',
+                      Text('common.backoffice'.tr(),
                         style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
                       ),
                       Text(
@@ -198,87 +197,94 @@ class _DesktopSidebar extends StatelessWidget {
             child: ListView(
               padding: EdgeInsets.symmetric(vertical: AppSpacing.md),
               children: [
-                _NavSection(title: 'MAIN'),
+                const _NavSection(title: 'MAIN'),
                 _NavItem(
                   icon: Icons.dashboard_outlined,
                   activeIcon: Icons.dashboard,
-                  label: 'Dashboard',
+                  label: 'common.dashboard'.tr(),
                   route: AppRoutes.home,
                   currentLocation: currentLocation,
                 ),
                 _NavItem(
                   icon: Icons.store_outlined,
                   activeIcon: Icons.store,
-                  label: 'Brands',
+                  label: 'common.brands'.tr(),
                   route: AppRoutes.brandList,
                   currentLocation: currentLocation,
                 ),
                 _NavItem(
                   icon: Icons.inventory_2_outlined,
                   activeIcon: Icons.inventory_2,
-                  label: 'Inventory',
+                  label: 'common.inventory'.tr(),
                   route: '/inventory',
                   currentLocation: currentLocation,
                 ),
                 _NavItem(
                   icon: Icons.people_outlined,
                   activeIcon: Icons.people,
-                  label: 'Users',
+                  label: 'common.users'.tr(),
                   route: usersRoute,
                   currentLocation: currentLocation,
                 ),
 
                 SizedBox(height: AppSpacing.lg),
-                _NavSection(title: 'MANAGEMENT'),
+                const _NavSection(title: 'MANAGEMENT'),
                 _NavItem(
                   icon: Icons.table_restaurant_outlined,
                   activeIcon: Icons.table_restaurant,
-                  label: 'Tables',
+                  label: 'common.tables'.tr(),
                   route: tablesRoute,
                   currentLocation: currentLocation,
                 ),
                 _NavItem(
                   icon: Icons.receipt_long_outlined,
                   activeIcon: Icons.receipt_long,
-                  label: 'Bills',
+                  label: 'common.bills'.tr(),
                   route: billsRoute,
                   currentLocation: currentLocation,
                 ),
                 _NavItem(
                   icon: Icons.hotel_outlined,
                   activeIcon: Icons.hotel,
-                  label: 'Room Types',
+                  label: 'common.room_types'.tr(),
                   route: roomTypesRoute,
                   currentLocation: currentLocation,
                 ),
                 _NavItem(
                   icon: Icons.devices_outlined,
                   activeIcon: Icons.devices,
-                  label: 'POS Devices',
+                  label: 'common.pos_devices'.tr(),
                   route: posDevicesRoute,
                   currentLocation: currentLocation,
                 ),
                 _NavItem(
                   icon: Icons.menu_book_outlined,
                   activeIcon: Icons.menu_book,
-                  label: 'Menu',
+                  label: 'common.menu'.tr(),
                   route: menuRoute,
+                  currentLocation: currentLocation,
+                ),
+                _NavItem(
+                  icon: Icons.feedback_outlined,
+                  activeIcon: Icons.feedback,
+                  label: 'common.feedback'.tr(),
+                  route: AppRoutes.feedbackDashboard,
                   currentLocation: currentLocation,
                 ),
 
                 SizedBox(height: AppSpacing.lg),
-                _NavSection(title: 'SYSTEM'),
+                const _NavSection(title: 'SYSTEM'),
                 _NavItem(
                   icon: Icons.settings_outlined,
                   activeIcon: Icons.settings,
-                  label: 'Settings',
+                  label: 'common.settings'.tr(),
                   route: AppRoutes.settings,
                   currentLocation: currentLocation,
                 ),
                 _NavItem(
                   icon: Icons.notifications_outlined,
                   activeIcon: Icons.notifications,
-                  label: 'Notifications',
+                  label: 'common.notifications'.tr(),
                   route: '/notifications',
                   currentLocation: currentLocation,
                 ),
@@ -293,7 +299,7 @@ class _DesktopSidebar extends StatelessWidget {
             builder: (ctx) => _NavItem(
               icon: Icons.logout_outlined,
               activeIcon: Icons.logout,
-              label: 'Logout',
+              label: 'common.logout'.tr(),
               route: AppRoutes.login,
               currentLocation: currentLocation,
               isFooter: true,
@@ -389,55 +395,61 @@ class _TabletSidebar extends StatelessWidget {
                 children: [
                   _TabletNavItem(
                     icon: Icons.dashboard,
-                    label: 'Home',
+                    label: 'common.home'.tr(),
                     route: AppRoutes.home,
                     currentLocation: currentLocation,
                   ),
                   _TabletNavItem(
                     icon: Icons.store,
-                    label: 'Brands',
+                    label: 'common.brands'.tr(),
                     route: AppRoutes.brandList,
                     currentLocation: currentLocation,
                   ),
                   _TabletNavItem(
                     icon: Icons.people,
-                    label: 'Users',
+                    label: 'common.users'.tr(),
                     route: usersRoute,
                     currentLocation: currentLocation,
                   ),
                   _TabletNavItem(
                     icon: Icons.table_restaurant,
-                    label: 'Tables',
+                    label: 'common.tables'.tr(),
                     route: tablesRoute,
                     currentLocation: currentLocation,
                   ),
                   _TabletNavItem(
                     icon: Icons.hotel,
-                    label: 'Room Types',
+                    label: 'common.room_types'.tr(),
                     route: roomTypesRoute,
                     currentLocation: currentLocation,
                   ),
                   _TabletNavItem(
                     icon: Icons.devices,
-                    label: 'POS Devices',
+                    label: 'common.pos_devices'.tr(),
                     route: posDevicesRoute,
                     currentLocation: currentLocation,
                   ),
                   _TabletNavItem(
                     icon: Icons.menu_book,
-                    label: 'Menu',
+                    label: 'common.menu'.tr(),
                     route: menuRoute,
                     currentLocation: currentLocation,
                   ),
                   _TabletNavItem(
+                    icon: Icons.feedback,
+                    label: 'common.feedback'.tr(),
+                    route: AppRoutes.feedbackDashboard,
+                    currentLocation: currentLocation,
+                  ),
+                  _TabletNavItem(
                     icon: Icons.receipt_long,
-                    label: 'Bills',
+                    label: 'common.bills'.tr(),
                     route: billsRoute,
                     currentLocation: currentLocation,
                   ),
                   _TabletNavItem(
                     icon: Icons.settings,
-                    label: 'Settings',
+                    label: 'common.settings'.tr(),
                     route: AppRoutes.settings,
                     currentLocation: currentLocation,
                   ),
@@ -447,7 +459,7 @@ class _TabletSidebar extends StatelessWidget {
           ),
           _TabletNavItem(
             icon: Icons.logout,
-            label: 'Logout',
+            label: 'common.logout'.tr(),
             route: AppRoutes.login,
             currentLocation: currentLocation,
           ),
@@ -536,11 +548,11 @@ class _MobileShell extends StatelessWidget {
         title: Text(_getPageTitle(currentLocation)),
         actions: [
           IconButton(
-            icon: Icon(Icons.notifications_outlined),
+            icon: const Icon(Icons.notifications_outlined),
             onPressed: () {},
           ),
           IconButton(
-            icon: Icon(Icons.account_circle_outlined),
+            icon: const Icon(Icons.account_circle_outlined),
             onPressed: () => context.go(AppRoutes.profile),
           ),
         ],
@@ -561,6 +573,7 @@ class _MobileShell extends StatelessWidget {
     if (location == '/inventory') return 'Inventory';
     if (location == '/pos-devices' || location == '/all-pos-devices') return 'POS Devices';
     if (location.contains('/bills')) return 'Bills';
+    if (location.startsWith('/feedback')) return 'Feedback';
     if (location == '/notifications') return 'Notifications';
     return 'Dashboard';
   }
@@ -602,8 +615,8 @@ class _MobileDrawer extends StatelessWidget {
             ),
           ),
           ListTile(
-            leading: Icon(Icons.dashboard),
-            title: Text('Dashboard'),
+            leading: const Icon(Icons.dashboard),
+            title: Text('common.dashboard'.tr()),
             selected: currentLocation == AppRoutes.home,
             onTap: () {
               Navigator.pop(context);
@@ -611,8 +624,8 @@ class _MobileDrawer extends StatelessWidget {
             },
           ),
           ListTile(
-            leading: Icon(Icons.store),
-            title: Text('Brands'),
+            leading: const Icon(Icons.store),
+            title: Text('common.brands'.tr()),
             selected: currentLocation.startsWith('/brands') &&
                 !currentLocation.contains('/users') &&
                 !currentLocation.contains('/tables') &&
@@ -625,8 +638,8 @@ class _MobileDrawer extends StatelessWidget {
             },
           ),
           ListTile(
-            leading: Icon(Icons.people),
-            title: Text('Users'),
+            leading: const Icon(Icons.people),
+            title: Text('common.users'.tr()),
             selected: currentLocation.startsWith(usersRoute) && brandId != null,
             onTap: () {
               Navigator.pop(context);
@@ -634,8 +647,8 @@ class _MobileDrawer extends StatelessWidget {
             },
           ),
           ListTile(
-            leading: Icon(Icons.table_restaurant),
-            title: Text('Tables'),
+            leading: const Icon(Icons.table_restaurant),
+            title: Text('common.tables'.tr()),
             selected: currentLocation.startsWith(tablesRoute) && brandId != null,
             onTap: () {
               Navigator.pop(context);
@@ -643,8 +656,8 @@ class _MobileDrawer extends StatelessWidget {
             },
           ),
           ListTile(
-            leading: Icon(Icons.hotel),
-            title: Text('Room Types'),
+            leading: const Icon(Icons.hotel),
+            title: Text('common.room_types'.tr()),
             selected: currentLocation.startsWith(roomTypesRoute) && brandId != null,
             onTap: () {
               Navigator.pop(context);
@@ -652,8 +665,8 @@ class _MobileDrawer extends StatelessWidget {
             },
           ),
           ListTile(
-            leading: Icon(Icons.devices),
-            title: Text('POS Devices'),
+            leading: const Icon(Icons.devices),
+            title: Text('common.pos_devices'.tr()),
             selected: currentLocation.startsWith(posDevicesRoute) && brandId != null,
             onTap: () {
               Navigator.pop(context);
@@ -661,8 +674,8 @@ class _MobileDrawer extends StatelessWidget {
             },
           ),
           ListTile(
-            leading: Icon(Icons.menu_book),
-            title: Text('Menu'),
+            leading: const Icon(Icons.menu_book),
+            title: Text('common.menu'.tr()),
             selected: currentLocation.startsWith(menuRoute) && brandId != null,
             onTap: () {
               Navigator.pop(context);
@@ -670,8 +683,17 @@ class _MobileDrawer extends StatelessWidget {
             },
           ),
           ListTile(
+            leading: const Icon(Icons.feedback),
+            title: Text('common.feedback'.tr()),
+            selected: currentLocation.startsWith(AppRoutes.feedbackDashboard),
+            onTap: () {
+              Navigator.pop(context);
+              context.go(AppRoutes.feedbackDashboard);
+            },
+          ),
+          ListTile(
             leading: const Icon(Icons.receipt_long),
-            title: const Text('Bills'),
+            title: Text('common.bills'.tr()),
             selected: currentLocation.startsWith(billsRoute) && brandId != null,
             onTap: () {
               Navigator.pop(context);
@@ -679,19 +701,19 @@ class _MobileDrawer extends StatelessWidget {
             },
           ),
           ListTile(
-            leading: Icon(Icons.settings),
-            title: Text('Settings'),
+            leading: const Icon(Icons.settings),
+            title: Text('common.settings'.tr()),
             selected: currentLocation == AppRoutes.settings || currentLocation == AppRoutes.profile,
             onTap: () {
               Navigator.pop(context);
               context.go(AppRoutes.settings);
             },
           ),
-          Divider(),
+          const Divider(),
           Builder(
             builder: (ctx) => ListTile(
-              leading: Icon(Icons.logout),
-              title: Text('Logout'),
+              leading: const Icon(Icons.logout),
+              title: Text('common.logout'.tr()),
               onTap: () {
                 Navigator.pop(context);
                 showLogoutConfirmation(context, () {
@@ -730,14 +752,14 @@ class _TopBar extends StatelessWidget {
           // Search
           Expanded(
             child: Container(
-              constraints: BoxConstraints(maxWidth: 400),
+              constraints: const BoxConstraints(maxWidth: 400),
               child: TextField(
                 decoration: InputDecoration(
-                  hintText: 'Search...',
-                  prefixIcon: Icon(Icons.search, size: 20),
+                  hintText: 'common.search'.tr(),
+                  prefixIcon: const Icon(Icons.search, size: 20),
                   isDense: true,
-                  contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                  border: OutlineInputBorder(
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  border: const OutlineInputBorder(
                     borderRadius: AppBorders.md,
                     borderSide: BorderSide.none,
                   ),
@@ -752,12 +774,12 @@ class _TopBar extends StatelessWidget {
 
           // Actions
           IconButton(
-            icon: Icon(Icons.notifications_outlined),
+            icon: const Icon(Icons.notifications_outlined),
             onPressed: () {},
             tooltip: 'Notifications',
           ),
           IconButton(
-            icon: Icon(Icons.help_outline),
+            icon: const Icon(Icons.help_outline),
             onPressed: () {},
             tooltip: 'Help',
           ),
@@ -765,8 +787,8 @@ class _TopBar extends StatelessWidget {
 
           // User Avatar
           PopupMenuButton<String>(
-            offset: Offset(0, 48),
-            shape: RoundedRectangleBorder(borderRadius: AppBorders.md),
+            offset: const Offset(0, 48),
+            shape: const RoundedRectangleBorder(borderRadius: AppBorders.md),
             child: Row(
               children: [
                 CircleAvatar(
@@ -783,7 +805,7 @@ class _TopBar extends StatelessWidget {
                 ),
                 SizedBox(width: AppSpacing.sm),
                 Text(user?.name ?? 'User', style: theme.textTheme.bodyMedium),
-                Icon(Icons.arrow_drop_down),
+                const Icon(Icons.arrow_drop_down),
               ],
             ),
             itemBuilder: (context) => [
@@ -791,9 +813,9 @@ class _TopBar extends StatelessWidget {
                 value: 'profile',
                 child: Row(
                   children: [
-                    Icon(Icons.person_outline, size: 20),
+                    const Icon(Icons.person_outline, size: 20),
                     SizedBox(width: AppSpacing.sm),
-                    Text('Profile'),
+                    Text('common.profile'.tr()),
                   ],
                 ),
               ),
@@ -801,20 +823,20 @@ class _TopBar extends StatelessWidget {
                 value: 'settings',
                 child: Row(
                   children: [
-                    Icon(Icons.settings_outlined, size: 20),
+                    const Icon(Icons.settings_outlined, size: 20),
                     SizedBox(width: AppSpacing.sm),
-                    Text('Settings'),
+                    Text('common.settings'.tr()),
                   ],
                 ),
               ),
-              PopupMenuDivider(),
+              const PopupMenuDivider(),
               PopupMenuItem(
                 value: 'logout',
                 child: Row(
                   children: [
-                    Icon(Icons.logout, size: 20),
+                    const Icon(Icons.logout, size: 20),
                     SizedBox(width: AppSpacing.sm),
-                    Text('Logout'),
+                    Text('common.logout'.tr()),
                   ],
                 ),
               ),

@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:back_office/imports/core_imports.dart';
@@ -172,15 +171,15 @@ class _BranchFormViewState extends State<_BranchFormView> {
                             children: [
                               AppTextField(
                                 controller: _nameController,
-                                label: 'Branch Name *',
+                                label: 'common.branch_name'.tr(),
                                 prefixIcon: const Icon(Icons.store),
                                 validator: (v) =>
-                                    v?.isEmpty == true ? 'Branch name is required' : null,
+                                    v?.isEmpty ?? false ? 'Branch name is required' : null,
                               ),
                               SizedBox(height: AppSpacing.md),
                               AppTextField(
                                 controller: _branchCodeController,
-                                label: 'Branch Code',
+                                label: 'common.branch_code'.tr(),
                                 prefixIcon: const Icon(Icons.tag),
                               ),
                             ],
@@ -191,7 +190,7 @@ class _BranchFormViewState extends State<_BranchFormView> {
                       SizedBox(height: AppSpacing.lg),
 
                       // ── Contact ──
-                      _SectionHeader(
+                      const _SectionHeader(
                         icon: Icons.contact_phone,
                         title: 'Contact Information',
                         color: Colors.teal,
@@ -204,14 +203,14 @@ class _BranchFormViewState extends State<_BranchFormView> {
                             children: [
                               AppTextField(
                                 controller: _emailController,
-                                label: 'Email',
+                                label: 'common.email'.tr(),
                                 prefixIcon: const Icon(Icons.email_outlined),
                                 keyboardType: TextInputType.emailAddress,
                               ),
                               SizedBox(height: AppSpacing.md),
                               AppTextField(
                                 controller: _phoneController,
-                                label: 'Phone',
+                                label: 'common.phone'.tr(),
                                 prefixIcon: const Icon(Icons.phone_outlined),
                                 keyboardType: TextInputType.phone,
                               ),
@@ -223,7 +222,7 @@ class _BranchFormViewState extends State<_BranchFormView> {
                       SizedBox(height: AppSpacing.lg),
 
                       // ── Address ──
-                      _SectionHeader(
+                      const _SectionHeader(
                         icon: Icons.location_on,
                         title: 'Address',
                         color: Colors.blue,
@@ -236,7 +235,7 @@ class _BranchFormViewState extends State<_BranchFormView> {
                             children: [
                               AppTextField(
                                 controller: _addressFullController,
-                                label: 'Full Address',
+                                label: 'common.full_address'.tr(),
                                 prefixIcon: const Icon(Icons.home_outlined),
                                 maxLines: 2,
                               ),
@@ -246,7 +245,7 @@ class _BranchFormViewState extends State<_BranchFormView> {
                                   Expanded(
                                     child: AppTextField(
                                       controller: _cityController,
-                                      label: 'City',
+                                      label: 'common.city'.tr(),
                                       prefixIcon: const Icon(Icons.location_city),
                                     ),
                                   ),
@@ -254,7 +253,7 @@ class _BranchFormViewState extends State<_BranchFormView> {
                                   Expanded(
                                     child: AppTextField(
                                       controller: _stateController,
-                                      label: 'State',
+                                      label: 'common.state'.tr(),
                                       prefixIcon: const Icon(Icons.map_outlined),
                                     ),
                                   ),
@@ -266,7 +265,7 @@ class _BranchFormViewState extends State<_BranchFormView> {
                                   Expanded(
                                     child: AppTextField(
                                       controller: _countryController,
-                                      label: 'Country',
+                                      label: 'common.country'.tr(),
                                       prefixIcon: const Icon(Icons.public),
                                     ),
                                   ),
@@ -274,7 +273,7 @@ class _BranchFormViewState extends State<_BranchFormView> {
                                   Expanded(
                                     child: AppTextField(
                                       controller: _zipCodeController,
-                                      label: 'ZIP Code',
+                                      label: 'common.zip_code'.tr(),
                                       prefixIcon: const Icon(Icons.pin_drop),
                                       keyboardType: TextInputType.number,
                                     ),
@@ -289,7 +288,7 @@ class _BranchFormViewState extends State<_BranchFormView> {
                       SizedBox(height: AppSpacing.lg),
 
                       // ── Registration ──
-                      _SectionHeader(
+                      const _SectionHeader(
                         icon: Icons.description,
                         title: 'Registration Details',
                         color: Colors.orange,
@@ -302,13 +301,13 @@ class _BranchFormViewState extends State<_BranchFormView> {
                             children: [
                               AppTextField(
                                 controller: _gstNoController,
-                                label: 'GST Number',
+                                label: 'common.gst_number'.tr(),
                                 prefixIcon: const Icon(Icons.receipt_long),
                               ),
                               SizedBox(height: AppSpacing.md),
                               AppTextField(
                                 controller: _fssaiNoController,
-                                label: 'FSSAI Number',
+                                label: 'common.fssai_number'.tr(),
                                 prefixIcon: const Icon(Icons.verified_outlined),
                               ),
                             ],
@@ -319,7 +318,7 @@ class _BranchFormViewState extends State<_BranchFormView> {
                       SizedBox(height: AppSpacing.lg),
 
                       // ── Settings ──
-                      _SectionHeader(
+                      const _SectionHeader(
                         icon: Icons.settings,
                         title: 'Operating Hours',
                         color: Colors.purple,
@@ -335,7 +334,7 @@ class _BranchFormViewState extends State<_BranchFormView> {
                                   Expanded(
                                     child: AppTextField(
                                       controller: _openTimeController,
-                                      label: 'Opening Time',
+                                      label: 'common.opening_time'.tr(),
                                       hint: 'e.g. 09:00 AM',
                                       prefixIcon: const Icon(Icons.access_time),
                                     ),
@@ -344,7 +343,7 @@ class _BranchFormViewState extends State<_BranchFormView> {
                                   Expanded(
                                     child: AppTextField(
                                       controller: _closeTimeController,
-                                      label: 'Closing Time',
+                                      label: 'common.closing_time'.tr(),
                                       hint: 'e.g. 11:00 PM',
                                       prefixIcon: const Icon(Icons.access_time_filled),
                                     ),
@@ -353,9 +352,9 @@ class _BranchFormViewState extends State<_BranchFormView> {
                               ),
                               SizedBox(height: AppSpacing.md),
                               SwitchListTile(
-                                title: const Text('Master Branch'),
+                                title: Text('common.master_branch'.tr()),
                                 subtitle:
-                                    const Text('This is the primary branch of the brand'),
+                                    Text('common.this_is_the_primary_branch_of'.tr()),
                                 value: _isMasterBranch,
                                 onChanged: (v) => setState(() => _isMasterBranch = v),
                                 contentPadding: EdgeInsets.zero,
@@ -374,7 +373,7 @@ class _BranchFormViewState extends State<_BranchFormView> {
                             child: OutlinedButton.icon(
                               onPressed: isLoading ? null : _goBack,
                               icon: const Icon(Icons.close),
-                              label: const Text('Cancel'),
+                              label: Text('common.cancel'.tr()),
                               style: OutlinedButton.styleFrom(
                                 padding: const EdgeInsets.symmetric(vertical: 14),
                               ),

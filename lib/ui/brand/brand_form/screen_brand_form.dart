@@ -1,11 +1,9 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:back_office/imports/core_imports.dart';
 import 'package:back_office/data/repositories/brand_repository_impl.dart';
 import 'package:back_office/ui/brand/brand_list/cubit_brand.dart';
 import 'package:back_office/ui/brand/brand_list/state_brand.dart';
-import 'package:back_office/routing/app_routes.dart';
 import 'package:back_office/shared/shared.dart';
 
 class ScreenBrandForm extends StatelessWidget {
@@ -136,9 +134,9 @@ class _BrandFormViewState extends State<_BrandFormView> {
                             children: [
                               AppTextField(
                                 controller: _nameController,
-                                label: 'Brand Name *',
+                                label: 'common.brand_name'.tr(),
                                 prefixIcon: const Icon(Icons.business),
-                                validator: (v) => v?.isEmpty == true ? 'Brand name is required' : null,
+                                validator: (v) => v?.isEmpty ?? false ? 'Brand name is required' : null,
                               ),
                             ],
                           ),
@@ -148,7 +146,7 @@ class _BrandFormViewState extends State<_BrandFormView> {
                       SizedBox(height: AppSpacing.lg),
 
                       // ── Contact Section ──
-                      _SectionHeader(
+                      const _SectionHeader(
                         icon: Icons.contact_phone,
                         title: 'Contact Information',
                         color: Colors.teal,
@@ -161,21 +159,21 @@ class _BrandFormViewState extends State<_BrandFormView> {
                             children: [
                               AppTextField(
                                 controller: _emailController,
-                                label: 'Email',
+                                label: 'common.email'.tr(),
                                 prefixIcon: const Icon(Icons.email_outlined),
                                 keyboardType: TextInputType.emailAddress,
                               ),
                               SizedBox(height: AppSpacing.md),
                               AppTextField(
                                 controller: _phoneController,
-                                label: 'Phone',
+                                label: 'common.phone'.tr(),
                                 prefixIcon: const Icon(Icons.phone_outlined),
                                 keyboardType: TextInputType.phone,
                               ),
                               SizedBox(height: AppSpacing.md),
                               AppTextField(
                                 controller: _websiteController,
-                                label: 'Website',
+                                label: 'common.website'.tr(),
                                 prefixIcon: const Icon(Icons.language),
                                 keyboardType: TextInputType.url,
                               ),
@@ -187,7 +185,7 @@ class _BrandFormViewState extends State<_BrandFormView> {
                       SizedBox(height: AppSpacing.lg),
 
                       // ── Registration Section ──
-                      _SectionHeader(
+                      const _SectionHeader(
                         icon: Icons.description,
                         title: 'Registration Details',
                         color: Colors.orange,
@@ -200,13 +198,13 @@ class _BrandFormViewState extends State<_BrandFormView> {
                             children: [
                               AppTextField(
                                 controller: _gstNoController,
-                                label: 'GST Number',
+                                label: 'common.gst_number'.tr(),
                                 prefixIcon: const Icon(Icons.receipt_long),
                               ),
                               SizedBox(height: AppSpacing.md),
                               AppTextField(
                                 controller: _fssaiNoController,
-                                label: 'FSSAI Number',
+                                label: 'common.fssai_number'.tr(),
                                 prefixIcon: const Icon(Icons.verified_outlined),
                               ),
                             ],
@@ -223,7 +221,7 @@ class _BrandFormViewState extends State<_BrandFormView> {
                             child: OutlinedButton.icon(
                               onPressed: isLoading ? null : _goBack,
                               icon: const Icon(Icons.close),
-                              label: const Text('Cancel'),
+                              label: Text('common.cancel'.tr()),
                               style: OutlinedButton.styleFrom(
                                 padding: const EdgeInsets.symmetric(vertical: 14),
                               ),

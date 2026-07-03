@@ -1,11 +1,9 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:back_office/imports/core_imports.dart';
 import 'package:back_office/data/repositories/brand_repository_impl.dart';
 import 'package:back_office/ui/brand/brand_list/cubit_brand.dart';
 import 'package:back_office/ui/brand/brand_list/state_brand.dart';
-import 'package:back_office/routing/app_routes.dart';
 import 'package:back_office/data/models/brand_model.dart';
 
 class ScreenBrandList extends StatelessWidget {
@@ -29,7 +27,7 @@ class _BrandListView extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Brands'),
+        title: Text('common.brands'.tr()),
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
@@ -39,7 +37,7 @@ class _BrandListView extends StatelessWidget {
           FilledButton.icon(
             onPressed: () => context.go(AppRoutes.brandCreate),
             icon: const Icon(Icons.add, size: 18),
-            label: const Text('New Brand'),
+            label: Text('common.new_brand'.tr()),
             style: FilledButton.styleFrom(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               visualDensity: VisualDensity.compact,
@@ -73,7 +71,7 @@ class _BrandListView extends StatelessWidget {
                   FilledButton.icon(
                     onPressed: () => context.read<CubitBrand>().loadBrands(),
                     icon: const Icon(Icons.refresh),
-                    label: const Text('Retry'),
+                    label: Text('common.retry'.tr()),
                   ),
                 ],
               ),
@@ -94,19 +92,19 @@ class _BrandListView extends StatelessWidget {
                     child: Icon(Icons.store_outlined, size: 64, color: cs.primary),
                   ),
                   SizedBox(height: AppSpacing.lg),
-                  Text('No brands yet',
+                  Text('common.no_brands_yet'.tr(),
                       style: Theme.of(context)
                           .textTheme
                           .titleLarge
                           ?.copyWith(fontWeight: FontWeight.w600)),
                   SizedBox(height: AppSpacing.sm),
-                  Text('Create your first brand to get started',
+                  Text('common.create_your_first_brand_to_get'.tr(),
                       style: TextStyle(color: cs.outline)),
                   SizedBox(height: AppSpacing.lg),
                   FilledButton.icon(
                     onPressed: () => context.go(AppRoutes.brandCreate),
                     icon: const Icon(Icons.add),
-                    label: const Text('Create Brand'),
+                    label: Text('common.create_brand'.tr()),
                     style: FilledButton.styleFrom(
                       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
                     ),
@@ -145,14 +143,14 @@ class _BrandListView extends StatelessWidget {
       context: context,
       builder: (dialogContext) => AlertDialog(
         icon: Icon(Icons.warning_amber_rounded, color: cs.error, size: 40),
-        title: const Text('Delete Brand?'),
+        title: Text('common.delete_brand'.tr()),
         content: Text(
           'Are you sure you want to delete "${brand.displayName}"?\n\nThis action cannot be undone.',
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
-            child: const Text('Cancel'),
+            child: Text('common.cancel'.tr()),
           ),
           FilledButton(
             onPressed: () {
@@ -160,7 +158,7 @@ class _BrandListView extends StatelessWidget {
               context.read<CubitBrand>().deleteBrand(brand.id);
             },
             style: FilledButton.styleFrom(backgroundColor: cs.error),
-            child: const Text('Delete'),
+            child: Text('common.delete'.tr()),
           ),
         ],
       ),
@@ -252,11 +250,11 @@ class _BrandCard extends StatelessWidget {
                       }
                     },
                     itemBuilder: (context) => [
-                      const PopupMenuItem(
+                      PopupMenuItem(
                         value: 'edit',
                         child: ListTile(
-                          leading: Icon(Icons.edit),
-                          title: Text('Edit'),
+                          leading: const Icon(Icons.edit),
+                          title: Text('common.edit'.tr()),
                           dense: true,
                           contentPadding: EdgeInsets.zero,
                         ),
@@ -265,7 +263,7 @@ class _BrandCard extends StatelessWidget {
                         value: 'delete',
                         child: ListTile(
                           leading: Icon(Icons.delete, color: cs.error),
-                          title: Text('Delete', style: TextStyle(color: cs.error)),
+                          title: Text('common.delete'.tr(), style: TextStyle(color: cs.error)),
                           dense: true,
                           contentPadding: EdgeInsets.zero,
                         ),

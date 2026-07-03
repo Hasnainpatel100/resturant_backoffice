@@ -13,13 +13,13 @@ import '../../imports/imports.dart';
 class AppErrorWidget extends StatelessWidget {
   const AppErrorWidget({
     super.key,
-    this.title = 'Something went wrong',
+    this.title,
     this.message,
     this.onRetry,
     this.icon = Icons.error_outline_rounded,
   });
 
-  final String title;
+  final String? title;
   final String? message;
   final VoidCallback? onRetry;
   final IconData icon;
@@ -38,7 +38,7 @@ class AppErrorWidget extends StatelessWidget {
             Icon(icon, size: 56, color: cs.error),
             const SizedBox(height: 16),
             Text(
-              title,
+              title ?? 'shared.something_went_wrong'.tr(),
               style: tt.titleMedium?.copyWith(
                 color: cs.onSurface,
                 fontWeight: FontWeight.bold,
@@ -56,7 +56,7 @@ class AppErrorWidget extends StatelessWidget {
             if (onRetry != null) ...[
               const SizedBox(height: 24),
               AppButton(
-                label: 'Try Again',
+                label: 'shared.try_again'.tr(),
                 onPressed: onRetry,
                 variant: ButtonVariant.outline,
               ),
