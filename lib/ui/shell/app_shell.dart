@@ -150,6 +150,7 @@ class _DesktopSidebar extends StatelessWidget {
     final billsRoute = brandId != null ? '/brands/$brandId/bills' : AppRoutes.brandList;
     final branchesRoute = brandId != null ? '/brands/$brandId/branches' : AppRoutes.brandList;
     final branchCreateRoute = brandId != null ? '/brands/$brandId/branches/create' : AppRoutes.brandList;
+    final inventoryRoute = brandId != null ? '/brands/$brandId/inventory' : AppRoutes.brandList;
 
     final String userInitials;
     if (user?.name != null && user!.name!.isNotEmpty) {
@@ -283,6 +284,13 @@ class _DesktopSidebar extends StatelessWidget {
                   activeIcon: Icons.people,
                   label: 'Staff',
                   route: usersRoute,
+                  currentLocation: currentLocation,
+                ),
+                _NavItem(
+                  icon: Icons.inventory_2_outlined,
+                  activeIcon: Icons.inventory_2,
+                  label: 'Inventory',
+                  route: inventoryRoute,
                   currentLocation: currentLocation,
                 ),
                 _NavItem(
@@ -462,6 +470,7 @@ class _TabletSidebar extends StatelessWidget {
     final menuRoute = brandId != null ? '/brands/$brandId/menu' : AppRoutes.brandList;
     final posDevicesRoute = brandId != null ? '/brands/$brandId/pos-devices' : AppRoutes.brandList;
     final billsRoute = brandId != null ? '/brands/$brandId/bills' : AppRoutes.brandList;
+    final inventoryRoute = brandId != null ? '/brands/$brandId/inventory' : AppRoutes.brandList;
 
     return Container(
       width: 72,
@@ -537,6 +546,12 @@ class _TabletSidebar extends StatelessWidget {
                     icon: Icons.receipt_long,
                     label: 'Bills',
                     route: billsRoute,
+                    currentLocation: currentLocation,
+                  ),
+                  _TabletNavItem(
+                    icon: Icons.inventory_2_outlined,
+                    label: 'Inventory',
+                    route: inventoryRoute,
                     currentLocation: currentLocation,
                   ),
                   _TabletNavItem(
@@ -688,6 +703,7 @@ class _MobileDrawer extends StatelessWidget {
     final menuRoute = brandId != null ? '/brands/$brandId/menu' : AppRoutes.brandList;
     final posDevicesRoute = brandId != null ? '/brands/$brandId/pos-devices' : AppRoutes.brandList;
     final billsRoute = brandId != null ? '/brands/$brandId/bills' : AppRoutes.brandList;
+    final inventoryRoute = brandId != null ? '/brands/$brandId/inventory' : AppRoutes.brandList;
 
     return Drawer(
       child: ListView(
@@ -780,6 +796,15 @@ class _MobileDrawer extends StatelessWidget {
             onTap: () {
               Navigator.pop(context);
               context.go(billsRoute);
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.inventory_2_outlined),
+            title: const Text('Inventory'),
+            selected: currentLocation.contains('/inventory') && brandId != null,
+            onTap: () {
+              Navigator.pop(context);
+              context.go(inventoryRoute);
             },
           ),
           ListTile(

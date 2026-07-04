@@ -90,18 +90,61 @@ abstract final class AppRoutes {
   static const String supplierEdit   = '/brands/:brandId/inventory/suppliers/:supplierId/edit';
   static const String supplierLedger = '/brands/:brandId/inventory/suppliers/:supplierId/ledger';
 
+  // Raw Material Groups
+  static const String groupList   = '/brands/:brandId/inventory/groups';
+  static const String groupCreate = '/brands/:brandId/inventory/groups/create';
+  static const String groupEdit   = '/brands/:brandId/inventory/groups/:groupId/edit';
+
+  // Raw Material Taxes
+  static const String taxList   = '/brands/:brandId/inventory/taxes';
+  static const String taxCreate = '/brands/:brandId/inventory/taxes/create';
+  static const String taxEdit   = '/brands/:brandId/inventory/taxes/:taxId/edit';
+
+  // Bill Types
+  static const String billTypeList   = '/brands/:brandId/inventory/bill-types';
+  static const String billTypeCreate = '/brands/:brandId/inventory/bill-types/create';
+  static const String billTypeEdit   = '/brands/:brandId/inventory/bill-types/:billTypeId/edit';
+
+  // Stock Reasons
+  static const String reasonList   = '/brands/:brandId/inventory/reasons';
+  static const String reasonCreate = '/brands/:brandId/inventory/reasons/create';
+  static const String reasonEdit   = '/brands/:brandId/inventory/reasons/:reasonId/edit';
+
   // Purchases
   static const String purchaseList   = '/brands/:brandId/inventory/purchases';
   static const String purchaseCreate = '/brands/:brandId/inventory/purchases/create';
   static const String purchaseDetail = '/brands/:brandId/inventory/purchases/:purchaseId';
 
+  // Procurement (PO, GRN, Invoices)
+  static const String purchaseOrderList   = '/brands/:brandId/inventory/purchase-orders';
+  static const String purchaseOrderCreate = '/brands/:brandId/inventory/purchase-orders/create';
+  static const String purchaseOrderEdit   = '/brands/:brandId/inventory/purchase-orders/:poId/edit';
+
+  static const String goodsReceiptList   = '/brands/:brandId/inventory/goods-receipts';
+  static const String goodsReceiptCreate = '/brands/:brandId/inventory/goods-receipts/create';
+  static const String goodsReceiptEdit   = '/brands/:brandId/inventory/goods-receipts/:grnId/edit';
+
+  static const String supplierInvoiceList   = '/brands/:brandId/inventory/supplier-invoices';
+  static const String supplierInvoiceCreate = '/brands/:brandId/inventory/supplier-invoices/create';
+  static const String supplierInvoiceEdit   = '/brands/:brandId/inventory/supplier-invoices/:invoiceId/edit';
+
   // Adjustments
   static const String adjustmentList   = '/brands/:brandId/inventory/adjustments';
   static const String adjustmentCreate = '/brands/:brandId/inventory/adjustments/create';
+  static const String manualStockEntryCreate = '/brands/:brandId/inventory/adjustments/entries/create';
+  static const String manualStockEntryEdit   = '/brands/:brandId/inventory/adjustments/entries/:entryId/edit';
+  static const String manualStockOutCreate = '/brands/:brandId/inventory/adjustments/outs/create';
+  static const String manualStockOutEdit   = '/brands/:brandId/inventory/adjustments/outs/:outId/edit';
 
   // Transfers
   static const String transferList   = '/brands/:brandId/inventory/transfers';
   static const String transferCreate = '/brands/:brandId/inventory/transfers/create';
+  static const String transferEdit   = '/brands/:brandId/inventory/transfers/:transferId/edit';
+
+  // Indents
+  static const String indentList   = '/brands/:brandId/inventory/indents';
+  static const String indentCreate = '/brands/:brandId/inventory/indents/create';
+  static const String indentEdit   = '/brands/:brandId/inventory/indents/:indentId/edit';
 
   // Reports
   static const String inventoryReports = '/brands/:brandId/inventory/reports';

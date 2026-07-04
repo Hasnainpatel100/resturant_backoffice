@@ -64,6 +64,36 @@ import '../ui/inventory/transfers/screen_transfer_list.dart';
 import '../ui/inventory/transfers/screen_transfer_form.dart';
 import '../ui/inventory/reports/screen_inventory_reports.dart';
 
+import '../ui/restaurant_inventory/views/screen_unit_list.dart' as ri_unit_list;
+import '../ui/restaurant_inventory/views/screen_unit_form.dart' as ri_unit_form;
+import '../ui/restaurant_inventory/views/screen_location_list.dart' as ri_location_list;
+import '../ui/restaurant_inventory/views/screen_location_form.dart' as ri_location_form;
+import '../ui/restaurant_inventory/views/screen_group_list.dart' as ri_group_list;
+import '../ui/restaurant_inventory/views/screen_group_form.dart' as ri_group_form;
+import '../ui/restaurant_inventory/views/screen_tax_list.dart' as ri_tax_list;
+import '../ui/restaurant_inventory/views/screen_tax_form.dart' as ri_tax_form;
+import '../ui/restaurant_inventory/views/screen_material_list.dart' as ri_material_list;
+import '../ui/restaurant_inventory/views/screen_material_form.dart' as ri_material_form;
+import '../ui/restaurant_inventory/views/screen_vendor_list.dart' as ri_vendor_list;
+import '../ui/restaurant_inventory/views/screen_vendor_form.dart' as ri_vendor_form;
+import '../ui/restaurant_inventory/views/screen_bill_type_list.dart' as ri_bill_type_list;
+import '../ui/restaurant_inventory/views/screen_bill_type_form.dart' as ri_bill_type_form;
+import '../ui/restaurant_inventory/views/screen_stock_reason_list.dart' as ri_reason_list;
+import '../ui/restaurant_inventory/views/screen_stock_reason_form.dart' as ri_reason_form;
+import '../ui/restaurant_inventory/views/screen_adjustment_dashboard.dart' as ri_adj_dashboard;
+import '../ui/restaurant_inventory/views/screen_stock_entry_form.dart' as ri_entry_form;
+import '../ui/restaurant_inventory/views/screen_stock_out_form.dart' as ri_out_form;
+import '../ui/restaurant_inventory/views/screen_po_list.dart' as ri_po_list;
+import '../ui/restaurant_inventory/views/screen_po_form.dart' as ri_po_form;
+import '../ui/restaurant_inventory/views/screen_grn_list.dart' as ri_grn_list;
+import '../ui/restaurant_inventory/views/screen_grn_form.dart' as ri_grn_form;
+import '../ui/restaurant_inventory/views/screen_invoice_list.dart' as ri_invoice_list;
+import '../ui/restaurant_inventory/views/screen_invoice_form.dart' as ri_invoice_form;
+import '../ui/restaurant_inventory/views/screen_indent_list.dart' as ri_indent_list;
+import '../ui/restaurant_inventory/views/screen_indent_form.dart' as ri_indent_form;
+import '../ui/restaurant_inventory/views/screen_transfer_list.dart' as ri_transfer_list;
+import '../ui/restaurant_inventory/views/screen_transfer_form.dart' as ri_transfer_form;
+
 final GoRouter appRouter = GoRouter(
   navigatorKey: rootNavigatorKey,
   initialLocation: AppRoutes.login,
@@ -302,13 +332,13 @@ final GoRouter appRouter = GoRouter(
             return ScreenInventoryDashboard(brandId: brandId);
           },
           routes: [
-            // Items
+            // Items (Raw Materials)
             GoRoute(
               path: 'items',
               name: 'itemList',
               builder: (context, state) {
                 final brandId = state.pathParameters['brandId']!;
-                return ScreenItemList(brandId: brandId);
+                return ri_material_list.ScreenMaterialList(brandId: brandId);
               },
               routes: [
                 GoRoute(
@@ -316,7 +346,7 @@ final GoRouter appRouter = GoRouter(
                   name: 'itemCreate',
                   builder: (context, state) {
                     final brandId = state.pathParameters['brandId']!;
-                    return ScreenItemForm(brandId: brandId);
+                    return ri_material_form.ScreenMaterialForm(brandId: brandId);
                   },
                 ),
                 GoRoute(
@@ -325,7 +355,7 @@ final GoRouter appRouter = GoRouter(
                   builder: (context, state) {
                     final brandId = state.pathParameters['brandId']!;
                     final itemId = state.pathParameters['itemId']!;
-                    return ScreenItemDetail(brandId: brandId, itemId: itemId);
+                    return ri_material_form.ScreenMaterialForm(brandId: brandId, itemId: itemId);
                   },
                   routes: [
                     GoRoute(
@@ -334,7 +364,7 @@ final GoRouter appRouter = GoRouter(
                       builder: (context, state) {
                         final brandId = state.pathParameters['brandId']!;
                         final itemId = state.pathParameters['itemId']!;
-                        return ScreenItemForm(brandId: brandId, itemId: itemId);
+                        return ri_material_form.ScreenMaterialForm(brandId: brandId, itemId: itemId);
                       },
                     ),
                   ],
@@ -376,7 +406,7 @@ final GoRouter appRouter = GoRouter(
               name: 'unitList',
               builder: (context, state) {
                 final brandId = state.pathParameters['brandId']!;
-                return ScreenUnitList(brandId: brandId);
+                return ri_unit_list.ScreenUnitList(brandId: brandId);
               },
               routes: [
                 GoRoute(
@@ -384,7 +414,7 @@ final GoRouter appRouter = GoRouter(
                   name: 'unitCreate',
                   builder: (context, state) {
                     final brandId = state.pathParameters['brandId']!;
-                    return ScreenUnitForm(brandId: brandId);
+                    return ri_unit_form.ScreenUnitForm(brandId: brandId);
                   },
                 ),
                 GoRoute(
@@ -393,18 +423,18 @@ final GoRouter appRouter = GoRouter(
                   builder: (context, state) {
                     final brandId = state.pathParameters['brandId']!;
                     final unitId = state.pathParameters['unitId']!;
-                    return ScreenUnitForm(brandId: brandId, unitId: unitId);
+                    return ri_unit_form.ScreenUnitForm(brandId: brandId, unitId: unitId);
                   },
                 ),
               ],
             ),
-            // Warehouses
+            // Warehouses (Locations)
             GoRoute(
               path: 'warehouses',
               name: 'warehouseList',
               builder: (context, state) {
                 final brandId = state.pathParameters['brandId']!;
-                return ScreenWarehouseList(brandId: brandId);
+                return ri_location_list.ScreenLocationList(brandId: brandId);
               },
               routes: [
                 GoRoute(
@@ -412,7 +442,7 @@ final GoRouter appRouter = GoRouter(
                   name: 'warehouseCreate',
                   builder: (context, state) {
                     final brandId = state.pathParameters['brandId']!;
-                    return ScreenWarehouseForm(brandId: brandId);
+                    return ri_location_form.ScreenLocationForm(brandId: brandId);
                   },
                 ),
                 GoRoute(
@@ -421,19 +451,19 @@ final GoRouter appRouter = GoRouter(
                   builder: (context, state) {
                     final brandId = state.pathParameters['brandId']!;
                     final warehouseId = state.pathParameters['warehouseId']!;
-                    return ScreenWarehouseForm(
-                        brandId: brandId, warehouseId: warehouseId);
+                    return ri_location_form.ScreenLocationForm(
+                        brandId: brandId, locationId: warehouseId);
                   },
                 ),
               ],
             ),
-            // Suppliers
+            // Suppliers (Vendors)
             GoRoute(
               path: 'suppliers',
               name: 'supplierList',
               builder: (context, state) {
                 final brandId = state.pathParameters['brandId']!;
-                return ScreenSupplierList(brandId: brandId);
+                return ri_vendor_list.ScreenVendorList(brandId: brandId);
               },
               routes: [
                 GoRoute(
@@ -441,7 +471,7 @@ final GoRouter appRouter = GoRouter(
                   name: 'supplierCreate',
                   builder: (context, state) {
                     final brandId = state.pathParameters['brandId']!;
-                    return ScreenSupplierForm(brandId: brandId);
+                    return ri_vendor_form.ScreenVendorForm(brandId: brandId);
                   },
                 ),
                 GoRoute(
@@ -450,7 +480,7 @@ final GoRouter appRouter = GoRouter(
                   builder: (context, state) {
                     final brandId = state.pathParameters['brandId']!;
                     final supplierId = state.pathParameters['supplierId']!;
-                    return ScreenSupplierForm(brandId: brandId, supplierId: supplierId);
+                    return ri_vendor_form.ScreenVendorForm(brandId: brandId, supplierId: supplierId);
                   },
                 ),
                 GoRoute(
@@ -460,6 +490,118 @@ final GoRouter appRouter = GoRouter(
                     final brandId = state.pathParameters['brandId']!;
                     final supplierId = state.pathParameters['supplierId']!;
                     return ScreenSupplierLedger(brandId: brandId, supplierId: supplierId);
+                  },
+                ),
+              ],
+            ),
+            // Raw Material Groups
+            GoRoute(
+              path: 'groups',
+              name: 'groupList',
+              builder: (context, state) {
+                final brandId = state.pathParameters['brandId']!;
+                return ri_group_list.ScreenGroupList(brandId: brandId);
+              },
+              routes: [
+                GoRoute(
+                  path: 'create',
+                  name: 'groupCreate',
+                  builder: (context, state) {
+                    final brandId = state.pathParameters['brandId']!;
+                    return ri_group_form.ScreenGroupForm(brandId: brandId);
+                  },
+                ),
+                GoRoute(
+                  path: ':groupId/edit',
+                  name: 'groupEdit',
+                  builder: (context, state) {
+                    final brandId = state.pathParameters['brandId']!;
+                    final groupId = state.pathParameters['groupId']!;
+                    return ri_group_form.ScreenGroupForm(brandId: brandId, groupId: groupId);
+                  },
+                ),
+              ],
+            ),
+            // Raw Material Taxes
+            GoRoute(
+              path: 'taxes',
+              name: 'taxList',
+              builder: (context, state) {
+                final brandId = state.pathParameters['brandId']!;
+                return ri_tax_list.ScreenTaxList(brandId: brandId);
+              },
+              routes: [
+                GoRoute(
+                  path: 'create',
+                  name: 'taxCreate',
+                  builder: (context, state) {
+                    final brandId = state.pathParameters['brandId']!;
+                    return ri_tax_form.ScreenTaxForm(brandId: brandId);
+                  },
+                ),
+                GoRoute(
+                  path: ':taxId/edit',
+                  name: 'taxEdit',
+                  builder: (context, state) {
+                    final brandId = state.pathParameters['brandId']!;
+                    final taxId = state.pathParameters['taxId']!;
+                    return ri_tax_form.ScreenTaxForm(brandId: brandId, taxId: taxId);
+                  },
+                ),
+              ],
+            ),
+            // Bill Types
+            GoRoute(
+              path: 'bill-types',
+              name: 'billTypeList',
+              builder: (context, state) {
+                final brandId = state.pathParameters['brandId']!;
+                return ri_bill_type_list.ScreenBillTypeList(brandId: brandId);
+              },
+              routes: [
+                GoRoute(
+                  path: 'create',
+                  name: 'billTypeCreate',
+                  builder: (context, state) {
+                    final brandId = state.pathParameters['brandId']!;
+                    return ri_bill_type_form.ScreenBillTypeForm(brandId: brandId);
+                  },
+                ),
+                GoRoute(
+                  path: ':billTypeId/edit',
+                  name: 'billTypeEdit',
+                  builder: (context, state) {
+                    final brandId = state.pathParameters['brandId']!;
+                    final billTypeId = state.pathParameters['billTypeId']!;
+                    return ri_bill_type_form.ScreenBillTypeForm(brandId: brandId, billTypeId: billTypeId);
+                  },
+                ),
+              ],
+            ),
+            // Stock Reasons
+            GoRoute(
+              path: 'reasons',
+              name: 'reasonList',
+              builder: (context, state) {
+                final brandId = state.pathParameters['brandId']!;
+                return ri_reason_list.ScreenStockReasonList(brandId: brandId);
+              },
+              routes: [
+                GoRoute(
+                  path: 'create',
+                  name: 'reasonCreate',
+                  builder: (context, state) {
+                    final brandId = state.pathParameters['brandId']!;
+                    return ri_reason_form.ScreenStockReasonForm(brandId: brandId);
+                  },
+                ),
+                GoRoute(
+                  path: ':reasonId/edit',
+                  name: 'reasonEdit',
+                  builder: (context, state) {
+                    final brandId = state.pathParameters['brandId']!;
+                    final reasonId = state.pathParameters['reasonId']!;
+                    return ri_reason_form.ScreenStockReasonForm(brandId: brandId, reasonId: reasonId);
                   },
                 ),
               ],
@@ -492,13 +634,97 @@ final GoRouter appRouter = GoRouter(
                 ),
               ],
             ),
+            // Purchase Orders (PO)
+            GoRoute(
+              path: 'purchase-orders',
+              name: 'purchaseOrderList',
+              builder: (context, state) {
+                final brandId = state.pathParameters['brandId']!;
+                return ri_po_list.ScreenPOList(brandId: brandId);
+              },
+              routes: [
+                GoRoute(
+                  path: 'create',
+                  name: 'purchaseOrderCreate',
+                  builder: (context, state) {
+                    final brandId = state.pathParameters['brandId']!;
+                    return ri_po_form.ScreenPOForm(brandId: brandId);
+                  },
+                ),
+                GoRoute(
+                  path: ':poId/edit',
+                  name: 'purchaseOrderEdit',
+                  builder: (context, state) {
+                    final brandId = state.pathParameters['brandId']!;
+                    final poId = state.pathParameters['poId']!;
+                    return ri_po_form.ScreenPOForm(brandId: brandId, poId: poId);
+                  },
+                ),
+              ],
+            ),
+            // Goods Receipts (GRN)
+            GoRoute(
+              path: 'goods-receipts',
+              name: 'goodsReceiptList',
+              builder: (context, state) {
+                final brandId = state.pathParameters['brandId']!;
+                return ri_grn_list.ScreenGRNList(brandId: brandId);
+              },
+              routes: [
+                GoRoute(
+                  path: 'create',
+                  name: 'goodsReceiptCreate',
+                  builder: (context, state) {
+                    final brandId = state.pathParameters['brandId']!;
+                    return ri_grn_form.ScreenGRNForm(brandId: brandId);
+                  },
+                ),
+                GoRoute(
+                  path: ':grnId/edit',
+                  name: 'goodsReceiptEdit',
+                  builder: (context, state) {
+                    final brandId = state.pathParameters['brandId']!;
+                    final grnId = state.pathParameters['grnId']!;
+                    return ri_grn_form.ScreenGRNForm(brandId: brandId, grnId: grnId);
+                  },
+                ),
+              ],
+            ),
+            // Supplier Invoices
+            GoRoute(
+              path: 'supplier-invoices',
+              name: 'supplierInvoiceList',
+              builder: (context, state) {
+                final brandId = state.pathParameters['brandId']!;
+                return ri_invoice_list.ScreenInvoiceList(brandId: brandId);
+              },
+              routes: [
+                GoRoute(
+                  path: 'create',
+                  name: 'supplierInvoiceCreate',
+                  builder: (context, state) {
+                    final brandId = state.pathParameters['brandId']!;
+                    return ri_invoice_form.ScreenInvoiceForm(brandId: brandId);
+                  },
+                ),
+                GoRoute(
+                  path: ':invoiceId/edit',
+                  name: 'supplierInvoiceEdit',
+                  builder: (context, state) {
+                    final brandId = state.pathParameters['brandId']!;
+                    final invoiceId = state.pathParameters['invoiceId']!;
+                    return ri_invoice_form.ScreenInvoiceForm(brandId: brandId, invoiceId: invoiceId);
+                  },
+                ),
+              ],
+            ),
             // Adjustments
             GoRoute(
               path: 'adjustments',
               name: 'adjustmentList',
               builder: (context, state) {
                 final brandId = state.pathParameters['brandId']!;
-                return ScreenAdjustmentList(brandId: brandId);
+                return ri_adj_dashboard.ScreenAdjustmentDashboard(brandId: brandId);
               },
               routes: [
                 GoRoute(
@@ -506,7 +732,41 @@ final GoRouter appRouter = GoRouter(
                   name: 'adjustmentCreate',
                   builder: (context, state) {
                     final brandId = state.pathParameters['brandId']!;
-                    return ScreenAdjustmentForm(brandId: brandId);
+                    return ri_adj_dashboard.ScreenAdjustmentDashboard(brandId: brandId);
+                  },
+                ),
+                GoRoute(
+                  path: 'entries/create',
+                  name: 'manualStockEntryCreate',
+                  builder: (context, state) {
+                    final brandId = state.pathParameters['brandId']!;
+                    return ri_entry_form.ScreenStockEntryForm(brandId: brandId);
+                  },
+                ),
+                GoRoute(
+                  path: 'entries/:entryId/edit',
+                  name: 'manualStockEntryEdit',
+                  builder: (context, state) {
+                    final brandId = state.pathParameters['brandId']!;
+                    final entryId = state.pathParameters['entryId']!;
+                    return ri_entry_form.ScreenStockEntryForm(brandId: brandId, entryId: entryId);
+                  },
+                ),
+                GoRoute(
+                  path: 'outs/create',
+                  name: 'manualStockOutCreate',
+                  builder: (context, state) {
+                    final brandId = state.pathParameters['brandId']!;
+                    return ri_out_form.ScreenStockOutForm(brandId: brandId);
+                  },
+                ),
+                GoRoute(
+                  path: 'outs/:outId/edit',
+                  name: 'manualStockOutEdit',
+                  builder: (context, state) {
+                    final brandId = state.pathParameters['brandId']!;
+                    final outId = state.pathParameters['outId']!;
+                    return ri_out_form.ScreenStockOutForm(brandId: brandId, outId: outId);
                   },
                 ),
               ],
@@ -517,7 +777,7 @@ final GoRouter appRouter = GoRouter(
               name: 'transferList',
               builder: (context, state) {
                 final brandId = state.pathParameters['brandId']!;
-                return ScreenTransferList(brandId: brandId);
+                return ri_transfer_list.ScreenTransferList(brandId: brandId);
               },
               routes: [
                 GoRoute(
@@ -525,7 +785,44 @@ final GoRouter appRouter = GoRouter(
                   name: 'transferCreate',
                   builder: (context, state) {
                     final brandId = state.pathParameters['brandId']!;
-                    return ScreenTransferForm(brandId: brandId);
+                    return ri_transfer_form.ScreenTransferForm(brandId: brandId);
+                  },
+                ),
+                GoRoute(
+                  path: ':transferId/edit',
+                  name: 'transferEdit',
+                  builder: (context, state) {
+                    final brandId = state.pathParameters['brandId']!;
+                    final transferId = state.pathParameters['transferId']!;
+                    return ri_transfer_form.ScreenTransferForm(brandId: brandId, transferId: transferId);
+                  },
+                ),
+              ],
+            ),
+            // Indents
+            GoRoute(
+              path: 'indents',
+              name: 'indentList',
+              builder: (context, state) {
+                final brandId = state.pathParameters['brandId']!;
+                return ri_indent_list.ScreenIndentList(brandId: brandId);
+              },
+              routes: [
+                GoRoute(
+                  path: 'create',
+                  name: 'indentCreate',
+                  builder: (context, state) {
+                    final brandId = state.pathParameters['brandId']!;
+                    return ri_indent_form.ScreenIndentForm(brandId: brandId);
+                  },
+                ),
+                GoRoute(
+                  path: ':indentId/edit',
+                  name: 'indentEdit',
+                  builder: (context, state) {
+                    final brandId = state.pathParameters['brandId']!;
+                    final indentId = state.pathParameters['indentId']!;
+                    return ri_indent_form.ScreenIndentForm(brandId: brandId, indentId: indentId);
                   },
                 ),
               ],
