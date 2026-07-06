@@ -35,19 +35,27 @@ class _ScreenVendorListState extends State<ScreenVendorList> {
     final cs = Theme.of(context).colorScheme;
 
     return Scaffold(
+      backgroundColor: cs.surfaceContainerLowest,
       appBar: AppBar(
-        title: const Text('Suppliers & Vendors'),
+        backgroundColor: cs.surface,
+        scrolledUnderElevation: 1,
+        title: const Text('Suppliers & Vendors',
+            style: TextStyle(fontWeight: FontWeight.w800)),
         actions: [
           IconButton(
-            icon: const Icon(Icons.refresh),
+            icon: const Icon(Icons.refresh_rounded),
             tooltip: 'Refresh',
             onPressed: () => controller.loadVendors(),
           ),
           const SizedBox(width: 4),
           FilledButton.icon(
-            onPressed: () => context.push('/brands/${widget.brandId}/inventory/suppliers/create'),
-            icon: const Icon(Icons.add, size: 18),
+            onPressed: () => context
+                .push('/brands/${widget.brandId}/inventory/suppliers/create'),
+            icon: const Icon(Icons.add_rounded, size: 18),
             label: const Text('New Vendor'),
+            style: FilledButton.styleFrom(
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10))),
           ),
           const SizedBox(width: 12),
         ],
@@ -57,9 +65,10 @@ class _ScreenVendorListState extends State<ScreenVendorList> {
           return const Center(child: CircularProgressIndicator());
         }
 
-        if (controller.errorMessage.value != null && controller.vendors.isEmpty) {
+        if (controller.errorMessage.value != null &&
+            controller.vendors.isEmpty) {
           return AppEmptyState(
-            icon: Icons.error_outline,
+            icon: Icons.error_outline_rounded,
             title: 'Failed to load vendors',
             subtitle: controller.errorMessage.value,
             actionLabel: 'Retry',
@@ -69,43 +78,47 @@ class _ScreenVendorListState extends State<ScreenVendorList> {
 
         if (controller.vendors.isEmpty) {
           return AppEmptyState(
-            icon: Icons.people_outline,
+            icon: Icons.people_outline_rounded,
             title: 'No vendors yet',
-            subtitle: 'Add procurement vendors and suppliers who supply raw materials.',
+            subtitle:
+                'Add procurement vendors and suppliers who supply raw materials.',
             actionLabel: 'Add Vendor',
-            onAction: () => context.push('/brands/${widget.brandId}/inventory/suppliers/create'),
+            onAction: () => context
+                .push('/brands/${widget.brandId}/inventory/suppliers/create'),
           );
         }
 
         return RefreshIndicator(
           onRefresh: () => controller.loadVendors(),
           child: ListView.builder(
-            padding: EdgeInsets.all(AppSpacing.md),
+            padding: EdgeInsets.fromLTRB(
+                AppSpacing.md, AppSpacing.sm, AppSpacing.md, AppSpacing.xxl),
             itemCount: controller.vendors.length,
             itemBuilder: (context, index) {
               final v = controller.vendors[index];
-              return Card(
-                child: ListTile(
-                  leading: CircleAvatar(
-                    backgroundColor: cs.primary.withOpacity(0.1),
-                    child: Icon(Icons.business, color: cs.primary),
+              return AppListCard(
+                icon: Icons.storefront_rounded,
+                iconColor: cs.primary,
+                title: v.vendorName,
+                ref: v.vendorCode,
+                lines: [
+                  'Contact: ${v.contactPerson ?? "N/A"}  •  Phone: ${v.phone ?? "N/A"}',
+                  'Balance: \$${v.openingBalance.toStringAsFixed(2)} (${v.balanceType})',
+                ],
+                actions: [
+                  AppListCardAction(
+                    icon: Icons.edit_outlined,
+                    tooltip: 'Edit',
+                    onTap: () => context.push(
+                        '/brands/${widget.brandId}/inventory/suppliers/${v.id}/edit'),
                   ),
-                  title: Text(v.vendorName, style: const TextStyle(fontWeight: FontWeight.bold)),
-                  subtitle: Text('Code: ${v.vendorCode} • Contact: ${v.contactPerson ?? "N/A"} • Phone: ${v.phone ?? "N/A"} • Bal: \$${v.openingBalance} (${v.balanceType})'),
-                  trailing: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      IconButton(
-                        icon: const Icon(Icons.edit_outlined),
-                        onPressed: () => context.push('/brands/${widget.brandId}/inventory/suppliers/${v.id}/edit'),
-                      ),
-                      IconButton(
-                        icon: Icon(Icons.delete_outline, color: cs.error),
-                        onPressed: () => _confirmDelete(context, v),
-                      ),
-                    ],
+                  AppListCardAction(
+                    icon: Icons.delete_outline_rounded,
+                    tooltip: 'Delete',
+                    color: cs.error,
+                    onTap: () => _confirmDelete(context, v),
                   ),
-                ),
+                ],
               );
             },
           ),
@@ -121,24 +134,25 @@ class _ScreenVendorListState extends State<ScreenVendorList> {
       builder: (dialogCtx) => AlertDialog(
         icon: Icon(Icons.warning_amber_rounded, color: cs.error, size: 40),
         title: const Text('Delete Vendor?'),
-        content: Text('Are you sure you want to delete "${v.displayLabel}"?\n\nThis action cannot be undone.'),
+        content: Text(
+            'Are you sure you want to delete "${v.displayLabel}"?\n\nThis action cannot be undone.'),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(dialogCtx),
-            child: const Text('Cancel'),
-          ),
+              onPressed: () => Navigator.pop(dialogCtx),
+              child: const Text('Cancel')),
           FilledButton(
             onPressed: () async {
               Navigator.pop(dialogCtx);
               final success = await controller.deleteVendor(v.id);
               if (success) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Vendor deleted successfully'), backgroundColor: Colors.green),
-                );
+                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                    content: Text('Vendor deleted successfully'),
+                    backgroundColor: Colors.green));
               } else {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text(controller.errorMessage.value ?? 'Failed to delete vendor'), backgroundColor: cs.error),
-                );
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                    content: Text(controller.errorMessage.value ??
+                        'Failed to delete vendor'),
+                    backgroundColor: cs.error));
               }
             },
             style: FilledButton.styleFrom(backgroundColor: cs.error),

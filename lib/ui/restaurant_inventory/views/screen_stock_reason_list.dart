@@ -20,7 +20,8 @@ class _ScreenStockReasonListState extends State<ScreenStockReasonList> {
   @override
   void initState() {
     super.initState();
-    controller = Get.put(StockReasonController(repository: StockReasonRepositoryImpl()));
+    controller = Get.put(
+        StockReasonController(repository: StockReasonRepositoryImpl()));
     controller.loadReasons();
   }
 
@@ -35,19 +36,27 @@ class _ScreenStockReasonListState extends State<ScreenStockReasonList> {
     final cs = Theme.of(context).colorScheme;
 
     return Scaffold(
+      backgroundColor: cs.surfaceContainerLowest,
       appBar: AppBar(
-        title: const Text('Stock Out / Adjustment Reasons'),
+        backgroundColor: cs.surface,
+        scrolledUnderElevation: 1,
+        title: const Text('Stock Adjustment Reasons',
+            style: TextStyle(fontWeight: FontWeight.w800)),
         actions: [
           IconButton(
-            icon: const Icon(Icons.refresh),
+            icon: const Icon(Icons.refresh_rounded),
             tooltip: 'Refresh',
             onPressed: () => controller.loadReasons(),
           ),
           const SizedBox(width: 4),
           FilledButton.icon(
-            onPressed: () => context.push('/brands/${widget.brandId}/inventory/reasons/create'),
-            icon: const Icon(Icons.add, size: 18),
+            onPressed: () => context
+                .push('/brands/${widget.brandId}/inventory/reasons/create'),
+            icon: const Icon(Icons.add_rounded, size: 18),
             label: const Text('New Reason'),
+            style: FilledButton.styleFrom(
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10))),
           ),
           const SizedBox(width: 12),
         ],
@@ -56,56 +65,61 @@ class _ScreenStockReasonListState extends State<ScreenStockReasonList> {
         if (controller.isLoading.value && controller.reasons.isEmpty) {
           return const Center(child: CircularProgressIndicator());
         }
-
-        if (controller.errorMessage.value != null && controller.reasons.isEmpty) {
+        if (controller.errorMessage.value != null &&
+            controller.reasons.isEmpty) {
           return AppEmptyState(
-            icon: Icons.error_outline,
+            icon: Icons.error_outline_rounded,
             title: 'Failed to load stock reasons',
             subtitle: controller.errorMessage.value,
             actionLabel: 'Retry',
             onAction: () => controller.loadReasons(),
           );
         }
-
         if (controller.reasons.isEmpty) {
           return AppEmptyState(
-            icon: Icons.assignment_late_outlined,
+            icon: Icons.assignment_late_rounded,
             title: 'No stock reasons yet',
-            subtitle: 'Add reasons for manual stock adjustments and stock-out events like Spoiled, Expired, Theft, Internal Consumption, etc.',
+            subtitle:
+                'Add reasons for stock adjustments: Spoiled, Expired, Theft, Internal Use, etc.',
             actionLabel: 'Add Reason',
-            onAction: () => context.push('/brands/${widget.brandId}/inventory/reasons/create'),
+            onAction: () => context
+                .push('/brands/${widget.brandId}/inventory/reasons/create'),
           );
         }
 
         return RefreshIndicator(
           onRefresh: () => controller.loadReasons(),
           child: ListView.builder(
-            padding: EdgeInsets.all(AppSpacing.md),
+            padding: EdgeInsets.fromLTRB(
+                AppSpacing.md, AppSpacing.sm, AppSpacing.md, AppSpacing.xxl),
             itemCount: controller.reasons.length,
             itemBuilder: (context, index) {
               final r = controller.reasons[index];
-              return Card(
-                child: ListTile(
-                  leading: CircleAvatar(
-                    backgroundColor: cs.primary.withOpacity(0.1),
-                    child: Icon(Icons.help_outline, color: cs.primary),
-                  ),
-                  title: Text(r.reasonName, style: const TextStyle(fontWeight: FontWeight.bold)),
-                  subtitle: Text('Type: ${r.reasonType.toUpperCase()} • Status: ${r.isActive ? "Active" : "Inactive"}'),
-                  trailing: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      IconButton(
-                        icon: const Icon(Icons.edit_outlined),
-                        onPressed: () => context.push('/brands/${widget.brandId}/inventory/reasons/${r.id}/edit'),
-                      ),
-                      IconButton(
-                        icon: Icon(Icons.delete_outline, color: cs.error),
-                        onPressed: () => _confirmDelete(context, r),
-                      ),
-                    ],
-                  ),
+              return AppListCard(
+                icon: Icons.help_rounded,
+                iconColor: Colors.orange.shade600,
+                title: r.reasonName,
+                lines: [
+                  'Type: ${r.reasonType.toUpperCase()}',
+                ],
+                status: AppListCardStatus(
+                  label: r.isActive ? 'Active' : 'Inactive',
+                  color: r.isActive ? Colors.green.shade600 : Colors.grey,
                 ),
+                actions: [
+                  AppListCardAction(
+                    icon: Icons.edit_outlined,
+                    tooltip: 'Edit',
+                    onTap: () => context.push(
+                        '/brands/${widget.brandId}/inventory/reasons/${r.id}/edit'),
+                  ),
+                  AppListCardAction(
+                    icon: Icons.delete_outline_rounded,
+                    tooltip: 'Delete',
+                    color: cs.error,
+                    onTap: () => _confirmDelete(context, r),
+                  ),
+                ],
               );
             },
           ),
@@ -118,30 +132,27 @@ class _ScreenStockReasonListState extends State<ScreenStockReasonList> {
     final cs = Theme.of(context).colorScheme;
     showDialog(
       context: context,
-      builder: (dialogCtx) => AlertDialog(
+      builder: (ctx) => AlertDialog(
         icon: Icon(Icons.warning_amber_rounded, color: cs.error, size: 40),
         title: const Text('Delete Stock Reason?'),
-        content: Text('Are you sure you want to delete "${r.displayLabel}"?\n\nThis action cannot be undone.'),
+        content: Text(
+            'Are you sure you want to delete "${r.displayLabel}"?\n\nThis action cannot be undone.'),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(dialogCtx),
-            child: const Text('Cancel'),
-          ),
+              onPressed: () => Navigator.pop(ctx),
+              child: const Text('Cancel')),
           FilledButton(
-            onPressed: () async {
-              Navigator.pop(dialogCtx);
-              final success = await controller.deleteReason(r.id);
-              if (success) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Stock reason deleted successfully'), backgroundColor: Colors.green),
-                );
-              } else {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text(controller.errorMessage.value ?? 'Failed to delete reason'), backgroundColor: cs.error),
-                );
-              }
-            },
             style: FilledButton.styleFrom(backgroundColor: cs.error),
+            onPressed: () async {
+              Navigator.pop(ctx);
+              final ok = await controller.deleteReason(r.id);
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                content: Text(ok
+                    ? 'Stock reason deleted successfully'
+                    : controller.errorMessage.value ?? 'Failed'),
+                backgroundColor: ok ? Colors.green : cs.error,
+              ));
+            },
             child: const Text('Delete'),
           ),
         ],

@@ -20,7 +20,8 @@ class _ScreenGroupListState extends State<ScreenGroupList> {
   @override
   void initState() {
     super.initState();
-    controller = Get.put(RawMaterialGroupController(repository: RawMaterialGroupRepositoryImpl()));
+    controller = Get.put(
+        RawMaterialGroupController(repository: RawMaterialGroupRepositoryImpl()));
     controller.loadGroups();
   }
 
@@ -35,19 +36,27 @@ class _ScreenGroupListState extends State<ScreenGroupList> {
     final cs = Theme.of(context).colorScheme;
 
     return Scaffold(
+      backgroundColor: cs.surfaceContainerLowest,
       appBar: AppBar(
-        title: const Text('Raw Material Groups'),
+        backgroundColor: cs.surface,
+        scrolledUnderElevation: 1,
+        title: const Text('Raw Material Groups',
+            style: TextStyle(fontWeight: FontWeight.w800)),
         actions: [
           IconButton(
-            icon: const Icon(Icons.refresh),
+            icon: const Icon(Icons.refresh_rounded),
             tooltip: 'Refresh',
             onPressed: () => controller.loadGroups(),
           ),
           const SizedBox(width: 4),
           FilledButton.icon(
-            onPressed: () => context.push('/brands/${widget.brandId}/inventory/groups/create'),
-            icon: const Icon(Icons.add, size: 18),
+            onPressed: () => context
+                .push('/brands/${widget.brandId}/inventory/groups/create'),
+            icon: const Icon(Icons.add_rounded, size: 18),
             label: const Text('New Group'),
+            style: FilledButton.styleFrom(
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10))),
           ),
           const SizedBox(width: 12),
         ],
@@ -56,56 +65,62 @@ class _ScreenGroupListState extends State<ScreenGroupList> {
         if (controller.isLoading.value && controller.groups.isEmpty) {
           return const Center(child: CircularProgressIndicator());
         }
-
         if (controller.errorMessage.value != null && controller.groups.isEmpty) {
           return AppEmptyState(
-            icon: Icons.error_outline,
+            icon: Icons.error_outline_rounded,
             title: 'Failed to load groups',
             subtitle: controller.errorMessage.value,
             actionLabel: 'Retry',
             onAction: () => controller.loadGroups(),
           );
         }
-
         if (controller.groups.isEmpty) {
           return AppEmptyState(
-            icon: Icons.category_outlined,
+            icon: Icons.folder_outlined,
             title: 'No groups yet',
-            subtitle: 'Add groups/categories of raw materials like Meat, Vegetables, Packaging materials, etc.',
+            subtitle:
+                'Add categories like Meat, Vegetables, Packaging, etc.',
             actionLabel: 'Add Group',
-            onAction: () => context.push('/brands/${widget.brandId}/inventory/groups/create'),
+            onAction: () => context
+                .push('/brands/${widget.brandId}/inventory/groups/create'),
           );
         }
 
         return RefreshIndicator(
           onRefresh: () => controller.loadGroups(),
           child: ListView.builder(
-            padding: EdgeInsets.all(AppSpacing.md),
+            padding: EdgeInsets.fromLTRB(
+                AppSpacing.md, AppSpacing.sm, AppSpacing.md, AppSpacing.xxl),
             itemCount: controller.groups.length,
             itemBuilder: (context, index) {
               final group = controller.groups[index];
-              return Card(
-                child: ListTile(
-                  leading: CircleAvatar(
-                    backgroundColor: cs.secondary.withOpacity(0.1),
-                    child: Icon(Icons.folder_open, color: cs.secondary),
-                  ),
-                  title: Text(group.groupName, style: const TextStyle(fontWeight: FontWeight.bold)),
-                  subtitle: Text('Code: ${group.groupCode} • Desc: ${group.description ?? "N/A"} • Status: ${group.isActive ? "Active" : "Inactive"}'),
-                  trailing: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      IconButton(
-                        icon: const Icon(Icons.edit_outlined),
-                        onPressed: () => context.push('/brands/${widget.brandId}/inventory/groups/${group.id}/edit'),
-                      ),
-                      IconButton(
-                        icon: Icon(Icons.delete_outline, color: cs.error),
-                        onPressed: () => _confirmDelete(context, group),
-                      ),
-                    ],
-                  ),
+              return AppListCard(
+                icon: Icons.folder_rounded,
+                iconColor: cs.secondary,
+                title: group.groupName,
+                ref: group.groupCode,
+                lines: [
+                  group.description ?? 'No description',
+                ],
+                status: AppListCardStatus(
+                  label: group.isActive ? 'Active' : 'Inactive',
+                  color:
+                      group.isActive ? Colors.green.shade600 : Colors.grey,
                 ),
+                actions: [
+                  AppListCardAction(
+                    icon: Icons.edit_outlined,
+                    tooltip: 'Edit',
+                    onTap: () => context.push(
+                        '/brands/${widget.brandId}/inventory/groups/${group.id}/edit'),
+                  ),
+                  AppListCardAction(
+                    icon: Icons.delete_outline_rounded,
+                    tooltip: 'Delete',
+                    color: cs.error,
+                    onTap: () => _confirmDelete(context, group),
+                  ),
+                ],
               );
             },
           ),
@@ -118,30 +133,27 @@ class _ScreenGroupListState extends State<ScreenGroupList> {
     final cs = Theme.of(context).colorScheme;
     showDialog(
       context: context,
-      builder: (dialogCtx) => AlertDialog(
+      builder: (ctx) => AlertDialog(
         icon: Icon(Icons.warning_amber_rounded, color: cs.error, size: 40),
         title: const Text('Delete Group?'),
-        content: Text('Are you sure you want to delete "${group.displayLabel}"?\n\nThis action cannot be undone.'),
+        content: Text(
+            'Are you sure you want to delete "${group.displayLabel}"?\n\nThis action cannot be undone.'),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(dialogCtx),
-            child: const Text('Cancel'),
-          ),
+              onPressed: () => Navigator.pop(ctx),
+              child: const Text('Cancel')),
           FilledButton(
-            onPressed: () async {
-              Navigator.pop(dialogCtx);
-              final success = await controller.deleteGroup(group.id);
-              if (success) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Group deleted successfully'), backgroundColor: Colors.green),
-                );
-              } else {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text(controller.errorMessage.value ?? 'Failed to delete group'), backgroundColor: cs.error),
-                );
-              }
-            },
             style: FilledButton.styleFrom(backgroundColor: cs.error),
+            onPressed: () async {
+              Navigator.pop(ctx);
+              final ok = await controller.deleteGroup(group.id);
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                content: Text(ok
+                    ? 'Group deleted successfully'
+                    : controller.errorMessage.value ?? 'Failed'),
+                backgroundColor: ok ? Colors.green : cs.error,
+              ));
+            },
             child: const Text('Delete'),
           ),
         ],

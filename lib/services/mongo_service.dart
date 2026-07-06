@@ -10,6 +10,13 @@ class MongoService {
   final _logger = Logger();
   Db? _db;
 
+  // ── CONNECTION SETTINGS ──────────────────────────────────────────────
+  // Option A (no auth): 'mongodb://localhost:27017/pos_system_dev'
+  // Option B (with auth): 'mongodb://USERNAME:PASSWORD@localhost:27017/pos_system_dev'
+  // Change the connection string below to match your MongoDB setup.
+  static const String _mongoUri = 'mongodb://localhost:27017/pos_system_dev';
+  // ─────────────────────────────────────────────────────────────────────
+
   Db? get db => _db;
 
   bool get isConnected => kIsWeb ? true : (_db != null && _db!.isConnected);
@@ -21,12 +28,18 @@ class MongoService {
     }
     if (isConnected) return;
     try {
-      // Connecting to local MongoDB on port 27017, database pos_system_dev
-      _db = await Db.create('mongodb://localhost:27017/pos_system_dev');
+      _db = await Db.create(_mongoUri);
       await _db!.open();
       _logger.i('Successfully connected to MongoDB (pos_system_dev)');
     } catch (e) {
       _logger.e('Failed to connect to MongoDB', error: e);
+      _logger.e(
+        'If you see "Command requires authentication", your MongoDB has auth enabled.\n'
+        'Either:\n'
+        '  (A) Disable auth in mongod.cfg (set authorization: disabled)\n'
+        '  (B) Update _mongoUri above to include credentials:\n'
+        '      mongodb://USERNAME:PASSWORD@localhost:27017/pos_system_dev',
+      );
       rethrow;
     }
   }

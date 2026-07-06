@@ -23,7 +23,8 @@ class _ScreenTransferListState extends State<ScreenTransferList> {
   @override
   void initState() {
     super.initState();
-    controller = Get.put(StockTransferController(repository: StockTransferRepositoryImpl()));
+    controller = Get.put(
+        StockTransferController(repository: StockTransferRepositoryImpl()));
     lookupController = Get.put(InventoryLookupController());
     controller.loadTransfers();
     lookupController.loadAllLookups();
@@ -36,7 +37,8 @@ class _ScreenTransferListState extends State<ScreenTransferList> {
   }
 
   String _getWarehouseName(String id) {
-    final branch = lookupController.branches.firstWhereOrNull((b) => b.id == id);
+    final branch =
+        lookupController.branches.firstWhereOrNull((b) => b.id == id);
     if (branch != null) {
       return branch.name.en.isNotEmpty ? branch.name.en : branch.branchCode;
     }
@@ -48,18 +50,27 @@ class _ScreenTransferListState extends State<ScreenTransferList> {
     final cs = Theme.of(context).colorScheme;
 
     return Scaffold(
+      backgroundColor: cs.surfaceContainerLowest,
       appBar: AppBar(
-        title: const Text('Stock Transfers'),
+        backgroundColor: cs.surface,
+        scrolledUnderElevation: 1,
+        title: const Text('Stock Transfers',
+            style: TextStyle(fontWeight: FontWeight.w800)),
         actions: [
           IconButton(
-            icon: const Icon(Icons.refresh),
+            icon: const Icon(Icons.refresh_rounded),
+            tooltip: 'Refresh',
             onPressed: () => controller.loadTransfers(),
           ),
           const SizedBox(width: 4),
           FilledButton.icon(
-            onPressed: () => context.push('/brands/${widget.brandId}/inventory/transfers/create'),
-            icon: const Icon(Icons.add),
+            onPressed: () => context
+                .push('/brands/${widget.brandId}/inventory/transfers/create'),
+            icon: const Icon(Icons.add_rounded, size: 18),
             label: const Text('New Transfer'),
+            style: FilledButton.styleFrom(
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10))),
           ),
           const SizedBox(width: 12),
         ],
@@ -68,87 +79,94 @@ class _ScreenTransferListState extends State<ScreenTransferList> {
         if (controller.isLoading.value && controller.transfers.isEmpty) {
           return const Center(child: CircularProgressIndicator());
         }
-
-        if (controller.errorMessage.value != null && controller.transfers.isEmpty) {
+        if (controller.errorMessage.value != null &&
+            controller.transfers.isEmpty) {
           return AppEmptyState(
-            icon: Icons.error_outline,
+            icon: Icons.error_outline_rounded,
             title: 'Failed to load transfers',
             subtitle: controller.errorMessage.value,
             actionLabel: 'Retry',
             onAction: () => controller.loadTransfers(),
           );
         }
-
         if (controller.transfers.isEmpty) {
           return AppEmptyState(
-            icon: Icons.compare_arrows_outlined,
+            icon: Icons.compare_arrows_rounded,
             title: 'No transfers yet',
-            subtitle: 'Log physical stock transfers between kitchen locations or warehouses.',
+            subtitle:
+                'Log physical stock transfers between kitchen locations or warehouses.',
             actionLabel: 'New Transfer',
-            onAction: () => context.push('/brands/${widget.brandId}/inventory/transfers/create'),
+            onAction: () => context
+                .push('/brands/${widget.brandId}/inventory/transfers/create'),
           );
         }
 
         return RefreshIndicator(
           onRefresh: () => controller.loadTransfers(),
           child: ListView.builder(
-            padding: EdgeInsets.all(AppSpacing.md),
+            padding: EdgeInsets.fromLTRB(
+                AppSpacing.md, AppSpacing.sm, AppSpacing.md, AppSpacing.xxl),
             itemCount: controller.transfers.length,
             itemBuilder: (context, idx) {
               final transfer = controller.transfers[idx];
               final isDraft = transfer.status == 'draft';
+              final dateStr = DateFormat('dd MMM yyyy')
+                  .format(transfer.transferDate);
+              final statusColor =
+                  isDraft ? Colors.amber.shade700 : Colors.green.shade600;
 
-              return Card(
-                child: ListTile(
-                  leading: CircleAvatar(
-                    backgroundColor: cs.primary.withOpacity(0.1),
-                    child: Icon(Icons.compare_arrows, color: cs.primary),
+              return AppListCard(
+                icon: Icons.compare_arrows_rounded,
+                iconColor: statusColor,
+                title: transfer.transferNo,
+                status: AppListCardStatus(
+                    label: transfer.status, color: statusColor),
+                lines: [
+                  'From: ${_getWarehouseName(transfer.fromWarehouseId)}',
+                  'To: ${_getWarehouseName(transfer.toWarehouseId)}  •  $dateStr',
+                ],
+                actions: [
+                  AppListCardAction(
+                    icon: isDraft
+                        ? Icons.edit_outlined
+                        : Icons.visibility_outlined,
+                    tooltip: isDraft ? 'Edit' : 'View',
+                    onTap: () => context.push(
+                        '/brands/${widget.brandId}/inventory/transfers/${transfer.id}/edit'),
                   ),
-                  title: Text(transfer.transferNo, style: const TextStyle(fontWeight: FontWeight.bold)),
-                  subtitle: Text('From: ${_getWarehouseName(transfer.fromWarehouseId)}\nTo: ${_getWarehouseName(transfer.toWarehouseId)}\nDate: ${DateFormat('yyyy-MM-dd').format(transfer.transferDate)}'),
-                  isThreeLine: true,
-                  trailing: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                        decoration: BoxDecoration(
-                          color: isDraft ? Colors.grey[200] : Colors.green[100],
-                          borderRadius: BorderRadius.circular(4),
-                        ),
-                        child: Text(
-                          transfer.status.toUpperCase(),
-                          style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: isDraft ? Colors.grey[800] : Colors.green[800]),
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      IconButton(
-                        icon: Icon(isDraft ? Icons.edit_outlined : Icons.visibility_outlined),
-                        onPressed: () => context.push('/brands/${widget.brandId}/inventory/transfers/${transfer.id}/edit'),
-                      ),
-                      if (isDraft)
-                        IconButton(
-                          icon: Icon(Icons.delete_outline, color: cs.error),
-                          onPressed: () async {
-                            final confirm = await showDialog<bool>(
-                              context: context,
-                              builder: (context) => AlertDialog(
-                                title: const Text('Delete Transfer?'),
-                                content: Text('Are you sure you want to delete "${transfer.transferNo}"?'),
-                                actions: [
-                                  TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancel')),
-                                  TextButton(onPressed: () => Navigator.pop(context, true), child: const Text('Delete', style: TextStyle(color: Colors.red))),
-                                ],
+                  if (isDraft)
+                    AppListCardAction(
+                      icon: Icons.delete_outline_rounded,
+                      tooltip: 'Delete',
+                      color: cs.error,
+                      onTap: () async {
+                        final confirm = await showDialog<bool>(
+                          context: context,
+                          builder: (ctx) => AlertDialog(
+                            icon: Icon(Icons.warning_amber_rounded,
+                                color: cs.error, size: 40),
+                            title: const Text('Delete Transfer?'),
+                            content: Text(
+                                'Delete "${transfer.transferNo}"? This cannot be undone.'),
+                            actions: [
+                              TextButton(
+                                  onPressed: () => Navigator.pop(ctx, false),
+                                  child: const Text('Cancel')),
+                              FilledButton(
+                                style: FilledButton.styleFrom(
+                                    backgroundColor: cs.error),
+                                onPressed: () => Navigator.pop(ctx, true),
+                                child: const Text('Delete'),
                               ),
-                            );
-                            if (confirm == true) {
-                              await controller.deleteTransfer(transfer.id);
-                            }
-                          },
-                        ),
-                    ],
-                  ),
-                ),
+                            ],
+                          ),
+                        );
+                        if (confirm == true) {
+                          await controller.deleteTransfer(transfer.id);
+                        }
+                      },
+                    ),
+                ],
               );
             },
           ),

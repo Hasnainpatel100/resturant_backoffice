@@ -23,7 +23,8 @@ class _ScreenIndentListState extends State<ScreenIndentList> {
   @override
   void initState() {
     super.initState();
-    controller = Get.put(IndentController(repository: IndentRepositoryImpl()));
+    controller =
+        Get.put(IndentController(repository: IndentRepositoryImpl()));
     lookupController = Get.put(InventoryLookupController());
     controller.loadIndents();
     lookupController.loadAllLookups();
@@ -36,7 +37,8 @@ class _ScreenIndentListState extends State<ScreenIndentList> {
   }
 
   String _getWarehouseName(String id) {
-    final branch = lookupController.branches.firstWhereOrNull((b) => b.id == id);
+    final branch =
+        lookupController.branches.firstWhereOrNull((b) => b.id == id);
     if (branch != null) {
       return branch.name.en.isNotEmpty ? branch.name.en : branch.branchCode;
     }
@@ -48,18 +50,27 @@ class _ScreenIndentListState extends State<ScreenIndentList> {
     final cs = Theme.of(context).colorScheme;
 
     return Scaffold(
+      backgroundColor: cs.surfaceContainerLowest,
       appBar: AppBar(
-        title: const Text('Purchase Indents'),
+        backgroundColor: cs.surface,
+        scrolledUnderElevation: 1,
+        title: const Text('Purchase Indents',
+            style: TextStyle(fontWeight: FontWeight.w800)),
         actions: [
           IconButton(
-            icon: const Icon(Icons.refresh),
+            icon: const Icon(Icons.refresh_rounded),
+            tooltip: 'Refresh',
             onPressed: () => controller.loadIndents(),
           ),
           const SizedBox(width: 4),
           FilledButton.icon(
-            onPressed: () => context.push('/brands/${widget.brandId}/inventory/indents/create'),
-            icon: const Icon(Icons.add),
+            onPressed: () => context
+                .push('/brands/${widget.brandId}/inventory/indents/create'),
+            icon: const Icon(Icons.add_rounded, size: 18),
             label: const Text('New Indent'),
+            style: FilledButton.styleFrom(
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10))),
           ),
           const SizedBox(width: 12),
         ],
@@ -68,87 +79,94 @@ class _ScreenIndentListState extends State<ScreenIndentList> {
         if (controller.isLoading.value && controller.indents.isEmpty) {
           return const Center(child: CircularProgressIndicator());
         }
-
-        if (controller.errorMessage.value != null && controller.indents.isEmpty) {
+        if (controller.errorMessage.value != null &&
+            controller.indents.isEmpty) {
           return AppEmptyState(
-            icon: Icons.error_outline,
+            icon: Icons.error_outline_rounded,
             title: 'Failed to load indents',
             subtitle: controller.errorMessage.value,
             actionLabel: 'Retry',
             onAction: () => controller.loadIndents(),
           );
         }
-
         if (controller.indents.isEmpty) {
           return AppEmptyState(
-            icon: Icons.assignment_outlined,
+            icon: Icons.assignment_rounded,
             title: 'No indents yet',
-            subtitle: 'Create purchase indents to request stock items from another branch or central warehouse.',
+            subtitle:
+                'Create purchase indents to request stock from another branch or central warehouse.',
             actionLabel: 'New Indent',
-            onAction: () => context.push('/brands/${widget.brandId}/inventory/indents/create'),
+            onAction: () => context
+                .push('/brands/${widget.brandId}/inventory/indents/create'),
           );
         }
 
         return RefreshIndicator(
           onRefresh: () => controller.loadIndents(),
           child: ListView.builder(
-            padding: EdgeInsets.all(AppSpacing.md),
+            padding: EdgeInsets.fromLTRB(
+                AppSpacing.md, AppSpacing.sm, AppSpacing.md, AppSpacing.xxl),
             itemCount: controller.indents.length,
             itemBuilder: (context, idx) {
               final indent = controller.indents[idx];
               final isDraft = indent.status == 'draft';
+              final dateStr = DateFormat('dd MMM yyyy')
+                  .format(indent.indentDate);
+              final statusColor =
+                  isDraft ? Colors.amber.shade700 : Colors.green.shade600;
 
-              return Card(
-                child: ListTile(
-                  leading: CircleAvatar(
-                    backgroundColor: cs.primary.withOpacity(0.1),
-                    child: Icon(Icons.assignment, color: cs.primary),
+              return AppListCard(
+                icon: Icons.assignment_rounded,
+                iconColor: statusColor,
+                title: indent.indentNo,
+                status: AppListCardStatus(
+                    label: indent.status, color: statusColor),
+                lines: [
+                  'From: ${_getWarehouseName(indent.fromWarehouseId)}',
+                  'To: ${_getWarehouseName(indent.toWarehouseId)}  •  $dateStr',
+                ],
+                actions: [
+                  AppListCardAction(
+                    icon: isDraft
+                        ? Icons.edit_outlined
+                        : Icons.visibility_outlined,
+                    tooltip: isDraft ? 'Edit' : 'View',
+                    onTap: () => context.push(
+                        '/brands/${widget.brandId}/inventory/indents/${indent.id}/edit'),
                   ),
-                  title: Text(indent.indentNo, style: const TextStyle(fontWeight: FontWeight.bold)),
-                  subtitle: Text('From: ${_getWarehouseName(indent.fromWarehouseId)}\nTo: ${_getWarehouseName(indent.toWarehouseId)}\nDate: ${DateFormat('yyyy-MM-dd').format(indent.indentDate)}'),
-                  isThreeLine: true,
-                  trailing: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                        decoration: BoxDecoration(
-                          color: isDraft ? Colors.grey[200] : Colors.green[100],
-                          borderRadius: BorderRadius.circular(4),
-                        ),
-                        child: Text(
-                          indent.status.toUpperCase(),
-                          style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: isDraft ? Colors.grey[800] : Colors.green[800]),
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      IconButton(
-                        icon: Icon(isDraft ? Icons.edit_outlined : Icons.visibility_outlined),
-                        onPressed: () => context.push('/brands/${widget.brandId}/inventory/indents/${indent.id}/edit'),
-                      ),
-                      if (isDraft)
-                        IconButton(
-                          icon: Icon(Icons.delete_outline, color: cs.error),
-                          onPressed: () async {
-                            final confirm = await showDialog<bool>(
-                              context: context,
-                              builder: (context) => AlertDialog(
-                                title: const Text('Delete Indent?'),
-                                content: Text('Are you sure you want to delete "${indent.indentNo}"?'),
-                                actions: [
-                                  TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancel')),
-                                  TextButton(onPressed: () => Navigator.pop(context, true), child: const Text('Delete', style: TextStyle(color: Colors.red))),
-                                ],
+                  if (isDraft)
+                    AppListCardAction(
+                      icon: Icons.delete_outline_rounded,
+                      tooltip: 'Delete',
+                      color: cs.error,
+                      onTap: () async {
+                        final confirm = await showDialog<bool>(
+                          context: context,
+                          builder: (ctx) => AlertDialog(
+                            icon: Icon(Icons.warning_amber_rounded,
+                                color: cs.error, size: 40),
+                            title: const Text('Delete Indent?'),
+                            content: Text(
+                                'Delete "${indent.indentNo}"? This cannot be undone.'),
+                            actions: [
+                              TextButton(
+                                  onPressed: () => Navigator.pop(ctx, false),
+                                  child: const Text('Cancel')),
+                              FilledButton(
+                                style: FilledButton.styleFrom(
+                                    backgroundColor: cs.error),
+                                onPressed: () => Navigator.pop(ctx, true),
+                                child: const Text('Delete'),
                               ),
-                            );
-                            if (confirm == true) {
-                              await controller.deleteIndent(indent.id);
-                            }
-                          },
-                        ),
-                    ],
-                  ),
-                ),
+                            ],
+                          ),
+                        );
+                        if (confirm == true) {
+                          await controller.deleteIndent(indent.id);
+                        }
+                      },
+                    ),
+                ],
               );
             },
           ),

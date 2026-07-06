@@ -24,9 +24,10 @@ class _ScreenPOListState extends State<ScreenPOList> {
   @override
   void initState() {
     super.initState();
-    controller = Get.put(PurchaseOrderController(repository: PurchaseOrderRepositoryImpl()));
-    vendorController = Get.put(VendorController(repository: VendorRepositoryImpl()));
-
+    controller = Get.put(
+        PurchaseOrderController(repository: PurchaseOrderRepositoryImpl()));
+    vendorController =
+        Get.put(VendorController(repository: VendorRepositoryImpl()));
     controller.loadPOs();
     vendorController.loadVendors();
   }
@@ -38,23 +39,18 @@ class _ScreenPOListState extends State<ScreenPOList> {
   }
 
   String _getVendorName(String vendorId) {
-    final v = vendorController.vendors.firstWhereOrNull((vendor) => vendor.id == vendorId);
+    final v =
+        vendorController.vendors.firstWhereOrNull((v) => v.id == vendorId);
     return v?.vendorName ?? 'Unknown Vendor';
   }
 
-  Color _getStatusColor(String status) {
-    switch (status.toLowerCase()) {
-      case 'posted':
-      case 'received':
-        return Colors.green;
-      case 'submitted':
-        return Colors.blue;
-      case 'cancelled':
-        return Colors.red;
-      case 'draft':
-      default:
-        return Colors.amber.shade800;
-    }
+  Color _statusColor(String status) {
+    return switch (status.toLowerCase()) {
+      'posted' || 'received' => Colors.green.shade600,
+      'submitted' => Colors.blue.shade600,
+      'cancelled' => Colors.red.shade600,
+      _ => Colors.amber.shade700,
+    };
   }
 
   @override
@@ -62,110 +58,104 @@ class _ScreenPOListState extends State<ScreenPOList> {
     final cs = Theme.of(context).colorScheme;
 
     return Scaffold(
+      backgroundColor: cs.surfaceContainerLowest,
       appBar: AppBar(
-        title: const Text('Purchase Orders'),
+        backgroundColor: cs.surface,
+        scrolledUnderElevation: 1,
+        title: const Text('Purchase Orders',
+            style: TextStyle(fontWeight: FontWeight.w800)),
         actions: [
           IconButton(
-            icon: const Icon(Icons.refresh),
+            icon: const Icon(Icons.refresh_rounded),
+            tooltip: 'Refresh',
             onPressed: () {
               controller.loadPOs();
               vendorController.loadVendors();
             },
           ),
+          const SizedBox(width: 4),
+          FilledButton.icon(
+            onPressed: () => context.push(
+                '/brands/${widget.brandId}/inventory/purchase-orders/create'),
+            icon: const Icon(Icons.add_rounded, size: 18),
+            label: const Text('New PO'),
+            style: FilledButton.styleFrom(
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10))),
+          ),
+          const SizedBox(width: 12),
         ],
       ),
       body: Obx(() {
         if (controller.isLoading.value && controller.pos.isEmpty) {
           return const Center(child: CircularProgressIndicator());
         }
-
         if (controller.errorMessage.value != null && controller.pos.isEmpty) {
           return AppEmptyState(
-            icon: Icons.error_outline,
+            icon: Icons.error_outline_rounded,
             title: 'Failed to load Purchase Orders',
             subtitle: controller.errorMessage.value,
             actionLabel: 'Retry',
             onAction: () => controller.loadPOs(),
           );
         }
-
         if (controller.pos.isEmpty) {
           return AppEmptyState(
             icon: Icons.receipt_long_outlined,
             title: 'No purchase orders',
-            subtitle: 'Create a purchase order to request items/materials from a vendor.',
+            subtitle:
+                'Create a purchase order to request items from a vendor.',
             actionLabel: 'New Purchase Order',
-            onAction: () => context.push('/brands/${widget.brandId}/inventory/purchase-orders/create'),
+            onAction: () => context.push(
+                '/brands/${widget.brandId}/inventory/purchase-orders/create'),
           );
         }
 
         return RefreshIndicator(
           onRefresh: () => controller.loadPOs(),
           child: ListView.builder(
-            padding: EdgeInsets.all(AppSpacing.md),
+            padding: EdgeInsets.fromLTRB(
+                AppSpacing.md, AppSpacing.sm, AppSpacing.md, AppSpacing.xxl),
             itemCount: controller.pos.length,
             itemBuilder: (context, index) {
               final po = controller.pos[index];
-              final poDateStr = DateFormat('yyyy-MM-dd').format(po.poDate);
-              final delDateStr = DateFormat('yyyy-MM-dd').format(po.deliveryDate);
+              final poDateStr = DateFormat('dd MMM yyyy').format(po.poDate);
+              final delDateStr =
+                  DateFormat('dd MMM yyyy').format(po.deliveryDate);
               final isEditable = po.status == 'draft';
+              final statusColor = _statusColor(po.status);
 
-              return Card(
-                child: ListTile(
-                  title: Row(
-                    children: [
-                      Text(po.poNo, style: const TextStyle(fontWeight: FontWeight.bold)),
-                      const SizedBox(width: 12),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                        decoration: BoxDecoration(
-                          color: _getStatusColor(po.status).withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: Text(
-                          po.status.toUpperCase(),
-                          style: TextStyle(
-                            color: _getStatusColor(po.status),
-                            fontSize: 10,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                    ],
+              return AppListCard(
+                icon: Icons.assignment_rounded,
+                iconColor: statusColor,
+                title: po.poNo,
+                status: AppListCardStatus(label: po.status, color: statusColor),
+                lines: [
+                  'Vendor: ${_getVendorName(po.vendorId)}',
+                  'PO: $poDateStr  •  Delivery: $delDateStr  •  \$${po.totalWithTax.toStringAsFixed(2)}',
+                ],
+                actions: [
+                  AppListCardAction(
+                    icon: isEditable
+                        ? Icons.edit_outlined
+                        : Icons.visibility_outlined,
+                    tooltip: isEditable ? 'Edit' : 'View',
+                    onTap: () => context.push(
+                        '/brands/${widget.brandId}/inventory/purchase-orders/${po.id}/edit'),
                   ),
-                  subtitle: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const SizedBox(height: 4),
-                      Text('Vendor: ${_getVendorName(po.vendorId)}'),
-                      Text('Date: $poDateStr • Delivery: $delDateStr • Total: \$${po.totalWithTax.toStringAsFixed(2)}'),
-                    ],
-                  ),
-                  trailing: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      IconButton(
-                        icon: Icon(isEditable ? Icons.edit_outlined : Icons.visibility_outlined),
-                        onPressed: () => context.push('/brands/${widget.brandId}/inventory/purchase-orders/${po.id}/edit'),
-                      ),
-                      if (isEditable)
-                        IconButton(
-                          icon: Icon(Icons.delete_outline, color: cs.error),
-                          onPressed: () => _confirmDelete(context, po),
-                        ),
-                    ],
-                  ),
-                ),
+                  if (isEditable)
+                    AppListCardAction(
+                      icon: Icons.delete_outline_rounded,
+                      tooltip: 'Delete',
+                      color: cs.error,
+                      onTap: () => _confirmDelete(context, po),
+                    ),
+                ],
               );
             },
           ),
         );
       }),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => context.push('/brands/${widget.brandId}/inventory/purchase-orders/create'),
-        icon: const Icon(Icons.add),
-        label: const Text('New PO'),
-      ),
     );
   }
 
@@ -173,30 +163,27 @@ class _ScreenPOListState extends State<ScreenPOList> {
     final cs = Theme.of(context).colorScheme;
     showDialog(
       context: context,
-      builder: (dialogCtx) => AlertDialog(
+      builder: (ctx) => AlertDialog(
         icon: Icon(Icons.warning_amber_rounded, color: cs.error, size: 40),
         title: const Text('Delete Purchase Order?'),
-        content: Text('Are you sure you want to delete "${po.poNo}"? This action cannot be undone.'),
+        content: Text(
+            'Are you sure you want to delete "${po.poNo}"? This cannot be undone.'),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(dialogCtx),
-            child: const Text('Cancel'),
-          ),
+              onPressed: () => Navigator.pop(ctx),
+              child: const Text('Cancel')),
           FilledButton(
-            onPressed: () async {
-              Navigator.pop(dialogCtx);
-              final success = await controller.deletePO(po.id);
-              if (success) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Purchase Order deleted successfully'), backgroundColor: Colors.green),
-                );
-              } else {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text(controller.errorMessage.value ?? 'Failed to delete PO'), backgroundColor: cs.error),
-                );
-              }
-            },
             style: FilledButton.styleFrom(backgroundColor: cs.error),
+            onPressed: () async {
+              Navigator.pop(ctx);
+              final ok = await controller.deletePO(po.id);
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                content: Text(ok
+                    ? 'Purchase Order deleted'
+                    : controller.errorMessage.value ?? 'Failed'),
+                backgroundColor: ok ? Colors.green : cs.error,
+              ));
+            },
             child: const Text('Delete'),
           ),
         ],

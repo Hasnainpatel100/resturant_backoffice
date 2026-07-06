@@ -22,10 +22,12 @@ class _ScreenMaterialListState extends State<ScreenMaterialList> {
   @override
   void initState() {
     super.initState();
-    controller = Get.put(RawMaterialController(repository: RawMaterialRepositoryImpl()));
-    groupController = Get.put(RawMaterialGroupController(repository: RawMaterialGroupRepositoryImpl()));
-    unitController = Get.put(UnitController(repository: UnitRepositoryImpl()));
-
+    controller =
+        Get.put(RawMaterialController(repository: RawMaterialRepositoryImpl()));
+    groupController = Get.put(
+        RawMaterialGroupController(repository: RawMaterialGroupRepositoryImpl()));
+    unitController =
+        Get.put(UnitController(repository: UnitRepositoryImpl()));
     controller.loadMaterials();
     groupController.loadGroups();
     unitController.loadUnits();
@@ -38,7 +40,8 @@ class _ScreenMaterialListState extends State<ScreenMaterialList> {
   }
 
   String _getGroupName(String groupId) {
-    final group = groupController.groups.firstWhereOrNull((g) => g.id == groupId);
+    final group =
+        groupController.groups.firstWhereOrNull((g) => g.id == groupId);
     return group?.groupName ?? 'Unknown Group';
   }
 
@@ -52,11 +55,15 @@ class _ScreenMaterialListState extends State<ScreenMaterialList> {
     final cs = Theme.of(context).colorScheme;
 
     return Scaffold(
+      backgroundColor: cs.surfaceContainerLowest,
       appBar: AppBar(
-        title: const Text('Raw Materials & Ingredients'),
+        backgroundColor: cs.surface,
+        scrolledUnderElevation: 1,
+        title: const Text('Raw Materials & Ingredients',
+            style: TextStyle(fontWeight: FontWeight.w800)),
         actions: [
           IconButton(
-            icon: const Icon(Icons.refresh),
+            icon: const Icon(Icons.refresh_rounded),
             tooltip: 'Refresh',
             onPressed: () {
               controller.loadMaterials();
@@ -66,9 +73,13 @@ class _ScreenMaterialListState extends State<ScreenMaterialList> {
           ),
           const SizedBox(width: 4),
           FilledButton.icon(
-            onPressed: () => context.push('/brands/${widget.brandId}/inventory/items/create'),
-            icon: const Icon(Icons.add, size: 18),
+            onPressed: () => context
+                .push('/brands/${widget.brandId}/inventory/items/create'),
+            icon: const Icon(Icons.add_rounded, size: 18),
             label: const Text('New Material'),
+            style: FilledButton.styleFrom(
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10))),
           ),
           const SizedBox(width: 12),
         ],
@@ -78,9 +89,10 @@ class _ScreenMaterialListState extends State<ScreenMaterialList> {
           return const Center(child: CircularProgressIndicator());
         }
 
-        if (controller.errorMessage.value != null && controller.materials.isEmpty) {
+        if (controller.errorMessage.value != null &&
+            controller.materials.isEmpty) {
           return AppEmptyState(
-            icon: Icons.error_outline,
+            icon: Icons.error_outline_rounded,
             title: 'Failed to load raw materials',
             subtitle: controller.errorMessage.value,
             actionLabel: 'Retry',
@@ -90,45 +102,47 @@ class _ScreenMaterialListState extends State<ScreenMaterialList> {
 
         if (controller.materials.isEmpty) {
           return AppEmptyState(
-            icon: Icons.inventory_2_outlined,
+            icon: Icons.eco_outlined,
             title: 'No raw materials yet',
-            subtitle: 'Add raw ingredients and materials like Flour, Sugar, Chicken breasts, etc.',
+            subtitle:
+                'Add raw ingredients and materials like Flour, Sugar, Chicken, etc.',
             actionLabel: 'Add Raw Material',
-            onAction: () => context.push('/brands/${widget.brandId}/inventory/items/create'),
+            onAction: () => context
+                .push('/brands/${widget.brandId}/inventory/items/create'),
           );
         }
 
         return RefreshIndicator(
-          onRefresh: () async {
-            await controller.loadMaterials();
-          },
+          onRefresh: () async => controller.loadMaterials(),
           child: ListView.builder(
-            padding: EdgeInsets.all(AppSpacing.md),
+            padding: EdgeInsets.fromLTRB(
+                AppSpacing.md, AppSpacing.sm, AppSpacing.md, AppSpacing.xxl),
             itemCount: controller.materials.length,
             itemBuilder: (context, index) {
               final mat = controller.materials[index];
-              return Card(
-                child: ListTile(
-                  leading: CircleAvatar(
-                    backgroundColor: cs.primary.withOpacity(0.1),
-                    child: Icon(Icons.eco, color: cs.primary),
+              return AppListCard(
+                icon: Icons.eco_rounded,
+                iconColor: Colors.green.shade600,
+                title: mat.materialName,
+                ref: mat.materialCode,
+                lines: [
+                  'Group: ${_getGroupName(mat.groupId)}  •  Unit: ${_getUnitName(mat.baseUnitId)}',
+                  'Purchase Rate: \$${mat.purchaseRate.toStringAsFixed(2)}',
+                ],
+                actions: [
+                  AppListCardAction(
+                    icon: Icons.edit_outlined,
+                    tooltip: 'Edit',
+                    onTap: () => context.push(
+                        '/brands/${widget.brandId}/inventory/items/${mat.id}/edit'),
                   ),
-                  title: Text(mat.materialName, style: const TextStyle(fontWeight: FontWeight.bold)),
-                  subtitle: Text('Code: ${mat.materialCode} • Group: ${_getGroupName(mat.groupId)} • Base Unit: ${_getUnitName(mat.baseUnitId)} • Rate: \$${mat.purchaseRate}'),
-                  trailing: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      IconButton(
-                        icon: const Icon(Icons.edit_outlined),
-                        onPressed: () => context.push('/brands/${widget.brandId}/inventory/items/${mat.id}/edit'),
-                      ),
-                      IconButton(
-                        icon: Icon(Icons.delete_outline, color: cs.error),
-                        onPressed: () => _confirmDelete(context, mat),
-                      ),
-                    ],
+                  AppListCardAction(
+                    icon: Icons.delete_outline_rounded,
+                    tooltip: 'Delete',
+                    color: cs.error,
+                    onTap: () => _confirmDelete(context, mat),
                   ),
-                ),
+                ],
               );
             },
           ),
@@ -144,24 +158,25 @@ class _ScreenMaterialListState extends State<ScreenMaterialList> {
       builder: (dialogCtx) => AlertDialog(
         icon: Icon(Icons.warning_amber_rounded, color: cs.error, size: 40),
         title: const Text('Delete Raw Material?'),
-        content: Text('Are you sure you want to delete "${mat.displayLabel}"?\n\nThis action cannot be undone.'),
+        content: Text(
+            'Are you sure you want to delete "${mat.displayLabel}"?\n\nThis action cannot be undone.'),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(dialogCtx),
-            child: const Text('Cancel'),
-          ),
+              onPressed: () => Navigator.pop(dialogCtx),
+              child: const Text('Cancel')),
           FilledButton(
             onPressed: () async {
               Navigator.pop(dialogCtx);
               final success = await controller.deleteMaterial(mat.id);
               if (success) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Raw material deleted successfully'), backgroundColor: Colors.green),
-                );
+                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                    content: Text('Raw material deleted successfully'),
+                    backgroundColor: Colors.green));
               } else {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text(controller.errorMessage.value ?? 'Failed to delete material'), backgroundColor: cs.error),
-                );
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                    content: Text(controller.errorMessage.value ??
+                        'Failed to delete material'),
+                    backgroundColor: cs.error));
               }
             },
             style: FilledButton.styleFrom(backgroundColor: cs.error),

@@ -35,19 +35,27 @@ class _ScreenUnitListState extends State<ScreenUnitList> {
     final cs = Theme.of(context).colorScheme;
 
     return Scaffold(
+      backgroundColor: cs.surfaceContainerLowest,
       appBar: AppBar(
-        title: const Text('Units of Measurement'),
+        backgroundColor: cs.surface,
+        scrolledUnderElevation: 1,
+        title: const Text('Units of Measurement',
+            style: TextStyle(fontWeight: FontWeight.w800)),
         actions: [
           IconButton(
-            icon: const Icon(Icons.refresh),
+            icon: const Icon(Icons.refresh_rounded),
             tooltip: 'Refresh',
             onPressed: () => controller.loadUnits(),
           ),
           const SizedBox(width: 4),
           FilledButton.icon(
-            onPressed: () => context.push('/brands/${widget.brandId}/inventory/units/create'),
-            icon: const Icon(Icons.add, size: 18),
+            onPressed: () => context
+                .push('/brands/${widget.brandId}/inventory/units/create'),
+            icon: const Icon(Icons.add_rounded, size: 18),
             label: const Text('New Unit'),
+            style: FilledButton.styleFrom(
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10))),
           ),
           const SizedBox(width: 12),
         ],
@@ -56,52 +64,61 @@ class _ScreenUnitListState extends State<ScreenUnitList> {
         if (controller.isLoading.value && controller.units.isEmpty) {
           return const Center(child: CircularProgressIndicator());
         }
-
         if (controller.errorMessage.value != null && controller.units.isEmpty) {
           return AppEmptyState(
-            icon: Icons.error_outline,
+            icon: Icons.error_outline_rounded,
             title: 'Failed to load units',
             subtitle: controller.errorMessage.value,
             actionLabel: 'Retry',
             onAction: () => controller.loadUnits(),
           );
         }
-
         if (controller.units.isEmpty) {
           return AppEmptyState(
-            icon: Icons.straighten_outlined,
+            icon: Icons.straighten_rounded,
             title: 'No units yet',
             subtitle: 'Add units of measurement like kg, litre, piece, etc.',
             actionLabel: 'Add Unit',
-            onAction: () => context.push('/brands/${widget.brandId}/inventory/units/create'),
+            onAction: () => context
+                .push('/brands/${widget.brandId}/inventory/units/create'),
           );
         }
 
         return RefreshIndicator(
           onRefresh: () => controller.loadUnits(),
           child: ListView.builder(
-            padding: EdgeInsets.all(AppSpacing.md),
+            padding: EdgeInsets.fromLTRB(
+                AppSpacing.md, AppSpacing.sm, AppSpacing.md, AppSpacing.xxl),
             itemCount: controller.units.length,
             itemBuilder: (context, index) {
               final unit = controller.units[index];
-              return Card(
-                child: ListTile(
-                  title: Text(unit.unitName, style: const TextStyle(fontWeight: FontWeight.bold)),
-                  subtitle: Text('Code: ${unit.shortName} • Decimal: ${unit.decimalAllowed ? "Allowed" : "Not Allowed"} • Status: ${unit.isActive ? "Active" : "Inactive"}'),
-                  trailing: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      IconButton(
-                        icon: const Icon(Icons.edit_outlined),
-                        onPressed: () => context.push('/brands/${widget.brandId}/inventory/units/${unit.id}/edit'),
-                      ),
-                      IconButton(
-                        icon: Icon(Icons.delete_outline, color: cs.error),
-                        onPressed: () => _confirmDelete(context, unit),
-                      ),
-                    ],
-                  ),
+              final isActive = unit.isActive;
+              return AppListCard(
+                icon: Icons.straighten_rounded,
+                iconColor: cs.primary,
+                title: unit.unitName,
+                ref: unit.shortName,
+                lines: [
+                  'Decimal: ${unit.decimalAllowed ? "Allowed" : "Not Allowed"}  •  ${isActive ? "Active" : "Inactive"}',
+                ],
+                status: AppListCardStatus(
+                  label: isActive ? 'Active' : 'Inactive',
+                  color: isActive ? Colors.green.shade600 : Colors.grey,
                 ),
+                actions: [
+                  AppListCardAction(
+                    icon: Icons.edit_outlined,
+                    tooltip: 'Edit',
+                    onTap: () => context.push(
+                        '/brands/${widget.brandId}/inventory/units/${unit.id}/edit'),
+                  ),
+                  AppListCardAction(
+                    icon: Icons.delete_outline_rounded,
+                    tooltip: 'Delete',
+                    color: cs.error,
+                    onTap: () => _confirmDelete(context, unit),
+                  ),
+                ],
               );
             },
           ),
@@ -114,30 +131,27 @@ class _ScreenUnitListState extends State<ScreenUnitList> {
     final cs = Theme.of(context).colorScheme;
     showDialog(
       context: context,
-      builder: (dialogCtx) => AlertDialog(
+      builder: (ctx) => AlertDialog(
         icon: Icon(Icons.warning_amber_rounded, color: cs.error, size: 40),
         title: const Text('Delete Unit?'),
-        content: Text('Are you sure you want to delete "${unit.displayLabel}"?\n\nThis action cannot be undone.'),
+        content: Text(
+            'Are you sure you want to delete "${unit.displayLabel}"?\n\nThis action cannot be undone.'),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(dialogCtx),
-            child: const Text('Cancel'),
-          ),
+              onPressed: () => Navigator.pop(ctx),
+              child: const Text('Cancel')),
           FilledButton(
-            onPressed: () async {
-              Navigator.pop(dialogCtx);
-              final success = await controller.deleteUnit(unit.id);
-              if (success) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Unit deleted successfully'), backgroundColor: Colors.green),
-                );
-              } else {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text(controller.errorMessage.value ?? 'Failed to delete unit'), backgroundColor: cs.error),
-                );
-              }
-            },
             style: FilledButton.styleFrom(backgroundColor: cs.error),
+            onPressed: () async {
+              Navigator.pop(ctx);
+              final ok = await controller.deleteUnit(unit.id);
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                content: Text(ok
+                    ? 'Unit deleted successfully'
+                    : controller.errorMessage.value ?? 'Failed'),
+                backgroundColor: ok ? Colors.green : cs.error,
+              ));
+            },
             child: const Text('Delete'),
           ),
         ],
