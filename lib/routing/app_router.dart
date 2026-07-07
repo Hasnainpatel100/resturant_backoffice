@@ -39,9 +39,6 @@ import '../ui/branch/branch_plan/screen_branch_plan_history.dart';
 import '../ui/branch/branch_plan/screen_branch_plan_form.dart';
 import '../ui/bills/bill_list/screen_bill_list.dart';
 import '../ui/bills/bill_detail/screen_bill_detail.dart';
-import 'package:back_office/ui/feedback/views/feedback_dashboard_screen.dart';
-import 'package:back_office/ui/feedback/views/feedback_detail_screen.dart';
-import 'package:back_office/ui/feedback/views/feedback_settings_screen.dart';
 
 final GoRouter appRouter = GoRouter(
   navigatorKey: rootNavigatorKey,
@@ -303,24 +300,7 @@ final GoRouter appRouter = GoRouter(
           name: 'notifications',
           builder: (context, state) => const NotificationsScreen(),
         ),
-        GoRoute(
-          path: AppRoutes.feedbackDashboard,
-          name: 'feedbackDashboard',
-          builder: (context, state) => const FeedbackDashboardScreen(),
-        ),
-        GoRoute(
-          path: AppRoutes.feedbackDetail,
-          name: 'feedbackDetail',
-          builder: (context, state) {
-            final feedbackId = state.pathParameters['feedbackId']!;
-            return FeedbackDetailScreen(feedbackId: feedbackId);
-          },
-        ),
-        GoRoute(
-          path: AppRoutes.feedbackSettings,
-          name: 'feedbackSettings',
-          builder: (context, state) => const FeedbackSettingsScreen(),
-        ),
+
       ],
     ),
   ],

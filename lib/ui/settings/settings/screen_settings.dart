@@ -31,9 +31,11 @@ class ScreenSettings extends StatelessWidget {
                   leading: const Icon(Icons.language),
                   title: Text('common.language'.tr()),
                   subtitle: Text(
-                    context.locale.languageCode == 'hi'
-                        ? 'Hindi'
-                        : 'English',
+                    switch (context.locale.languageCode) {
+                      'hi' => 'common.hindi'.tr(),
+                      'ur' => 'common.urdu'.tr(),
+                      _ => 'common.english'.tr(),
+                    },
                   ),
                   trailing: const Icon(Icons.chevron_right),
                   onTap: () {
@@ -52,14 +54,14 @@ class ScreenSettings extends StatelessWidget {
                               },
                             ),
                             ListTile(
-                              title: Text('common.empty_key'.tr()),
+                              title: Text('common.hindi'.tr()),
                               onTap: () {
                                 context.setLocale(const Locale('hi'));
                                 Navigator.pop(context);
                               },
                             ),
                             ListTile(
-                              title: Text('common.empty_key'.tr()),
+                              title: Text('common.urdu'.tr()),
                               onTap: () {
                                 context.setLocale(const Locale('ur'));
                                 Navigator.pop(context);
