@@ -264,11 +264,7 @@ class _DesktopSidebar extends StatelessWidget {
                   route: menuRoute,
                   currentLocation: currentLocation,
                 ),
-                _NavItem(
-                  icon: Icons.feedback_outlined,
-                  activeIcon: Icons.feedback,
-                  label: 'common.feedback'.tr(),
-                  route: AppRoutes.feedbackDashboard,
+                _FeedbackNavGroup(
                   currentLocation: currentLocation,
                 ),
 
@@ -436,9 +432,16 @@ class _TabletSidebar extends StatelessWidget {
                     currentLocation: currentLocation,
                   ),
                   _TabletNavItem(
-                    icon: Icons.feedback,
-                    label: 'common.feedback'.tr(),
-                    route: AppRoutes.feedbackDashboard,
+                    icon: Icons.description,
+                    label: 'Feedback Configuration',
+                    route: AppRoutes.feedbackList,
+                    currentLocation: currentLocation,
+                  ),
+
+                  _TabletNavItem(
+                    icon: Icons.rate_review,
+                    label: 'Customer Responses',
+                    route: AppRoutes.customerResponses,
                     currentLocation: currentLocation,
                   ),
                   _TabletNavItem(
@@ -683,12 +686,20 @@ class _MobileDrawer extends StatelessWidget {
             },
           ),
           ListTile(
-            leading: const Icon(Icons.feedback),
-            title: Text('common.feedback'.tr()),
-            selected: currentLocation.startsWith(AppRoutes.feedbackDashboard),
+            leading: const Icon(Icons.description),
+            title: const Text('Feedback Configuration'),
             onTap: () {
               Navigator.pop(context);
-              context.go(AppRoutes.feedbackDashboard);
+              context.go(AppRoutes.feedbackList);
+            },
+          ),
+
+          ListTile(
+            leading: const Icon(Icons.rate_review),
+            title: const Text('Customer Responses'),
+            onTap: () {
+              Navigator.pop(context);
+              context.go(AppRoutes.customerResponses);
             },
           ),
           ListTile(
@@ -962,6 +973,54 @@ class _NavItem extends StatelessWidget {
             ),
           ),
         ),
+      ),
+    );
+  }
+}
+class _FeedbackNavGroup extends StatelessWidget {
+  const _FeedbackNavGroup({
+    required this.currentLocation,
+  });
+
+  final String currentLocation;
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+
+    final expanded =
+    currentLocation.startsWith('/feedback');
+
+    return Theme(
+      data: Theme.of(context).copyWith(
+        dividerColor: Colors.transparent,
+      ),
+      child: ExpansionTile(
+        initiallyExpanded: expanded,
+        leading: Icon(
+          Icons.feedback_outlined,
+          color: cs.onSurfaceVariant,
+        ),
+        title: const Text(
+          'Feedback',
+        ),
+        childrenPadding: const EdgeInsets.only(left: 28),
+        children: [
+          _NavItem(
+            icon: Icons.description_outlined,
+            activeIcon: Icons.description,
+            label: 'Feedback Configuration',
+            route: AppRoutes.feedbackList,
+            currentLocation: currentLocation,
+          ),
+          _NavItem(
+            icon: Icons.rate_review_outlined,
+            activeIcon: Icons.rate_review,
+            label: 'Customer Responses',
+            route: AppRoutes.customerResponses,
+            currentLocation: currentLocation,
+          ),
+        ],
       ),
     );
   }

@@ -61,10 +61,12 @@ abstract final class AppRoutes {
   static const String billDetail = '/brands/:brandId/bills/:billId';
 
   // Feedback
-  static const String feedbackDashboard = '/feedback';
+  static const String feedbackList = '/feedback';
+  static const String feedbackCreate = '/feedback/create';
+  static const String feedbackQuestionBuilder = '/feedback/questions';
+  static const String customerResponses = '/feedback/responses';
   static const String feedbackDetail = '/feedback/detail/:feedbackId';
   static const String feedbackSettings = '/feedback/settings';
-
   // Settings
   static const String settings = '/settings';
   static const String profile = '/profile';
