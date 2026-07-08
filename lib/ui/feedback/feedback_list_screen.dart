@@ -214,7 +214,7 @@ class _FeedbackListScreenState extends State<FeedbackListScreen> {
   }
 
   void _onEdit(_FeedbackListItem item) {
-    context.push('/feedback/${item.config.id}/edit');
+    context.push('/feedback/${item.config.id}/edit', extra: item.config);
   }
 
   void _onDuplicate(_FeedbackListItem item) {

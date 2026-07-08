@@ -33,6 +33,7 @@ import 'package:back_office/ui/pos_devices/pos_device_list/screen_pos_device_lis
 import 'package:back_office/ui/settings/settings/screen_settings.dart';
 import 'package:back_office/ui/profile/screen_profile.dart';
 import 'package:back_office/ui/shell/placeholder_screens.dart';
+import '../data/models/feedback_configuration_model.dart';
 
 import '../ui/feedback/feedback_list_screen.dart';
 import '../ui/feedback/feedback_configuration_screen.dart';
@@ -47,23 +48,10 @@ import '../ui/bills/bill_detail/screen_bill_detail.dart';
 import '../ui/inventory/screen_inventory_dashboard.dart';
 import '../ui/inventory/categories/screen_category_list.dart';
 import '../ui/inventory/categories/screen_category_form.dart';
-import '../ui/inventory/units/screen_unit_list.dart';
-import '../ui/inventory/units/screen_unit_form.dart';
-import '../ui/inventory/warehouses/screen_warehouse_list.dart';
-import '../ui/inventory/warehouses/screen_warehouse_form.dart';
-import '../ui/inventory/items/screen_item_list.dart';
-import '../ui/inventory/items/screen_item_form.dart';
-import '../ui/inventory/items/screen_item_detail.dart';
-import '../ui/inventory/suppliers/screen_supplier_list.dart';
-import '../ui/inventory/suppliers/screen_supplier_form.dart';
 import '../ui/inventory/suppliers/screen_supplier_ledger.dart';
 import '../ui/inventory/purchases/screen_purchase_list.dart';
 import '../ui/inventory/purchases/screen_purchase_form.dart';
 import '../ui/inventory/purchases/screen_purchase_detail.dart';
-import '../ui/inventory/adjustments/screen_adjustment_list.dart';
-import '../ui/inventory/adjustments/screen_adjustment_form.dart';
-import '../ui/inventory/transfers/screen_transfer_list.dart';
-import '../ui/inventory/transfers/screen_transfer_form.dart';
 import '../ui/inventory/reports/screen_inventory_reports.dart';
 
 import '../ui/restaurant_inventory/views/screen_unit_list.dart' as ri_unit_list;
@@ -870,6 +858,15 @@ final GoRouter appRouter = GoRouter(
           path: AppRoutes.feedbackCreate,
           name: 'feedbackCreate',
           builder: (context, state) => const FeedbackConfigurationScreen(),
+        ),
+        GoRoute(
+          path: '/feedback/:feedbackId/edit',
+          name: 'feedbackEdit',
+          builder: (context, state) {
+            final config = state.extra as FeedbackConfigurationModel? ??
+                FeedbackConfigurationScreen.getDummyConfigById(state.pathParameters['feedbackId'] ?? '');
+            return FeedbackConfigurationScreen(config: config);
+          },
         ),
         GoRoute(
           path: AppRoutes.feedbackQuestionBuilder,

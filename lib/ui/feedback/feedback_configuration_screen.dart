@@ -1,13 +1,67 @@
 import 'package:go_router/go_router.dart';
 
 import '../../imports/core_imports.dart';
+import '../../data/models/feedback_configuration_model.dart';
 
 /// Screen for creating / editing a feedback configuration.
 ///
 /// This is the first step of the feedback creation wizard. It collects the
 /// "General Information" fields and exposes Cancel / Next buttons.
 class FeedbackConfigurationScreen extends StatefulWidget {
-  const FeedbackConfigurationScreen({super.key});
+  final FeedbackConfigurationModel? config;
+
+  const FeedbackConfigurationScreen({super.key, this.config});
+
+  static FeedbackConfigurationModel getDummyConfigById(String id) {
+    final now = DateTime.now();
+    String branchId = 'branch_kp';
+    String title = 'Post-Dine Experience Survey';
+    String status = 'ACTIVE';
+    String sendMethod = 'WHATSAPP';
+
+    if (id == 'fbc_002') {
+      branchId = 'branch_baner';
+      title = 'Delivery Order Feedback';
+      status = 'ACTIVE';
+      sendMethod = 'SMS';
+    } else if (id == 'fbc_003') {
+      branchId = 'branch_vn';
+      title = 'Table Service Quality Check';
+      status = 'DRAFT';
+      sendMethod = 'DISABLED';
+    } else if (id == 'fbc_004') {
+      branchId = 'branch_wakad';
+      title = 'QR Table Feedback';
+      status = 'ACTIVE';
+      sendMethod = 'QR_CODE';
+    } else if (id == 'fbc_005') {
+      branchId = 'branch_kp';
+      title = 'Loyalty Program Feedback';
+      status = 'INACTIVE';
+      sendMethod = 'ALL';
+    } else if (id == 'fbc_006') {
+      branchId = 'branch_baner';
+      title = 'Legacy Feedback Form';
+      status = 'ARCHIVED';
+      sendMethod = 'DISABLED';
+    }
+
+    return FeedbackConfigurationModel(
+      id: id,
+      brandId: 'brand_001',
+      branchId: branchId,
+      title: title,
+      status: status,
+      sendMethod: sendMethod,
+      delayMinutes: 15,
+      minimumOrderAmount: 0,
+      createdAt: now.subtract(const Duration(days: 30)).millisecondsSinceEpoch,
+      createdBy: 'admin@brand.com',
+      updatedAt: now.millisecondsSinceEpoch,
+      updatedBy: 'admin@brand.com',
+      isActive: true,
+    );
+  }
 
   @override
   State<FeedbackConfigurationScreen> createState() =>
@@ -19,19 +73,19 @@ class _FeedbackConfigurationScreenState
   final _formKey = GlobalKey<FormState>();
 
   // ── Text Controllers ──────────────────────────────────────────────────────
-  final _titleController = TextEditingController();
-  final _googleFormUrlController = TextEditingController();
-  final _delayController = TextEditingController(text: '0');
-  final _minOrderAmountController = TextEditingController(text: '0');
+  late final TextEditingController _titleController;
+  late final TextEditingController _googleFormUrlController;
+  late final TextEditingController _delayController;
+  late final TextEditingController _minOrderAmountController;
 
   // ── Dropdown values ───────────────────────────────────────────────────────
   String? _selectedBranch;
-  String _selectedStatus = 'DRAFT';
-  String _selectedSendMethod = 'DISABLED';
+  late String _selectedStatus;
+  late String _selectedSendMethod;
 
   // ── Switches ──────────────────────────────────────────────────────────────
-  bool _isDefaultFeedback = false;
-  bool _isLoyaltyEnabled = false;
+  late bool _isDefaultFeedback;
+  late bool _isLoyaltyEnabled;
 
   // ── Static options (mirrors FeedbackListScreen) ───────────────────────────
   static const List<String> _branchOptions = [
@@ -56,6 +110,48 @@ class _FeedbackConfigurationScreenState
   ];
 
   @override
+  void initState() {
+    super.initState();
+    final c = widget.config;
+
+    _titleController = TextEditingController(text: c?.title ?? '');
+    _googleFormUrlController = TextEditingController(text: c?.googleFormUrl ?? '');
+    _delayController = TextEditingController(text: '${c?.delayMinutes ?? 0}');
+
+    final minAmount = c?.minimumOrderAmount;
+    final minAmountText = minAmount != null 
+        ? (minAmount == minAmount.toInt() ? '${minAmount.toInt()}' : '$minAmount')
+        : '0';
+    _minOrderAmountController = TextEditingController(text: minAmountText);
+
+    _selectedBranch = _getBranchName(c?.branchId ?? '');
+    _selectedStatus = c?.status ?? 'DRAFT';
+    _selectedSendMethod = c?.sendMethod ?? 'DISABLED';
+
+    _isDefaultFeedback = c?.isDefault ?? false;
+    _isLoyaltyEnabled = c?.loyaltyEnabled ?? false;
+  }
+
+  String? _getBranchName(String branchId) {
+    switch (branchId) {
+      case 'branch_kp':
+      case 'Koregaon Park':
+        return 'Koregaon Park';
+      case 'branch_baner':
+      case 'Baner':
+        return 'Baner';
+      case 'branch_vn':
+      case 'Viman Nagar':
+        return 'Viman Nagar';
+      case 'branch_wakad':
+      case 'Wakad':
+        return 'Wakad';
+      default:
+        return _branchOptions.contains(branchId) ? branchId : null;
+    }
+  }
+
+  @override
   void dispose() {
     _titleController.dispose();
     _googleFormUrlController.dispose();
@@ -73,6 +169,11 @@ class _FeedbackConfigurationScreenState
   void _onNext() {
     if (!(_formKey.currentState?.validate() ?? false)) return;
 
+    if (widget.config != null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Changes saved successfully')),
+      );
+    }
     context.push(AppRoutes.feedbackQuestionBuilder);
   }
 
@@ -109,7 +210,7 @@ class _FeedbackConfigurationScreenState
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Create Feedback',
+                          widget.config != null ? 'Edit Feedback' : 'Create Feedback',
                           style: Theme.of(context)
                               .textTheme
                               .headlineSmall
@@ -117,7 +218,9 @@ class _FeedbackConfigurationScreenState
                         ),
                         const SizedBox(height: 2),
                         Text(
-                          'Configure a customer feedback form',
+                          widget.config != null
+                              ? 'Modify customer feedback form details'
+                              : 'Configure a customer feedback form',
                           style: Theme.of(context)
                               .textTheme
                               .bodyMedium
@@ -317,9 +420,11 @@ class _FeedbackConfigurationScreenState
                   ),
                   SizedBox(width: AppSpacing.ms),
                   AppButton(
-                    label: 'Next',
+                    label: widget.config != null ? 'Save Changes' : 'Next',
                     variant: ButtonVariant.primary,
-                    suffixIcon: const Icon(Icons.arrow_forward, size: 18),
+                    suffixIcon: widget.config != null
+                        ? const Icon(Icons.check, size: 18)
+                        : const Icon(Icons.arrow_forward, size: 18),
                     onPressed: _onNext,
                   ),
                 ],
