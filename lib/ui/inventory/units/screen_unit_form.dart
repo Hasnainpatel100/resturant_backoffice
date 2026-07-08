@@ -90,7 +90,9 @@ class _UnitFormViewState extends State<_UnitFormView> {
               backgroundColor: Colors.green,
             ),
           );
-          context.pop();
+          if (context.mounted) {
+            Navigator.of(context).pop();
+          }
         }
         if (state.status == UnitStatus.error) {
           ScaffoldMessenger.of(context).showSnackBar(

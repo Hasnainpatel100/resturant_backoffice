@@ -1,41 +1,41 @@
-import 'base_mongo_datasource.dart';
+import 'base_hive_datasource.dart';
 
-class LocationMongoDataSource extends BaseMongoDataSource {
+class LocationMongoDataSource extends BaseHiveDataSource {
   LocationMongoDataSource() : super('locations');
 }
 
-class UnitMongoDataSource extends BaseMongoDataSource {
+class UnitMongoDataSource extends BaseHiveDataSource {
   UnitMongoDataSource() : super('units');
 }
 
-class RawMaterialGroupMongoDataSource extends BaseMongoDataSource {
+class RawMaterialGroupMongoDataSource extends BaseHiveDataSource {
   RawMaterialGroupMongoDataSource() : super('raw_material_groups');
 }
 
-class RawMaterialTaxMongoDataSource extends BaseMongoDataSource {
+class RawMaterialTaxMongoDataSource extends BaseHiveDataSource {
   RawMaterialTaxMongoDataSource() : super('raw_material_taxes');
 }
 
-class RawMaterialMongoDataSource extends BaseMongoDataSource {
+class RawMaterialMongoDataSource extends BaseHiveDataSource {
   RawMaterialMongoDataSource() : super('raw_materials');
 }
 
-class VendorMongoDataSource extends BaseMongoDataSource {
+class VendorMongoDataSource extends BaseHiveDataSource {
   VendorMongoDataSource() : super('vendors');
 }
 
-class BillTypeMongoDataSource extends BaseMongoDataSource {
+class BillTypeMongoDataSource extends BaseHiveDataSource {
   BillTypeMongoDataSource() : super('bill_types');
 }
 
-class StockReasonMongoDataSource extends BaseMongoDataSource {
+class StockReasonMongoDataSource extends BaseHiveDataSource {
   StockReasonMongoDataSource() : super('stock_reasons');
 }
 
-class BranchMongoDataSource extends BaseMongoDataSource {
+class BranchMongoDataSource extends BaseHiveDataSource {
   BranchMongoDataSource() : super('branches');
 }
 
-class UserMongoDataSource extends BaseMongoDataSource {
+class UserMongoDataSource extends BaseHiveDataSource {
   UserMongoDataSource() : super('users');
 }

@@ -87,11 +87,13 @@ class _ScreenLocationFormState extends State<ScreenLocationForm> {
         ? await controller.updateLocation(widget.locationId!, loc)
         : await controller.createLocation(loc);
 
+    if (!mounted) return;
+
     if (success) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(_isEditing ? 'Location updated' : 'Location created'), backgroundColor: Colors.green),
       );
-      context.pop();
+      Navigator.of(context).pop();
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(

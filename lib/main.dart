@@ -3,8 +3,7 @@ import 'imports/packages_imports.dart';
 import 'shared/wrappers/localization_wrapper.dart';
 import 'shared/wrappers/state_wrapper.dart';
 import 'app.dart';
-import 'services/mongo_service.dart';
-
+import 'package:hive_flutter/hive_flutter.dart';
 
 Future<void> main() async {
   final WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
@@ -15,12 +14,11 @@ Future<void> main() async {
 
   await AppConfig.init();
 
-  // Connect to MongoDB
+  // Initialize Hive
   try {
-    await MongoService().connect();
+    await Hive.initFlutter();
   } catch (e) {
-    // Print/log error but don't crash app startup if MongoDB isn't running locally yet
-    print('MongoDB connection failed: $e');
+    print('Hive initialization failed: $e');
   }
 
   runApp(

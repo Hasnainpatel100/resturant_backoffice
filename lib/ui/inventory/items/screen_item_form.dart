@@ -149,7 +149,9 @@ class _ItemFormViewState extends State<_ItemFormView> {
               backgroundColor: Colors.green,
             ),
           );
-          context.pop();
+          if (context.mounted) {
+            Navigator.of(context).pop();
+          }
         }
         if (state.status == ItemStatus.error) {
           ScaffoldMessenger.of(context).showSnackBar(

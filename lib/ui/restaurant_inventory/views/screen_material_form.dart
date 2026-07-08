@@ -142,11 +142,13 @@ class _ScreenMaterialFormState extends State<ScreenMaterialForm> {
         ? await controller.updateMaterial(widget.itemId!, mat)
         : await controller.createMaterial(mat);
 
+    if (!mounted) return;
+
     if (success) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(_isEditing ? 'Material updated' : 'Material created'), backgroundColor: Colors.green),
       );
-      context.pop();
+      Navigator.of(context).pop();
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(

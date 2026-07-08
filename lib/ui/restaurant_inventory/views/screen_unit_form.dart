@@ -65,11 +65,13 @@ class _ScreenUnitFormState extends State<ScreenUnitForm> {
         ? await controller.updateUnit(widget.unitId!, unit)
         : await controller.createUnit(unit);
 
+    if (!mounted) return;
+
     if (success) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(_isEditing ? 'Unit updated' : 'Unit created'), backgroundColor: Colors.green),
       );
-      context.pop();
+      Navigator.of(context).pop();
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(

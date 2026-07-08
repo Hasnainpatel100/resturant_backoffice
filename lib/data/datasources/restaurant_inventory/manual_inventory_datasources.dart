@@ -1,9 +1,9 @@
-import 'base_mongo_datasource.dart';
+import 'base_hive_datasource.dart';
 
-class ManualStockEntryMongoDataSource extends BaseMongoDataSource {
+class ManualStockEntryMongoDataSource extends BaseHiveDataSource {
   ManualStockEntryMongoDataSource() : super('manual_stock_entries');
 }
 
-class ManualStockOutMongoDataSource extends BaseMongoDataSource {
+class ManualStockOutMongoDataSource extends BaseHiveDataSource {
   ManualStockOutMongoDataSource() : super('manual_stock_outs');
 }

@@ -1,9 +1,9 @@
-import 'base_mongo_datasource.dart';
+import 'base_hive_datasource.dart';
 
-class IndentMongoDataSource extends BaseMongoDataSource {
+class IndentMongoDataSource extends BaseHiveDataSource {
   IndentMongoDataSource() : super('indents');
 }
 
-class StockTransferMongoDataSource extends BaseMongoDataSource {
+class StockTransferMongoDataSource extends BaseHiveDataSource {
   StockTransferMongoDataSource() : super('stock_transfers');
 }

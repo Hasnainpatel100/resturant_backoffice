@@ -98,7 +98,9 @@ class _WarehouseFormViewState extends State<_WarehouseFormView> {
               backgroundColor: Colors.green,
             ),
           );
-          context.pop();
+          if (context.mounted) {
+            Navigator.of(context).pop();
+          }
         }
         if (state.status == WarehouseStatus.error) {
           ScaffoldMessenger.of(context).showSnackBar(

@@ -101,7 +101,9 @@ class _CategoryFormViewState extends State<_CategoryFormView> {
               backgroundColor: Colors.green,
             ),
           );
-          context.pop();
+          if (context.mounted) {
+            Navigator.of(context).pop();
+          }
         }
         if (state.status == CategoryStatus.error) {
           ScaffoldMessenger.of(context).showSnackBar(
