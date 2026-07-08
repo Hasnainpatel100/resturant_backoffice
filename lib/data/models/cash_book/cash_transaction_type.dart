@@ -107,7 +107,7 @@ extension CashTransactionTypeExtension on CashTransactionType {
       case CashTransactionType.supplierPayment:
       case CashTransactionType.expense:
       case CashTransactionType.withdrawal:
-        return false;
+        return false; 
     }
   }
 

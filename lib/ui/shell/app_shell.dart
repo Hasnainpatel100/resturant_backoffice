@@ -248,24 +248,10 @@ class _DesktopSidebar extends StatelessWidget {
                   currentLocation: currentLocation,
                 ),
                 _NavItem(
-                  icon: Icons.add_circle_outline,
-                  activeIcon: Icons.add_circle,
-                  label: 'Add restaurant',
-                  route: AppRoutes.brandCreate,
-                  currentLocation: currentLocation,
-                ),
-                _NavItem(
                   icon: Icons.device_hub_outlined,
                   activeIcon: Icons.device_hub,
                   label: 'Branches',
                   route: branchesRoute,
-                  currentLocation: currentLocation,
-                ),
-                _NavItem(
-                  icon: Icons.add_circle_outline,
-                  activeIcon: Icons.add_circle,
-                  label: 'Add branch',
-                  route: branchCreateRoute,
                   currentLocation: currentLocation,
                 ),
 
