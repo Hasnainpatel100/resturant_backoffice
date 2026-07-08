@@ -152,6 +152,7 @@ class _DesktopSidebar extends StatelessWidget {
     final menuRoute = brandId != null ? '/brands/$brandId/menu' : AppRoutes.brandList;
     final posDevicesRoute = brandId != null ? '/brands/$brandId/pos-devices' : AppRoutes.brandList;
     final billsRoute = brandId != null ? '/brands/$brandId/bills' : AppRoutes.brandList;
+    final inventoryRoute = brandId != null ? '/brands/$brandId/inventory' : AppRoutes.brandList;
 
     return Container(
       width: 260,
@@ -216,7 +217,7 @@ class _DesktopSidebar extends StatelessWidget {
                   icon: Icons.inventory_2_outlined,
                   activeIcon: Icons.inventory_2,
                   label: 'common.inventory'.tr(),
-                  route: '/inventory',
+                  route: inventoryRoute,
                   currentLocation: currentLocation,
                 ),
                 _NavItem(
@@ -369,6 +370,7 @@ class _TabletSidebar extends StatelessWidget {
     final menuRoute = brandId != null ? '/brands/$brandId/menu' : AppRoutes.brandList;
     final posDevicesRoute = brandId != null ? '/brands/$brandId/pos-devices' : AppRoutes.brandList;
     final billsRoute = brandId != null ? '/brands/$brandId/bills' : AppRoutes.brandList;
+    final inventoryRoute = brandId != null ? '/brands/$brandId/inventory' : AppRoutes.brandList;
 
     return Container(
       width: 72,
@@ -399,6 +401,12 @@ class _TabletSidebar extends StatelessWidget {
                     icon: Icons.store,
                     label: 'common.brands'.tr(),
                     route: AppRoutes.brandList,
+                    currentLocation: currentLocation,
+                  ),
+                  _TabletNavItem(
+                    icon: Icons.inventory_2,
+                    label: 'common.inventory'.tr(),
+                    route: inventoryRoute,
                     currentLocation: currentLocation,
                   ),
                   _TabletNavItem(
@@ -499,7 +507,8 @@ class _TabletNavItem extends StatelessWidget {
               !currentLocation.contains('/room-types') &&
               !currentLocation.contains('/pos-devices') &&
               !currentLocation.contains('/menu') &&
-              !currentLocation.contains('/branches'));
+              !currentLocation.contains('/branches') &&
+              !currentLocation.contains('/inventory'));
     } else {
       isSelected = currentLocation.startsWith(route);
     }
@@ -566,6 +575,7 @@ class _MobileShell extends StatelessWidget {
   }
 
   String _getPageTitle(String location) {
+    if (location.contains('/inventory')) return 'Inventory';
     if (location.startsWith('/brands')) return 'Brands';
     if (location.startsWith('/tables')) return 'Tables';
     if (location.startsWith('/menu')) return 'Menu';
@@ -573,7 +583,6 @@ class _MobileShell extends StatelessWidget {
     if (location == '/profile') return 'Profile';
     if (location == '/home') return 'Home';
     if (location == '/users') return 'Users';
-    if (location == '/inventory') return 'Inventory';
     if (location == '/pos-devices' || location == '/all-pos-devices') return 'POS Devices';
     if (location.contains('/bills')) return 'Bills';
     if (location.startsWith('/feedback')) return 'Feedback';
@@ -600,6 +609,7 @@ class _MobileDrawer extends StatelessWidget {
     final menuRoute = brandId != null ? '/brands/$brandId/menu' : AppRoutes.brandList;
     final posDevicesRoute = brandId != null ? '/brands/$brandId/pos-devices' : AppRoutes.brandList;
     final billsRoute = brandId != null ? '/brands/$brandId/bills' : AppRoutes.brandList;
+    final inventoryRoute = brandId != null ? '/brands/$brandId/inventory' : AppRoutes.brandList;
 
     return Drawer(
       child: ListView(
@@ -634,10 +644,20 @@ class _MobileDrawer extends StatelessWidget {
                 !currentLocation.contains('/tables') &&
                 !currentLocation.contains('/room-types') &&
                 !currentLocation.contains('/pos-devices') &&
-                !currentLocation.contains('/menu'),
+                !currentLocation.contains('/menu') &&
+                !currentLocation.contains('/inventory'),
             onTap: () {
               Navigator.pop(context);
               context.go(AppRoutes.brandList);
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.inventory_2),
+            title: Text('common.inventory'.tr()),
+            selected: currentLocation.startsWith(inventoryRoute) && brandId != null,
+            onTap: () {
+              Navigator.pop(context);
+              context.go(inventoryRoute);
             },
           ),
           ListTile(
@@ -932,7 +952,8 @@ class _NavItem extends StatelessWidget {
               !currentLocation.contains('/room-types') &&
               !currentLocation.contains('/pos-devices') &&
               !currentLocation.contains('/menu') &&
-              !currentLocation.contains('/branches'));
+              !currentLocation.contains('/branches') &&
+              !currentLocation.contains('/inventory'));
     } else {
       isSelected = currentLocation.startsWith(route);
     }
