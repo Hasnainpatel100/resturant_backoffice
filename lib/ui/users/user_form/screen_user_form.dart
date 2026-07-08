@@ -235,35 +235,28 @@ class _UserFormViewState extends State<_UserFormView> {
               ? const Center(child: CircularProgressIndicator())
               : Form(
                   key: _formKey,
-                  child: Center(
-                    child: ConstrainedBox(
-                      constraints: const BoxConstraints(maxWidth: 800),
-                      child: ListView(
-                        padding: EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.md),
-                        children: [
-                          if (!_isEditing) ..._buildCreateFields(state),
-                          if (_isEditing)
-                            Padding(
-                              padding: EdgeInsets.only(bottom: AppSpacing.lg),
-                              child: Text(
-                                'Update Permissions',
-                                style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
-                              ),
-                            ),
-                          if (_isEditing)
-                            Padding(
-                              padding: EdgeInsets.only(bottom: AppSpacing.md),
-                              child: Text(
-                                'You can only modify the permissions for this user.',
-                                style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Theme.of(context).colorScheme.outline),
-                              ),
-                            ),
-                          if (!_isEditing) SizedBox(height: AppSpacing.lg),
-                          _buildPermissionsSection(),
-                          SizedBox(height: AppSpacing.xxl),
-                        ],
-                      ),
-                    ),
+                  child: ListView(
+                    padding: EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.md),
+                    children: [
+                      if (!_isEditing) ..._buildCreateFields(state),
+                      if (_isEditing)
+                        Padding(
+                          padding: EdgeInsets.only(bottom: AppSpacing.lg),
+                          child: Text('common.update_permissions'.tr(),
+                            style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                      if (_isEditing)
+                        Padding(
+                          padding: EdgeInsets.only(bottom: AppSpacing.md),
+                          child: Text('common.you_can_only_modify_the_permis'.tr(),
+                            style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Theme.of(context).colorScheme.outline),
+                          ),
+                        ),
+                      if (!_isEditing) SizedBox(height: AppSpacing.lg),
+                      _buildPermissionsSection(),
+                      SizedBox(height: AppSpacing.xxl),
+                    ],
                   ),
                 ),
           bottomNavigationBar: SafeArea(
@@ -274,7 +267,7 @@ class _UserFormViewState extends State<_UserFormView> {
                   Expanded(
                     child: OutlinedButton(
                       onPressed: () => context.go('/brands/${widget.brandId}/users'),
-                      child: const Text('Cancel'),
+                      child: Text('common.cancel'.tr()),
                     ),
                   ),
                   SizedBox(width: AppSpacing.md),
@@ -299,216 +292,130 @@ class _UserFormViewState extends State<_UserFormView> {
     final cs = Theme.of(context).colorScheme;
 
     return [
-      Text(
-        'Basic Information',
+      Text('common.basic_information'.tr(),
         style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
       ),
       SizedBox(height: AppSpacing.sm),
-      Text(
-        'Enter the fundamental details for this user.',
+      Text('common.enter_the_fundamental_details'.tr(),
         style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: cs.outline),
       ),
       SizedBox(height: AppSpacing.md),
-      Container(
-        decoration: BoxDecoration(
-          color: cs.surfaceContainerLowest,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: cs.outlineVariant.withOpacity(0.6), width: 1),
-          boxShadow: [
-            BoxShadow(
-              color: cs.shadow.withOpacity(0.03),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
-            ),
-          ],
+      Card(
+        elevation: 0,
+        shape: RoundedRectangleBorder(
+          borderRadius: AppBorders.lg,
+          side: BorderSide(color: cs.outlineVariant.withOpacity(0.5)),
         ),
-        padding: EdgeInsets.all(AppSpacing.lg),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            LayoutBuilder(
-              builder: (context, constraints) {
-                if (constraints.maxWidth > 550) {
-                  return Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Expanded(
-                        child: DropdownButtonFormField<String>(
-                          value: _selectedUserType,
-                          decoration: const InputDecoration(
-                            labelText: 'User Type',
-                          ),
-                          items: _userTypes
-                              .map((type) => DropdownMenuItem(value: type, child: Text(type)))
-                              .toList(),
-                          onChanged: _isEditing ? null : (value) => setState(() => _selectedUserType = value!),
-                          validator: (v) => v == null ? 'Required' : null,
-                        ),
+        color: cs.surface,
+        child: Padding(
+          padding: EdgeInsets.all(AppSpacing.lg),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Expanded(
+                    child: DropdownButtonFormField<String>(
+                      value: _selectedUserType,
+                      decoration: InputDecoration(
+                        labelText: 'User Type',
+                        border: const OutlineInputBorder(borderRadius: AppBorders.sm),
+                        filled: true,
+                        fillColor: cs.surfaceContainerLowest,
                       ),
-                      SizedBox(width: AppSpacing.md),
-                      Expanded(
-                        child: DropdownButtonFormField<String>(
-                          value: _selectedRole,
-                          decoration: const InputDecoration(
-                            labelText: 'Role',
-                          ),
-                          items: _roles
-                              .map((role) => DropdownMenuItem(value: role, child: Text(role)))
-                              .toList(),
-                          onChanged: _isEditing ? null : (value) => setState(() => _selectedRole = value!),
-                          validator: (v) => v == null ? 'Required' : null,
-                        ),
+                      items: _userTypes
+                          .map((type) => DropdownMenuItem(value: type, child: Text(type)))
+                          .toList(),
+                      onChanged: _isEditing ? null : (value) => setState(() => _selectedUserType = value!),
+                      validator: (v) => v == null ? 'Required' : null,
+                    ),
+                  ),
+                  SizedBox(width: AppSpacing.md),
+                  Expanded(
+                    child: DropdownButtonFormField<String>(
+                      value: _selectedRole,
+                      decoration: InputDecoration(
+                        labelText: 'Role',
+                        border: const OutlineInputBorder(borderRadius: AppBorders.sm),
+                        filled: true,
+                        fillColor: cs.surfaceContainerLowest,
                       ),
-                    ],
-                  );
-                } else {
-                  return Column(
-                    children: [
-                      DropdownButtonFormField<String>(
-                        value: _selectedUserType,
-                        decoration: const InputDecoration(
-                          labelText: 'User Type',
-                        ),
-                        items: _userTypes
-                            .map((type) => DropdownMenuItem(value: type, child: Text(type)))
-                            .toList(),
-                        onChanged: _isEditing ? null : (value) => setState(() => _selectedUserType = value!),
-                        validator: (v) => v == null ? 'Required' : null,
-                      ),
-                      SizedBox(height: AppSpacing.md),
-                      DropdownButtonFormField<String>(
-                        value: _selectedRole,
-                        decoration: const InputDecoration(
-                          labelText: 'Role',
-                        ),
-                        items: _roles
-                            .map((role) => DropdownMenuItem(value: role, child: Text(role)))
-                            .toList(),
-                        onChanged: _isEditing ? null : (value) => setState(() => _selectedRole = value!),
-                        validator: (v) => v == null ? 'Required' : null,
-                      ),
-                    ],
-                  );
-                }
-              },
-            ),
-            SizedBox(height: AppSpacing.lg),
-            LayoutBuilder(
-              builder: (context, constraints) {
-                if (constraints.maxWidth > 550) {
-                  return Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Expanded(
-                        child: AppTextField(
-                          controller: _firstNameCtrl,
-                          label: 'First Name',
-                          readOnly: _isEditing,
-                          validator: (v) => (v?.isEmpty ?? true) ? 'Required' : null,
-                        ),
-                      ),
-                      SizedBox(width: AppSpacing.md),
-                      Expanded(
-                        child: AppTextField(
-                          controller: _lastNameCtrl,
-                          label: 'Last Name',
-                          readOnly: _isEditing,
-                          validator: (v) => (v?.isEmpty ?? true) ? 'Required' : null,
-                        ),
-                      ),
-                    ],
-                  );
-                } else {
-                  return Column(
-                    children: [
-                      AppTextField(
-                        controller: _firstNameCtrl,
-                        label: 'First Name',
-                        readOnly: _isEditing,
-                        validator: (v) => (v?.isEmpty ?? true) ? 'Required' : null,
-                      ),
-                      SizedBox(height: AppSpacing.md),
-                      AppTextField(
-                        controller: _lastNameCtrl,
-                        label: 'Last Name',
-                        readOnly: _isEditing,
-                        validator: (v) => (v?.isEmpty ?? true) ? 'Required' : null,
-                      ),
-                    ],
-                  );
-                }
-              },
-            ),
-            SizedBox(height: AppSpacing.lg),
-            AppTextField(
-              controller: _usernameCtrl,
-              label: 'Username',
-              readOnly: _isEditing,
-              validator: (v) => (v?.isEmpty ?? true) ? 'Required' : null,
-            ),
-            if (!_isEditing) ...[
+                      items: _roles
+                          .map((role) => DropdownMenuItem(value: role, child: Text(role)))
+                          .toList(),
+                      onChanged: _isEditing ? null : (value) => setState(() => _selectedRole = value!),
+                      validator: (v) => v == null ? 'Required' : null,
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: AppSpacing.lg),
+              Row(
+                children: [
+                  Expanded(
+                    child: AppTextField(
+                      controller: _firstNameCtrl,
+                      label: 'common.first_name'.tr(),
+                      readOnly: _isEditing,
+                      validator: (v) => (v?.isEmpty ?? true) ? 'Required' : null,
+                    ),
+                  ),
+                  SizedBox(width: AppSpacing.md),
+                  Expanded(
+                    child: AppTextField(
+                      controller: _lastNameCtrl,
+                      label: 'common.last_name'.tr(),
+                      readOnly: _isEditing,
+                      validator: (v) => (v?.isEmpty ?? true) ? 'Required' : null,
+                    ),
+                  ),
+                ],
+              ),
               SizedBox(height: AppSpacing.lg),
               AppTextField(
-                controller: _pinCtrl,
-                label: 'Login PIN (6 digits)',
-                keyboardType: TextInputType.number,
-                obscureText: true,
+                controller: _usernameCtrl,
+                label: 'common.username'.tr(),
                 readOnly: _isEditing,
-                validator: (v) => v == null || v.length != 6 ? 'PIN must be 6 digits' : null,
+                validator: (v) => (v?.isEmpty ?? true) ? 'Required' : null,
               ),
+              if (!_isEditing) ...[
+                SizedBox(height: AppSpacing.lg),
+                AppTextField(
+                  controller: _pinCtrl,
+                  label: 'common.login_pin_6_digits'.tr(),
+                  keyboardType: TextInputType.number,
+                  obscureText: true,
+                  readOnly: _isEditing,
+                  validator: (v) => v == null || v.length != 6 ? 'PIN must be 6 digits' : null,
+                ),
+              ],
+              SizedBox(height: AppSpacing.lg),
+              Row(
+                children: [
+                  Expanded(
+                    child: AppTextField(
+                      controller: _emailCtrl,
+                      label: 'common.email'.tr(),
+                      keyboardType: TextInputType.emailAddress,
+                      readOnly: _isEditing,
+                      validator: (v) => (v?.isEmpty ?? true) ? 'Required' : null,
+                    ),
+                  ),
+                  SizedBox(width: AppSpacing.md),
+                  Expanded(
+                    child: AppTextField(
+                      controller: _phoneCtrl,
+                      label: 'common.phone_number'.tr(),
+                      keyboardType: TextInputType.phone,
+                      readOnly: _isEditing,
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: AppSpacing.lg),
+              _buildBranchDropdown(state),
             ],
-            SizedBox(height: AppSpacing.lg),
-            LayoutBuilder(
-              builder: (context, constraints) {
-                if (constraints.maxWidth > 550) {
-                  return Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Expanded(
-                        child: AppTextField(
-                          controller: _emailCtrl,
-                          label: 'Email',
-                          keyboardType: TextInputType.emailAddress,
-                          readOnly: _isEditing,
-                          validator: (v) => (v?.isEmpty ?? true) ? 'Required' : null,
-                        ),
-                      ),
-                      SizedBox(width: AppSpacing.md),
-                      Expanded(
-                        child: AppTextField(
-                          controller: _phoneCtrl,
-                          label: 'Phone Number',
-                          keyboardType: TextInputType.phone,
-                          readOnly: _isEditing,
-                        ),
-                      ),
-                    ],
-                  );
-                } else {
-                  return Column(
-                    children: [
-                      AppTextField(
-                        controller: _emailCtrl,
-                        label: 'Email',
-                        keyboardType: TextInputType.emailAddress,
-                        readOnly: _isEditing,
-                        validator: (v) => (v?.isEmpty ?? true) ? 'Required' : null,
-                      ),
-                      SizedBox(height: AppSpacing.md),
-                      AppTextField(
-                        controller: _phoneCtrl,
-                        label: 'Phone Number',
-                        keyboardType: TextInputType.phone,
-                        readOnly: _isEditing,
-                      ),
-                    ],
-                  );
-                }
-              },
-            ),
-            SizedBox(height: AppSpacing.lg),
-            _buildBranchDropdown(state),
-          ],
+          ),
         ),
       ),
     ];
@@ -518,13 +425,12 @@ class _UserFormViewState extends State<_UserFormView> {
     final cs = Theme.of(context).colorScheme;
     if (state.status == UserStatus.loading && state.branches.isEmpty) {
       return const Padding(
-        padding: EdgeInsets.all(8.0),
+        padding: EdgeInsets.all(8),
         child: Center(child: CircularProgressIndicator()),
       );
     }
     if (state.branches.isEmpty) {
-      return Text(
-        'No branches found. Create a branch first.',
+      return Text('common.no_branches_found_create_a_bra'.tr(),
         style: TextStyle(color: cs.error),
       );
     }
@@ -536,12 +442,15 @@ class _UserFormViewState extends State<_UserFormView> {
 
     return DropdownButtonFormField<String>(
       value: _selectedBranchId,
-      decoration: const InputDecoration(
+      decoration: InputDecoration(
         labelText: 'Branch (Optional)',
+        border: const OutlineInputBorder(borderRadius: AppBorders.sm),
+        filled: true,
+        fillColor: cs.surfaceContainerLowest,
       ),
-      hint: const Text('Select branch'),
+      hint: Text('common.select_branch'.tr()),
       items: [
-        const DropdownMenuItem<String>(value: null, child: Text('None (Brand Level)')),
+        DropdownMenuItem<String>(value: null, child: Text('common.none_brand_level'.tr())),
         ...state.branches.map((b) => DropdownMenuItem(value: b.id, child: Text(b.displayName))),
       ],
       onChanged: _isEditing ? null : (value) => setState(() => _selectedBranchId = value),
@@ -559,8 +468,7 @@ class _UserFormViewState extends State<_UserFormView> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
-              'Permissions',
+            Text('common.permissions'.tr(),
               style: Theme.of(context).textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
@@ -573,7 +481,7 @@ class _UserFormViewState extends State<_UserFormView> {
                       _selectedPermissions = List<String>.from(_allPermissions);
                     });
                   },
-                  child: const Text('Select All'),
+                  child: Text('common.select_all'.tr()),
                 ),
                 TextButton(
                   onPressed: () {
@@ -581,7 +489,7 @@ class _UserFormViewState extends State<_UserFormView> {
                       _selectedPermissions = [];
                     });
                   },
-                  child: const Text('Clear All'),
+                  child: Text('common.clear_all'.tr()),
                 ),
               ],
             ),
@@ -660,7 +568,7 @@ class _UserFormViewState extends State<_UserFormView> {
 
                         return FilterChip(
                           selected: isSelected,
-                          label: Text(displayName, style: TextStyle(fontSize: 13)),
+                          label: Text(displayName, style: const TextStyle(fontSize: 13)),
                           onSelected: (selected) {
                             setState(() {
                               if (selected) {
@@ -673,7 +581,7 @@ class _UserFormViewState extends State<_UserFormView> {
                           backgroundColor: cs.surfaceContainerHigh,
                           selectedColor: cs.primaryContainer,
                           checkmarkColor: cs.onPrimaryContainer,
-                          shape: RoundedRectangleBorder(borderRadius: AppBorders.sm),
+                          shape: const RoundedRectangleBorder(borderRadius: AppBorders.sm),
                         );
                       }).toList(),
                     ),

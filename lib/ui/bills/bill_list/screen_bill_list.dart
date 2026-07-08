@@ -52,7 +52,7 @@ class _ScreenBillListState extends State<ScreenBillList> {
       ],
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('Bills'),
+          title: Text('common.bills'.tr()),
           leading: IconButton(
             icon: const Icon(Icons.arrow_back),
             onPressed: () => context.go('/brands/${widget.brandId}'),
@@ -82,7 +82,7 @@ class _ScreenBillListState extends State<ScreenBillList> {
                     child: TextField(
                       controller: _searchController,
                       decoration: InputDecoration(
-                        hintText: 'Search by bill number, table, waiter...',
+                        hintText: 'common.search_by_bill_number_table_wa'.tr(),
                         prefixIcon: const Icon(Icons.search),
                         border: const OutlineInputBorder(),
                         suffixIcon: _searchQuery.isNotEmpty
@@ -119,9 +119,9 @@ class _ScreenBillListState extends State<ScreenBillList> {
                           ),
                           value: hasSelected ? (_selectedBranchId ?? '') : '',
                           items: [
-                            const DropdownMenuItem<String>(
+                            DropdownMenuItem<String>(
                               value: '',
-                              child: Text('All Branches'),
+                              child: Text('common.all_branches'.tr()),
                             ),
                             ...branchState.branches.map((b) {
                               return DropdownMenuItem<String>(
@@ -165,7 +165,7 @@ class _ScreenBillListState extends State<ScreenBillList> {
                             onPressed: () {
                               context.read<CubitBill>().loadBills(widget.brandId, _selectedBranchId);
                             },
-                            child: const Text('Retry'),
+                            child: Text('common.retry'.tr()),
                           ),
                         ],
                       ),

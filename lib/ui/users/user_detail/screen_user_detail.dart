@@ -36,7 +36,7 @@ class _UserDetailView extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('User Details'),
+        title: Text('common.user_details'.tr()),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => context.go('/brands/$brandId/users'),
@@ -67,7 +67,7 @@ class _UserDetailView extends StatelessWidget {
 
           final userProfile = state.user;
           if (userProfile == null) {
-            return const Center(child: Text('User not found'));
+            return Center(child: Text('common.user_not_found'.tr()));
           }
 
           final user = userProfile.user;
@@ -163,11 +163,11 @@ class _UserDetailView extends StatelessWidget {
                 children: [
                   Icon(Icons.security_outlined, size: 20, color: cs.primary),
                   SizedBox(width: AppSpacing.sm),
-                  Text('Permissions', style: Theme.of(context).textTheme.titleMedium),
+                  Text('common.permissions'.tr(), style: Theme.of(context).textTheme.titleMedium),
                 ],
               ),
               const Divider(),
-              Text('No permissions assigned', style: TextStyle(color: cs.outline)),
+              Text('common.no_permissions_assigned'.tr(), style: TextStyle(color: cs.outline)),
             ],
           ),
         ),
@@ -184,7 +184,7 @@ class _UserDetailView extends StatelessWidget {
               children: [
                 Icon(Icons.security_outlined, size: 20, color: cs.primary),
                 SizedBox(width: AppSpacing.sm),
-                Text('Permissions', style: Theme.of(context).textTheme.titleMedium),
+                Text('common.permissions'.tr(), style: Theme.of(context).textTheme.titleMedium),
                 const Spacer(),
                 Text(
                   '${permissions.length} assigned',

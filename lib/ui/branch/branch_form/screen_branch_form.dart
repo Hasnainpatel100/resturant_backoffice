@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:back_office/imports/core_imports.dart';
@@ -155,482 +154,256 @@ class _BranchFormViewState extends State<_BranchFormView> {
               ? const Center(child: CircularProgressIndicator())
               : Form(
                   key: _formKey,
-                  child: Center(
-                    child: ConstrainedBox(
-                      constraints: const BoxConstraints(maxWidth: 800),
-                      child: ListView(
-                        padding: EdgeInsets.all(AppSpacing.lg),
-                        children: [
-                          // ── Branch Identity ──
-                          _SectionHeader(
-                            icon: Icons.store,
-                            title: 'Branch Identity',
-                            color: cs.primary,
-                          ),
-                          SizedBox(height: AppSpacing.md),
-                          Container(
-                            decoration: BoxDecoration(
-                              color: cs.surfaceContainerLowest,
-                              borderRadius: BorderRadius.circular(16),
-                              border: Border.all(color: cs.outlineVariant.withOpacity(0.6), width: 1),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: cs.shadow.withOpacity(0.03),
-                                  blurRadius: 10,
-                                  offset: const Offset(0, 4),
-                                ),
-                              ],
-                            ),
-                            padding: EdgeInsets.all(AppSpacing.lg),
-                            child: Column(
-                              children: [
-                                LayoutBuilder(
-                                  builder: (context, constraints) {
-                                    if (constraints.maxWidth > 550) {
-                                      return Row(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          Expanded(
-                                            child: AppTextField(
-                                              controller: _nameController,
-                                              label: 'Branch Name *',
-                                              prefixIcon: const Icon(Icons.store),
-                                              validator: (v) =>
-                                                  v?.isEmpty == true ? 'Branch name is required' : null,
-                                            ),
-                                          ),
-                                          SizedBox(width: AppSpacing.md),
-                                          Expanded(
-                                            child: AppTextField(
-                                              controller: _branchCodeController,
-                                              label: 'Branch Code',
-                                              prefixIcon: const Icon(Icons.tag),
-                                            ),
-                                          ),
-                                        ],
-                                      );
-                                    } else {
-                                      return Column(
-                                        children: [
-                                          AppTextField(
-                                            controller: _nameController,
-                                            label: 'Branch Name *',
-                                            prefixIcon: const Icon(Icons.store),
-                                            validator: (v) =>
-                                                v?.isEmpty == true ? 'Branch name is required' : null,
-                                          ),
-                                          SizedBox(height: AppSpacing.md),
-                                          AppTextField(
-                                            controller: _branchCodeController,
-                                            label: 'Branch Code',
-                                            prefixIcon: const Icon(Icons.tag),
-                                          ),
-                                        ],
-                                      );
-                                    }
-                                  },
-                                ),
-                              ],
-                            ),
-                          ),
-
-                          SizedBox(height: AppSpacing.xl),
-
-                          // ── Contact ──
-                          _SectionHeader(
-                            icon: Icons.contact_phone,
-                            title: 'Contact Information',
-                            color: Colors.teal,
-                          ),
-                          SizedBox(height: AppSpacing.md),
-                          Container(
-                            decoration: BoxDecoration(
-                              color: cs.surfaceContainerLowest,
-                              borderRadius: BorderRadius.circular(16),
-                              border: Border.all(color: cs.outlineVariant.withOpacity(0.6), width: 1),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: cs.shadow.withOpacity(0.03),
-                                  blurRadius: 10,
-                                  offset: const Offset(0, 4),
-                                ),
-                              ],
-                            ),
-                            padding: EdgeInsets.all(AppSpacing.lg),
-                            child: Column(
-                              children: [
-                                LayoutBuilder(
-                                  builder: (context, constraints) {
-                                    if (constraints.maxWidth > 550) {
-                                      return Row(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          Expanded(
-                                            child: AppTextField(
-                                              controller: _emailController,
-                                              label: 'Email',
-                                              prefixIcon: const Icon(Icons.email_outlined),
-                                              keyboardType: TextInputType.emailAddress,
-                                            ),
-                                          ),
-                                          SizedBox(width: AppSpacing.md),
-                                          Expanded(
-                                            child: AppTextField(
-                                              controller: _phoneController,
-                                              label: 'Phone',
-                                              prefixIcon: const Icon(Icons.phone_outlined),
-                                              keyboardType: TextInputType.phone,
-                                            ),
-                                          ),
-                                        ],
-                                      );
-                                    } else {
-                                      return Column(
-                                        children: [
-                                          AppTextField(
-                                            controller: _emailController,
-                                            label: 'Email',
-                                            prefixIcon: const Icon(Icons.email_outlined),
-                                            keyboardType: TextInputType.emailAddress,
-                                          ),
-                                          SizedBox(height: AppSpacing.md),
-                                          AppTextField(
-                                            controller: _phoneController,
-                                            label: 'Phone',
-                                            prefixIcon: const Icon(Icons.phone_outlined),
-                                            keyboardType: TextInputType.phone,
-                                          ),
-                                        ],
-                                      );
-                                    }
-                                  },
-                                ),
-                              ],
-                            ),
-                          ),
-
-                          SizedBox(height: AppSpacing.xl),
-
-                          // ── Address ──
-                          _SectionHeader(
-                            icon: Icons.location_on,
-                            title: 'Address',
-                            color: Colors.blue,
-                          ),
-                          SizedBox(height: AppSpacing.md),
-                          Container(
-                            decoration: BoxDecoration(
-                              color: cs.surfaceContainerLowest,
-                              borderRadius: BorderRadius.circular(16),
-                              border: Border.all(color: cs.outlineVariant.withOpacity(0.6), width: 1),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: cs.shadow.withOpacity(0.03),
-                                  blurRadius: 10,
-                                  offset: const Offset(0, 4),
-                                ),
-                              ],
-                            ),
-                            padding: EdgeInsets.all(AppSpacing.lg),
-                            child: Column(
-                              children: [
-                                AppTextField(
-                                  controller: _addressFullController,
-                                  label: 'Full Address',
-                                  prefixIcon: const Icon(Icons.home_outlined),
-                                  maxLines: 2,
-                                ),
-                                SizedBox(height: AppSpacing.md),
-                                LayoutBuilder(
-                                  builder: (context, constraints) {
-                                    if (constraints.maxWidth > 550) {
-                                      return Row(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          Expanded(
-                                            child: AppTextField(
-                                              controller: _cityController,
-                                              label: 'City',
-                                              prefixIcon: const Icon(Icons.location_city),
-                                            ),
-                                          ),
-                                          SizedBox(width: AppSpacing.md),
-                                          Expanded(
-                                            child: AppTextField(
-                                              controller: _stateController,
-                                              label: 'State',
-                                              prefixIcon: const Icon(Icons.map_outlined),
-                                            ),
-                                          ),
-                                        ],
-                                      );
-                                    } else {
-                                      return Column(
-                                        children: [
-                                          AppTextField(
-                                            controller: _cityController,
-                                            label: 'City',
-                                            prefixIcon: const Icon(Icons.location_city),
-                                          ),
-                                          SizedBox(height: AppSpacing.md),
-                                          AppTextField(
-                                            controller: _stateController,
-                                            label: 'State',
-                                            prefixIcon: const Icon(Icons.map_outlined),
-                                          ),
-                                        ],
-                                      );
-                                    }
-                                  },
-                                ),
-                                SizedBox(height: AppSpacing.md),
-                                LayoutBuilder(
-                                  builder: (context, constraints) {
-                                    if (constraints.maxWidth > 550) {
-                                      return Row(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          Expanded(
-                                            child: AppTextField(
-                                              controller: _countryController,
-                                              label: 'Country',
-                                              prefixIcon: const Icon(Icons.public),
-                                            ),
-                                          ),
-                                          SizedBox(width: AppSpacing.md),
-                                          Expanded(
-                                            child: AppTextField(
-                                              controller: _zipCodeController,
-                                              label: 'ZIP Code',
-                                              prefixIcon: const Icon(Icons.pin_drop),
-                                              keyboardType: TextInputType.number,
-                                            ),
-                                          ),
-                                        ],
-                                      );
-                                    } else {
-                                      return Column(
-                                        children: [
-                                          AppTextField(
-                                            controller: _countryController,
-                                            label: 'Country',
-                                            prefixIcon: const Icon(Icons.public),
-                                          ),
-                                          SizedBox(height: AppSpacing.md),
-                                          AppTextField(
-                                            controller: _zipCodeController,
-                                            label: 'ZIP Code',
-                                            prefixIcon: const Icon(Icons.pin_drop),
-                                            keyboardType: TextInputType.number,
-                                          ),
-                                        ],
-                                      );
-                                    }
-                                  },
-                                ),
-                              ],
-                            ),
-                          ),
-
-                          SizedBox(height: AppSpacing.xl),
-
-                          // ── Registration ──
-                          _SectionHeader(
-                            icon: Icons.description,
-                            title: 'Registration Details',
-                            color: Colors.orange,
-                          ),
-                          SizedBox(height: AppSpacing.md),
-                          Container(
-                            decoration: BoxDecoration(
-                              color: cs.surfaceContainerLowest,
-                              borderRadius: BorderRadius.circular(16),
-                              border: Border.all(color: cs.outlineVariant.withOpacity(0.6), width: 1),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: cs.shadow.withOpacity(0.03),
-                                  blurRadius: 10,
-                                  offset: const Offset(0, 4),
-                                ),
-                              ],
-                            ),
-                            padding: EdgeInsets.all(AppSpacing.lg),
-                            child: Column(
-                              children: [
-                                LayoutBuilder(
-                                  builder: (context, constraints) {
-                                    if (constraints.maxWidth > 550) {
-                                      return Row(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          Expanded(
-                                            child: AppTextField(
-                                              controller: _gstNoController,
-                                              label: 'GST Number',
-                                              prefixIcon: const Icon(Icons.receipt_long),
-                                            ),
-                                          ),
-                                          SizedBox(width: AppSpacing.md),
-                                          Expanded(
-                                            child: AppTextField(
-                                              controller: _fssaiNoController,
-                                              label: 'FSSAI Number',
-                                              prefixIcon: const Icon(Icons.verified_outlined),
-                                            ),
-                                          ),
-                                        ],
-                                      );
-                                    } else {
-                                      return Column(
-                                        children: [
-                                          AppTextField(
-                                            controller: _gstNoController,
-                                            label: 'GST Number',
-                                            prefixIcon: const Icon(Icons.receipt_long),
-                                          ),
-                                          SizedBox(height: AppSpacing.md),
-                                          AppTextField(
-                                            controller: _fssaiNoController,
-                                            label: 'FSSAI Number',
-                                            prefixIcon: const Icon(Icons.verified_outlined),
-                                          ),
-                                        ],
-                                      );
-                                    }
-                                  },
-                                ),
-                              ],
-                            ),
-                          ),
-
-                          SizedBox(height: AppSpacing.xl),
-
-                          // ── Settings ──
-                          _SectionHeader(
-                            icon: Icons.settings,
-                            title: 'Operating Hours',
-                            color: Colors.purple,
-                          ),
-                          SizedBox(height: AppSpacing.md),
-                          Container(
-                            decoration: BoxDecoration(
-                              color: cs.surfaceContainerLowest,
-                              borderRadius: BorderRadius.circular(16),
-                              border: Border.all(color: cs.outlineVariant.withOpacity(0.6), width: 1),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: cs.shadow.withOpacity(0.03),
-                                  blurRadius: 10,
-                                  offset: const Offset(0, 4),
-                                ),
-                              ],
-                            ),
-                            padding: EdgeInsets.all(AppSpacing.lg),
-                            child: Column(
-                              children: [
-                                LayoutBuilder(
-                                  builder: (context, constraints) {
-                                    if (constraints.maxWidth > 550) {
-                                      return Row(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          Expanded(
-                                            child: AppTextField(
-                                              controller: _openTimeController,
-                                              label: 'Opening Time',
-                                              hint: 'e.g. 09:00 AM',
-                                              prefixIcon: const Icon(Icons.access_time),
-                                            ),
-                                          ),
-                                          SizedBox(width: AppSpacing.md),
-                                          Expanded(
-                                            child: AppTextField(
-                                              controller: _closeTimeController,
-                                              label: 'Closing Time',
-                                              hint: 'e.g. 11:00 PM',
-                                              prefixIcon: const Icon(Icons.access_time_filled),
-                                            ),
-                                          ),
-                                        ],
-                                      );
-                                    } else {
-                                      return Column(
-                                        children: [
-                                          AppTextField(
-                                            controller: _openTimeController,
-                                            label: 'Opening Time',
-                                            hint: 'e.g. 09:00 AM',
-                                            prefixIcon: const Icon(Icons.access_time),
-                                          ),
-                                          SizedBox(height: AppSpacing.md),
-                                          AppTextField(
-                                            controller: _closeTimeController,
-                                            label: 'Closing Time',
-                                            hint: 'e.g. 11:00 PM',
-                                            prefixIcon: const Icon(Icons.access_time_filled),
-                                          ),
-                                        ],
-                                      );
-                                    }
-                                  },
-                                ),
-                                SizedBox(height: AppSpacing.md),
-                                SwitchListTile(
-                                  title: const Text('Master Branch'),
-                                  subtitle:
-                                      const Text('This is the primary branch of the brand'),
-                                  value: _isMasterBranch,
-                                  onChanged: (v) => setState(() => _isMasterBranch = v),
-                                  contentPadding: EdgeInsets.zero,
-                                ),
-                              ],
-                            ),
-                          ),
-
-                          SizedBox(height: AppSpacing.xxl),
-                          const Divider(),
-                          SizedBox(height: AppSpacing.lg),
-
-                          // ── Actions ──
-                          Row(
+                  child: ListView(
+                    padding: EdgeInsets.all(AppSpacing.md),
+                    children: [
+                      // ── Branch Identity ──
+                      _SectionHeader(
+                        icon: Icons.store,
+                        title: 'Branch Identity',
+                        color: cs.primary,
+                      ),
+                      SizedBox(height: AppSpacing.sm),
+                      Card(
+                        child: Padding(
+                          padding: EdgeInsets.all(AppSpacing.md),
+                          child: Column(
                             children: [
-                              Expanded(
-                                child: OutlinedButton.icon(
-                                  onPressed: isLoading ? null : _goBack,
-                                  icon: const Icon(Icons.close),
-                                  label: const Text('Cancel'),
-                                  style: OutlinedButton.styleFrom(
-                                    padding: const EdgeInsets.symmetric(vertical: 16),
-                                  ),
-                                ),
+                              AppTextField(
+                                controller: _nameController,
+                                label: 'common.branch_name'.tr(),
+                                prefixIcon: const Icon(Icons.store),
+                                validator: (v) =>
+                                    v?.isEmpty ?? false ? 'Branch name is required' : null,
                               ),
-                              SizedBox(width: AppSpacing.md),
-                              Expanded(
-                                flex: 2,
-                                child: FilledButton.icon(
-                                  onPressed: isLoading ? null : _submitForm,
-                                  icon: isLoading
-                                      ? const SizedBox(
-                                          width: 18,
-                                          height: 18,
-                                          child: CircularProgressIndicator(
-                                            strokeWidth: 2,
-                                            color: Colors.white,
-                                          ),
-                                        )
-                                      : Icon(isEditing ? Icons.save : Icons.add),
-                                  label: Text(isEditing ? 'Update Branch' : 'Create Branch'),
-                                  style: FilledButton.styleFrom(
-                                    padding: const EdgeInsets.symmetric(vertical: 16),
-                                  ),
-                                ),
+                              SizedBox(height: AppSpacing.md),
+                              AppTextField(
+                                controller: _branchCodeController,
+                                label: 'common.branch_code'.tr(),
+                                prefixIcon: const Icon(Icons.tag),
                               ),
                             ],
                           ),
-                          SizedBox(height: AppSpacing.xxl),
+                        ),
+                      ),
+
+                      SizedBox(height: AppSpacing.lg),
+
+                      // ── Contact ──
+                      const _SectionHeader(
+                        icon: Icons.contact_phone,
+                        title: 'Contact Information',
+                        color: Colors.teal,
+                      ),
+                      SizedBox(height: AppSpacing.sm),
+                      Card(
+                        child: Padding(
+                          padding: EdgeInsets.all(AppSpacing.md),
+                          child: Column(
+                            children: [
+                              AppTextField(
+                                controller: _emailController,
+                                label: 'common.email'.tr(),
+                                prefixIcon: const Icon(Icons.email_outlined),
+                                keyboardType: TextInputType.emailAddress,
+                              ),
+                              SizedBox(height: AppSpacing.md),
+                              AppTextField(
+                                controller: _phoneController,
+                                label: 'common.phone'.tr(),
+                                prefixIcon: const Icon(Icons.phone_outlined),
+                                keyboardType: TextInputType.phone,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+
+                      SizedBox(height: AppSpacing.lg),
+
+                      // ── Address ──
+                      const _SectionHeader(
+                        icon: Icons.location_on,
+                        title: 'Address',
+                        color: Colors.blue,
+                      ),
+                      SizedBox(height: AppSpacing.sm),
+                      Card(
+                        child: Padding(
+                          padding: EdgeInsets.all(AppSpacing.md),
+                          child: Column(
+                            children: [
+                              AppTextField(
+                                controller: _addressFullController,
+                                label: 'common.full_address'.tr(),
+                                prefixIcon: const Icon(Icons.home_outlined),
+                                maxLines: 2,
+                              ),
+                              SizedBox(height: AppSpacing.md),
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: AppTextField(
+                                      controller: _cityController,
+                                      label: 'common.city'.tr(),
+                                      prefixIcon: const Icon(Icons.location_city),
+                                    ),
+                                  ),
+                                  SizedBox(width: AppSpacing.md),
+                                  Expanded(
+                                    child: AppTextField(
+                                      controller: _stateController,
+                                      label: 'common.state'.tr(),
+                                      prefixIcon: const Icon(Icons.map_outlined),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              SizedBox(height: AppSpacing.md),
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: AppTextField(
+                                      controller: _countryController,
+                                      label: 'common.country'.tr(),
+                                      prefixIcon: const Icon(Icons.public),
+                                    ),
+                                  ),
+                                  SizedBox(width: AppSpacing.md),
+                                  Expanded(
+                                    child: AppTextField(
+                                      controller: _zipCodeController,
+                                      label: 'common.zip_code'.tr(),
+                                      prefixIcon: const Icon(Icons.pin_drop),
+                                      keyboardType: TextInputType.number,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+
+                      SizedBox(height: AppSpacing.lg),
+
+                      // ── Registration ──
+                      const _SectionHeader(
+                        icon: Icons.description,
+                        title: 'Registration Details',
+                        color: Colors.orange,
+                      ),
+                      SizedBox(height: AppSpacing.sm),
+                      Card(
+                        child: Padding(
+                          padding: EdgeInsets.all(AppSpacing.md),
+                          child: Column(
+                            children: [
+                              AppTextField(
+                                controller: _gstNoController,
+                                label: 'common.gst_number'.tr(),
+                                prefixIcon: const Icon(Icons.receipt_long),
+                              ),
+                              SizedBox(height: AppSpacing.md),
+                              AppTextField(
+                                controller: _fssaiNoController,
+                                label: 'common.fssai_number'.tr(),
+                                prefixIcon: const Icon(Icons.verified_outlined),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+
+                      SizedBox(height: AppSpacing.lg),
+
+                      // ── Settings ──
+                      const _SectionHeader(
+                        icon: Icons.settings,
+                        title: 'Operating Hours',
+                        color: Colors.purple,
+                      ),
+                      SizedBox(height: AppSpacing.sm),
+                      Card(
+                        child: Padding(
+                          padding: EdgeInsets.all(AppSpacing.md),
+                          child: Column(
+                            children: [
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: AppTextField(
+                                      controller: _openTimeController,
+                                      label: 'common.opening_time'.tr(),
+                                      hint: 'e.g. 09:00 AM',
+                                      prefixIcon: const Icon(Icons.access_time),
+                                    ),
+                                  ),
+                                  SizedBox(width: AppSpacing.md),
+                                  Expanded(
+                                    child: AppTextField(
+                                      controller: _closeTimeController,
+                                      label: 'common.closing_time'.tr(),
+                                      hint: 'e.g. 11:00 PM',
+                                      prefixIcon: const Icon(Icons.access_time_filled),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              SizedBox(height: AppSpacing.md),
+                              SwitchListTile(
+                                title: Text('common.master_branch'.tr()),
+                                subtitle:
+                                    Text('common.this_is_the_primary_branch_of'.tr()),
+                                value: _isMasterBranch,
+                                onChanged: (v) => setState(() => _isMasterBranch = v),
+                                contentPadding: EdgeInsets.zero,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+
+                      SizedBox(height: AppSpacing.xl),
+
+                      // ── Actions ──
+                      Row(
+                        children: [
+                          Expanded(
+                            child: OutlinedButton.icon(
+                              onPressed: isLoading ? null : _goBack,
+                              icon: const Icon(Icons.close),
+                              label: Text('common.cancel'.tr()),
+                              style: OutlinedButton.styleFrom(
+                                padding: const EdgeInsets.symmetric(vertical: 14),
+                              ),
+                            ),
+                          ),
+                          SizedBox(width: AppSpacing.md),
+                          Expanded(
+                            flex: 2,
+                            child: FilledButton.icon(
+                              onPressed: isLoading ? null : _submitForm,
+                              icon: isLoading
+                                  ? const SizedBox(
+                                      width: 18,
+                                      height: 18,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                        color: Colors.white,
+                                      ),
+                                    )
+                                  : Icon(isEditing ? Icons.save : Icons.add),
+                              label: Text(isEditing ? 'Update Branch' : 'Create Branch'),
+                              style: FilledButton.styleFrom(
+                                padding: const EdgeInsets.symmetric(vertical: 14),
+                              ),
+                            ),
+                          ),
                         ],
                       ),
-                    ),
+                      SizedBox(height: AppSpacing.xl),
+                    ],
                   ),
                 ),
         );
@@ -690,33 +463,22 @@ class _SectionHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final cs = theme.colorScheme;
-    
     return Row(
       children: [
         Container(
-          padding: const EdgeInsets.all(10),
+          padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-            color: color.withOpacity(0.08),
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(
-              color: color.withOpacity(0.2),
-              width: 1,
-            ),
+            color: color.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(8),
           ),
-          child: Icon(icon, color: color, size: 22),
+          child: Icon(icon, color: color, size: 20),
         ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: Text(
-            title,
-            style: theme.textTheme.titleMedium?.copyWith(
-              fontWeight: FontWeight.bold,
-              color: cs.onSurface,
-              letterSpacing: 0.1,
-            ),
-          ),
+        const SizedBox(width: 10),
+        Text(
+          title,
+          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.w600,
+              ),
         ),
       ],
     );

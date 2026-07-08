@@ -402,7 +402,7 @@ class ImportPreviewDialog extends StatelessWidget {
                         ?.copyWith(color: colorScheme.onSurfaceVariant)),
                 const SizedBox(height: 8),
                 Expanded(
-                  child: Container(
+                  child: DecoratedBox(
                     decoration: BoxDecoration(
                       border: Border.all(color: colorScheme.outlineVariant),
                       borderRadius: BorderRadius.circular(10),

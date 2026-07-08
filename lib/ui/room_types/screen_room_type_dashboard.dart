@@ -1,6 +1,4 @@
 import 'package:back_office/ui/room_types/state_room_type.dart';
-import 'package:back_office/ui/tables/table_layout/screen_table_layout.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:back_office/imports/core_imports.dart';
@@ -59,7 +57,7 @@ class _RoomTypeDashboardView extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Room Types'),
+        title: Text('common.room_types'.tr()),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => context.go('/brands/$brandId'),
@@ -77,7 +75,7 @@ class _RoomTypeDashboardView extends StatelessWidget {
                     children: [
                       Icon(Icons.store, size: 48, color: cs.outline),
                       SizedBox(height: AppSpacing.md),
-                      const Text('Select a branch to manage room types'),
+                      Text('common.select_a_branch_to_manage_room'.tr()),
                       SizedBox(height: AppSpacing.md),
                       BlocBuilder<CubitBranch, StateBranch>(
                         builder: (context, branchState) {
@@ -85,11 +83,11 @@ class _RoomTypeDashboardView extends StatelessWidget {
                             return const Center(child: CircularProgressIndicator());
                           }
                           if (branchState.branches.isEmpty) {
-                            return Text('No branches found', style: TextStyle(color: cs.outline));
+                            return Text('common.no_branches_found'.tr(), style: TextStyle(color: cs.outline));
                           }
                           return DropdownButtonFormField<String>(
                             decoration: const InputDecoration(labelText: 'Branch'),
-                            hint: const Text('Select branch'),
+                            hint: Text('common.select_branch'.tr()),
                             items: branchState.branches.map((b) {
                               return DropdownMenuItem(value: b.id, child: Text(b.displayName));
                             }).toList(),
@@ -137,11 +135,11 @@ class _RoomTypeDashboardView extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('Room Types', style: Theme.of(context).textTheme.titleLarge),
+              Text('common.room_types'.tr(), style: Theme.of(context).textTheme.titleLarge),
               TextButton.icon(
                 onPressed: () => _showCreateDialog(context),
                 icon: const Icon(Icons.add),
-                label: const Text('Add'),
+                label: Text('common.add'.tr()),
               ),
             ],
           ),
@@ -155,12 +153,12 @@ class _RoomTypeDashboardView extends StatelessWidget {
                     children: [
                       Icon(Icons.meeting_room_outlined, size: 48, color: cs.outline),
                       SizedBox(height: AppSpacing.md),
-                      const Text('No room types yet'),
+                      Text('common.no_room_types_yet'.tr()),
                       SizedBox(height: AppSpacing.md),
                       ElevatedButton.icon(
                         onPressed: () => _showCreateDialog(context),
                         icon: const Icon(Icons.add),
-                        label: const Text('Add Room Type'),
+                        label: Text('common.add_room_type'.tr()),
                       ),
                     ],
                   ),
@@ -241,7 +239,7 @@ class _RoomTypeDashboardView extends StatelessWidget {
     showDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: const Text('Add Room Type'),
+        title: Text('common.add_room_type'.tr()),
         content: TextField(
           controller: nameController,
           decoration: const InputDecoration(labelText: 'Room Type Name'),
@@ -250,7 +248,7 @@ class _RoomTypeDashboardView extends StatelessWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
-            child: const Text('Cancel'),
+            child: Text('common.cancel'.tr()),
           ),
           ElevatedButton(
             onPressed: () {
@@ -261,7 +259,7 @@ class _RoomTypeDashboardView extends StatelessWidget {
                 Navigator.pop(dialogContext);
               }
             },
-            child: const Text('Add'),
+            child: Text('common.add'.tr()),
           ),
         ],
       ),
@@ -276,7 +274,7 @@ class _RoomTypeDashboardView extends StatelessWidget {
     showDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: const Text('Edit Room Type'),
+        title: Text('common.edit_room_type'.tr()),
         content: TextField(
           controller: nameController,
           decoration: const InputDecoration(labelText: 'Room Type Name'),
@@ -285,7 +283,7 @@ class _RoomTypeDashboardView extends StatelessWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
-            child: const Text('Cancel'),
+            child: Text('common.cancel'.tr()),
           ),
           ElevatedButton(
             onPressed: () {
@@ -300,7 +298,7 @@ class _RoomTypeDashboardView extends StatelessWidget {
                 Navigator.pop(dialogContext);
               }
             },
-            child: const Text('Save'),
+            child: Text('common.save'.tr()),
           ),
         ],
       ),
@@ -311,12 +309,12 @@ class _RoomTypeDashboardView extends StatelessWidget {
     showDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: const Text('Delete Room Type'),
+        title: Text('common.delete_room_type'.tr()),
         content: Text('Are you sure you want to delete "$name"?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
-            child: const Text('Cancel'),
+            child: Text('common.cancel'.tr()),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
@@ -331,7 +329,7 @@ class _RoomTypeDashboardView extends StatelessWidget {
               );
               Navigator.pop(dialogContext);
             },
-            child: const Text('Delete'),
+            child: Text('common.delete'.tr()),
           ),
         ],
       ),

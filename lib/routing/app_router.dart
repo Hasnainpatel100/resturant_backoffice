@@ -1,10 +1,8 @@
-import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:back_office/routing/global_navigator.dart';
 import 'package:back_office/routing/app_routes.dart';
 import 'package:back_office/config/app_config.dart';
-import 'package:back_office/theme/theme_constants.dart';
 import 'package:back_office/ui/auth/login/cubit_session.dart';
 
 import 'package:back_office/ui/auth/login/screen_login.dart';
@@ -36,6 +34,10 @@ import 'package:back_office/ui/settings/settings/screen_settings.dart';
 import 'package:back_office/ui/profile/screen_profile.dart';
 import 'package:back_office/ui/shell/placeholder_screens.dart';
 
+import '../ui/feedback/feedback_list_screen.dart';
+import '../ui/feedback/feedback_configuration_screen.dart';
+import '../ui/feedback/feedback_question_builder_screen.dart';
+import '../ui/feedback/screen_customer_response.dart';
 import '../ui/room_types/screen_room_type_dashboard.dart';
 import '../ui/branch/branch_plan/screen_branch_plan_history.dart';
 import '../ui/branch/branch_plan/screen_branch_plan_form.dart';
@@ -859,10 +861,32 @@ final GoRouter appRouter = GoRouter(
           builder: (context, state) => const MenuScreen(),
         ),
         GoRoute(
+          path: AppRoutes.feedbackList,
+          name: 'feedbackListScreen',
+          builder: (context, state) => const FeedbackListScreen(),
+        ),
+
+        GoRoute(
+          path: AppRoutes.feedbackCreate,
+          name: 'feedbackCreate',
+          builder: (context, state) => const FeedbackConfigurationScreen(),
+        ),
+        GoRoute(
+          path: AppRoutes.feedbackQuestionBuilder,
+          name: 'feedbackQuestionBuilder',
+          builder: (context, state) => const FeedbackQuestionBuilderScreen(),
+        ),
+        GoRoute(
+          path: AppRoutes.customerResponses,
+          name: 'customerResponses',
+          builder: (context, state) => const ScreenCustomerResponse(),
+        ),
+        GoRoute(
           path: '/notifications',
           name: 'notifications',
           builder: (context, state) => const NotificationsScreen(),
         ),
+
       ],
     ),
   ],

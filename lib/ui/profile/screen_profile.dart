@@ -1,10 +1,6 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:back_office/imports/core_imports.dart';
-import 'package:back_office/config/app_config.dart';
-import 'package:back_office/routing/app_routes.dart';
-import 'package:back_office/services/auth_service.dart';
 import 'package:back_office/data/repositories/user_repository_impl.dart';
 import 'package:back_office/ui/users/user_list/cubit_user.dart';
 import 'package:back_office/ui/users/user_list/state_user.dart';
@@ -32,7 +28,7 @@ class _ProfileView extends StatelessWidget {
     final cs = Theme.of(context).colorScheme;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('My Profile')),
+      appBar: AppBar(title: Text('common.my_profile'.tr())),
       body: BlocBuilder<CubitUser, StateUser>(
         builder: (context, state) {
           if (state.status == UserStatus.loading) {
@@ -44,11 +40,11 @@ class _ProfileView extends StatelessWidget {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text('Failed to load profile', style: TextStyle(color: cs.error)),
+                  Text('common.failed_to_load_profile'.tr(), style: TextStyle(color: cs.error)),
                   SizedBox(height: AppSpacing.sm),
                   ElevatedButton(
                     onPressed: () => context.read<CubitUser>().loadUser(AppConfig.userId),
-                    child: const Text('Retry'),
+                    child: Text('common.retry'.tr()),
                   ),
                 ],
               ),
@@ -57,7 +53,7 @@ class _ProfileView extends StatelessWidget {
 
           final userProfile = state.user;
           if (userProfile == null) {
-            return const Center(child: Text('Profile not found'));
+            return Center(child: Text('common.profile_not_found'.tr()));
           }
 
           final user = userProfile.user;
@@ -115,7 +111,7 @@ class _ProfileView extends StatelessWidget {
                   children: [
                     ListTile(
                       leading: const Icon(Icons.account_circle),
-                      title: const Text('Edit Profile'),
+                      title: Text('common.edit_profile'.tr()),
                       trailing: const Icon(Icons.chevron_right),
                       onTap: () {
                         // TODO: Implement Edit Profile for logged in user.
@@ -128,7 +124,7 @@ class _ProfileView extends StatelessWidget {
                     const Divider(height: 1),
                     ListTile(
                       leading: const Icon(Icons.lock),
-                      title: const Text('Change PIN'),
+                      title: Text('common.change_pin'.tr()),
                       trailing: const Icon(Icons.chevron_right),
                       onTap: () {
                         // TODO: Implement Change PIN
@@ -141,7 +137,7 @@ class _ProfileView extends StatelessWidget {
               Card(
                 child: ListTile(
                   leading: Icon(Icons.logout, color: cs.error),
-                  title: Text('Logout', style: TextStyle(color: cs.error)),
+                  title: Text('common.logout'.tr(), style: TextStyle(color: cs.error)),
                   onTap: () async {
                     await AuthService.instance.logout();
                     if (context.mounted) {

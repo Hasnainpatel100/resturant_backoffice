@@ -28,14 +28,13 @@ class ComingSoonScreen extends StatelessWidget {
               style: tt.headlineSmall?.copyWith(color: cs.onSurfaceVariant),
             ),
             SizedBox(height: AppSpacing.sm),
-            Text(
-              'This feature is under development',
+            Text('common.this_feature_is_under_developm'.tr(),
               style: tt.bodyMedium?.copyWith(color: cs.outline),
             ),
             SizedBox(height: AppSpacing.xl),
             OutlinedButton(
               onPressed: () => context.go(AppRoutes.brandList),
-              child: const Text('Go to Brands'),
+              child: Text('common.go_to_brands'.tr()),
             ),
           ],
         ),

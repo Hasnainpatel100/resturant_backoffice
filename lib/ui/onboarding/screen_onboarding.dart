@@ -87,8 +87,7 @@ class _OnboardingView extends StatelessWidget {
                 top: AppSpacing.lg,
                 bottom: AppSpacing.md,
               ),
-              child: Text(
-                'FlutterInit.',
+              child: Text('common.flutterinit'.tr(),
                 style: textTheme.titleLarge?.copyWith(
                   fontWeight: FontWeight.w900,
                   color: colorScheme.onSurface,
@@ -148,7 +147,7 @@ class _OnboardingView extends StatelessWidget {
                           ],
                         ),
                       ),
-                      SizedBox(height: 40),
+                      const SizedBox(height: 40),
                     ],
                   );
                 },
@@ -163,7 +162,7 @@ class _OnboardingView extends StatelessWidget {
                    SizedBox(height: AppSpacing.xl),
                   // Get Started Button
                   AppButton(
-                    label: 'shared.get_started'.tr(),
+                    label: 'common.shared_get_started'.tr().tr(),
                     onPressed: onGetStarted,
                     variant: ButtonVariant.primary,
                     width: ButtonSize.medium,

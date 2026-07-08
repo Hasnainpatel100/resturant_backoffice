@@ -1,11 +1,9 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:back_office/imports/core_imports.dart';
 import 'package:back_office/data/repositories/brand_repository_impl.dart';
 import 'package:back_office/ui/brand/brand_list/cubit_brand.dart';
 import 'package:back_office/ui/brand/brand_list/state_brand.dart';
-import 'package:back_office/routing/app_routes.dart';
 import 'package:back_office/shared/shared.dart';
 
 class ScreenBrandForm extends StatelessWidget {
@@ -106,6 +104,7 @@ class _BrandFormViewState extends State<_BrandFormView> {
       },
       builder: (context, state) {
         final isLoading = state.status == BrandStatus.loading;
+
         return Scaffold(
           appBar: AppBar(
             title: Text(isEditing ? 'Edit Brand' : 'Create Brand'),
@@ -118,242 +117,141 @@ class _BrandFormViewState extends State<_BrandFormView> {
               ? const Center(child: CircularProgressIndicator())
               : Form(
                   key: _formKey,
-                  child: Center(
-                    child: ConstrainedBox(
-                      constraints: const BoxConstraints(maxWidth: 800),
-                      child: ListView(
-                        padding: EdgeInsets.all(AppSpacing.lg),
-                        children: [
-                          // ── Brand Identity Section ──
-                          _SectionHeader(
-                            icon: Icons.store,
-                            title: 'Brand Identity',
-                            color: cs.primary,
-                          ),
-                          SizedBox(height: AppSpacing.md),
-                          Container(
-                            decoration: BoxDecoration(
-                              color: cs.surfaceContainerLowest,
-                              borderRadius: BorderRadius.circular(16),
-                              border: Border.all(color: cs.outlineVariant.withOpacity(0.6), width: 1),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: cs.shadow.withOpacity(0.03),
-                                  blurRadius: 10,
-                                  offset: const Offset(0, 4),
-                                ),
-                              ],
-                            ),
-                            padding: EdgeInsets.all(AppSpacing.lg),
-                            child: Column(
-                              children: [
-                                AppTextField(
-                                  controller: _nameController,
-                                  label: 'Brand Name *',
-                                  prefixIcon: const Icon(Icons.business),
-                                  validator: (v) => v?.isEmpty == true ? 'Brand name is required' : null,
-                                ),
-                              ],
-                            ),
-                          ),
-
-                          SizedBox(height: AppSpacing.xl),
-
-                          // ── Contact Section ──
-                          _SectionHeader(
-                            icon: Icons.contact_phone,
-                            title: 'Contact Information',
-                            color: Colors.teal,
-                          ),
-                          SizedBox(height: AppSpacing.md),
-                          Container(
-                            decoration: BoxDecoration(
-                              color: cs.surfaceContainerLowest,
-                              borderRadius: BorderRadius.circular(16),
-                              border: Border.all(color: cs.outlineVariant.withOpacity(0.6), width: 1),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: cs.shadow.withOpacity(0.03),
-                                  blurRadius: 10,
-                                  offset: const Offset(0, 4),
-                                ),
-                              ],
-                            ),
-                            padding: EdgeInsets.all(AppSpacing.lg),
-                            child: Column(
-                              children: [
-                                LayoutBuilder(
-                                  builder: (context, constraints) {
-                                    if (constraints.maxWidth > 550) {
-                                      return Row(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          Expanded(
-                                            child: AppTextField(
-                                              controller: _emailController,
-                                              label: 'Email',
-                                              prefixIcon: const Icon(Icons.email_outlined),
-                                              keyboardType: TextInputType.emailAddress,
-                                            ),
-                                          ),
-                                          SizedBox(width: AppSpacing.md),
-                                          Expanded(
-                                            child: AppTextField(
-                                              controller: _phoneController,
-                                              label: 'Phone',
-                                              prefixIcon: const Icon(Icons.phone_outlined),
-                                              keyboardType: TextInputType.phone,
-                                            ),
-                                          ),
-                                        ],
-                                      );
-                                    } else {
-                                      return Column(
-                                        children: [
-                                          AppTextField(
-                                            controller: _emailController,
-                                            label: 'Email',
-                                            prefixIcon: const Icon(Icons.email_outlined),
-                                            keyboardType: TextInputType.emailAddress,
-                                          ),
-                                          SizedBox(height: AppSpacing.md),
-                                          AppTextField(
-                                            controller: _phoneController,
-                                            label: 'Phone',
-                                            prefixIcon: const Icon(Icons.phone_outlined),
-                                            keyboardType: TextInputType.phone,
-                                          ),
-                                        ],
-                                      );
-                                    }
-                                  },
-                                ),
-                                SizedBox(height: AppSpacing.md),
-                                AppTextField(
-                                  controller: _websiteController,
-                                  label: 'Website',
-                                  prefixIcon: const Icon(Icons.language),
-                                  keyboardType: TextInputType.url,
-                                ),
-                              ],
-                            ),
-                          ),
-
-                          SizedBox(height: AppSpacing.xl),
-
-                          // ── Registration Section ──
-                          _SectionHeader(
-                            icon: Icons.description,
-                            title: 'Registration Details',
-                            color: Colors.orange,
-                          ),
-                          SizedBox(height: AppSpacing.md),
-                          Container(
-                            decoration: BoxDecoration(
-                              color: cs.surfaceContainerLowest,
-                              borderRadius: BorderRadius.circular(16),
-                              border: Border.all(color: cs.outlineVariant.withOpacity(0.6), width: 1),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: cs.shadow.withOpacity(0.03),
-                                  blurRadius: 10,
-                                  offset: const Offset(0, 4),
-                                ),
-                              ],
-                            ),
-                            padding: EdgeInsets.all(AppSpacing.lg),
-                            child: Column(
-                              children: [
-                                LayoutBuilder(
-                                  builder: (context, constraints) {
-                                    if (constraints.maxWidth > 550) {
-                                      return Row(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          Expanded(
-                                            child: AppTextField(
-                                              controller: _gstNoController,
-                                              label: 'GST Number',
-                                              prefixIcon: const Icon(Icons.receipt_long),
-                                            ),
-                                          ),
-                                          SizedBox(width: AppSpacing.md),
-                                          Expanded(
-                                            child: AppTextField(
-                                              controller: _fssaiNoController,
-                                              label: 'FSSAI Number',
-                                              prefixIcon: const Icon(Icons.verified_outlined),
-                                            ),
-                                          ),
-                                        ],
-                                      );
-                                    } else {
-                                      return Column(
-                                        children: [
-                                          AppTextField(
-                                            controller: _gstNoController,
-                                            label: 'GST Number',
-                                            prefixIcon: const Icon(Icons.receipt_long),
-                                          ),
-                                          SizedBox(height: AppSpacing.md),
-                                          AppTextField(
-                                            controller: _fssaiNoController,
-                                            label: 'FSSAI Number',
-                                            prefixIcon: const Icon(Icons.verified_outlined),
-                                          ),
-                                        ],
-                                      );
-                                    }
-                                  },
-                                ),
-                              ],
-                            ),
-                          ),
-
-                          SizedBox(height: AppSpacing.xxl),
-                          const Divider(),
-                          SizedBox(height: AppSpacing.lg),
-
-                          // ── Action Buttons ──
-                          Row(
+                  child: ListView(
+                    padding: EdgeInsets.all(AppSpacing.md),
+                    children: [
+                      // ── Brand Identity Section ──
+                      _SectionHeader(
+                        icon: Icons.store,
+                        title: 'Brand Identity',
+                        color: cs.primary,
+                      ),
+                      SizedBox(height: AppSpacing.sm),
+                      Card(
+                        child: Padding(
+                          padding: EdgeInsets.all(AppSpacing.md),
+                          child: Column(
                             children: [
-                              Expanded(
-                                child: OutlinedButton.icon(
-                                  onPressed: isLoading ? null : _goBack,
-                                  icon: const Icon(Icons.close),
-                                  label: const Text('Cancel'),
-                                  style: OutlinedButton.styleFrom(
-                                    padding: const EdgeInsets.symmetric(vertical: 16),
-                                  ),
-                                ),
-                              ),
-                              SizedBox(width: AppSpacing.md),
-                              Expanded(
-                                flex: 2,
-                                child: FilledButton.icon(
-                                  onPressed: isLoading ? null : _submitForm,
-                                  icon: isLoading
-                                      ? const SizedBox(
-                                          width: 18,
-                                          height: 18,
-                                          child: CircularProgressIndicator(
-                                            strokeWidth: 2,
-                                            color: Colors.white,
-                                          ),
-                                        )
-                                      : Icon(isEditing ? Icons.save : Icons.add),
-                                  label: Text(isEditing ? 'Update Brand' : 'Create Brand'),
-                                  style: FilledButton.styleFrom(
-                                    padding: const EdgeInsets.symmetric(vertical: 16),
-                                  ),
-                                ),
+                              AppTextField(
+                                controller: _nameController,
+                                label: 'common.brand_name'.tr(),
+                                prefixIcon: const Icon(Icons.business),
+                                validator: (v) => v?.isEmpty ?? false ? 'Brand name is required' : null,
                               ),
                             ],
                           ),
-                          SizedBox(height: AppSpacing.xxl),
+                        ),
+                      ),
+
+                      SizedBox(height: AppSpacing.lg),
+
+                      // ── Contact Section ──
+                      const _SectionHeader(
+                        icon: Icons.contact_phone,
+                        title: 'Contact Information',
+                        color: Colors.teal,
+                      ),
+                      SizedBox(height: AppSpacing.sm),
+                      Card(
+                        child: Padding(
+                          padding: EdgeInsets.all(AppSpacing.md),
+                          child: Column(
+                            children: [
+                              AppTextField(
+                                controller: _emailController,
+                                label: 'common.email'.tr(),
+                                prefixIcon: const Icon(Icons.email_outlined),
+                                keyboardType: TextInputType.emailAddress,
+                              ),
+                              SizedBox(height: AppSpacing.md),
+                              AppTextField(
+                                controller: _phoneController,
+                                label: 'common.phone'.tr(),
+                                prefixIcon: const Icon(Icons.phone_outlined),
+                                keyboardType: TextInputType.phone,
+                              ),
+                              SizedBox(height: AppSpacing.md),
+                              AppTextField(
+                                controller: _websiteController,
+                                label: 'common.website'.tr(),
+                                prefixIcon: const Icon(Icons.language),
+                                keyboardType: TextInputType.url,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+
+                      SizedBox(height: AppSpacing.lg),
+
+                      // ── Registration Section ──
+                      const _SectionHeader(
+                        icon: Icons.description,
+                        title: 'Registration Details',
+                        color: Colors.orange,
+                      ),
+                      SizedBox(height: AppSpacing.sm),
+                      Card(
+                        child: Padding(
+                          padding: EdgeInsets.all(AppSpacing.md),
+                          child: Column(
+                            children: [
+                              AppTextField(
+                                controller: _gstNoController,
+                                label: 'common.gst_number'.tr(),
+                                prefixIcon: const Icon(Icons.receipt_long),
+                              ),
+                              SizedBox(height: AppSpacing.md),
+                              AppTextField(
+                                controller: _fssaiNoController,
+                                label: 'common.fssai_number'.tr(),
+                                prefixIcon: const Icon(Icons.verified_outlined),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+
+                      SizedBox(height: AppSpacing.xl),
+
+                      // ── Action Buttons ──
+                      Row(
+                        children: [
+                          Expanded(
+                            child: OutlinedButton.icon(
+                              onPressed: isLoading ? null : _goBack,
+                              icon: const Icon(Icons.close),
+                              label: Text('common.cancel'.tr()),
+                              style: OutlinedButton.styleFrom(
+                                padding: const EdgeInsets.symmetric(vertical: 14),
+                              ),
+                            ),
+                          ),
+                          SizedBox(width: AppSpacing.md),
+                          Expanded(
+                            flex: 2,
+                            child: FilledButton.icon(
+                              onPressed: isLoading ? null : _submitForm,
+                              icon: isLoading
+                                  ? const SizedBox(
+                                      width: 18,
+                                      height: 18,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                        color: Colors.white,
+                                      ),
+                                    )
+                                  : Icon(isEditing ? Icons.save : Icons.add),
+                              label: Text(isEditing ? 'Update Brand' : 'Create Brand'),
+                              style: FilledButton.styleFrom(
+                                padding: const EdgeInsets.symmetric(vertical: 14),
+                              ),
+                            ),
+                          ),
                         ],
                       ),
-                    ),
+                      SizedBox(height: AppSpacing.xl),
+                    ],
                   ),
                 ),
         );
@@ -401,33 +299,22 @@ class _SectionHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final cs = theme.colorScheme;
-    
     return Row(
       children: [
         Container(
-          padding: const EdgeInsets.all(10),
+          padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-            color: color.withOpacity(0.08),
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(
-              color: color.withOpacity(0.2),
-              width: 1,
-            ),
+            color: color.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(8),
           ),
-          child: Icon(icon, color: color, size: 22),
+          child: Icon(icon, color: color, size: 20),
         ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: Text(
-            title,
-            style: theme.textTheme.titleMedium?.copyWith(
-              fontWeight: FontWeight.bold,
-              color: cs.onSurface,
-              letterSpacing: 0.1,
-            ),
-          ),
+        const SizedBox(width: 10),
+        Text(
+          title,
+          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.w600,
+              ),
         ),
       ],
     );

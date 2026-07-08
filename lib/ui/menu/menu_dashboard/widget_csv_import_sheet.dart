@@ -1,10 +1,7 @@
-import 'dart:io';
-import 'package:flutter/material.dart' hide Border;
 import 'package:file_picker/file_picker.dart';
 import 'package:csv/csv.dart';
 import 'package:excel/excel.dart' hide Border;
 import 'package:back_office/imports/core_imports.dart';
-import 'package:back_office/data/repositories/menu_repository_impl.dart';
 import 'package:back_office/ui/menu/menu_dashboard/cubit_menu.dart';
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -339,8 +336,7 @@ class _CsvImportSheetState extends State<_CsvImportSheet> {
                             .titleMedium
                             ?.copyWith(fontWeight: FontWeight.bold),
                       ),
-                      Text(
-                        'CSV or Excel • category assigned automatically',
+                      Text('common.csv_or_excel_category_assigned'.tr(),
                         style: Theme.of(context).textTheme.labelSmall?.copyWith(
                           color: cs.onSurfaceVariant,
                         ),
@@ -406,11 +402,11 @@ class _PickerBody extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         // ── Template column guide ────────────────────────────────────────
-        _SectionCard(
+        const _SectionCard(
           icon: Icons.table_chart_outlined,
           title: 'Expected columns',
           child: Column(
-            children: const [
+            children: [
               _ColRow(col: 'name', note: 'Required', required: true),
               _ColRow(col: 'code', note: 'SKU / item code'),
               _ColRow(col: 'description', note: 'Short description'),
@@ -602,11 +598,11 @@ class _PreviewBody extends StatelessWidget {
                 ),
               if (rows.length > 50)
                 TableRow(children: [
-                  _TD('…'),
+                  const _TD('…'),
                   _TD('${rows.length - 50} more rows not shown'),
-                  _TD(''),
-                  _TD(''),
-                  _TD(''),
+                  const _TD(''),
+                  const _TD(''),
+                  const _TD(''),
                 ]),
             ],
           ),
@@ -621,7 +617,7 @@ class _PreviewBody extends StatelessWidget {
               child: OutlinedButton.icon(
                 onPressed: isSubmitting ? null : onReplace,
                 icon: const Icon(Icons.folder_open_rounded, size: 16),
-                label: const Text('Replace file'),
+                label: Text('common.replace_file'.tr()),
                 style: OutlinedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 13),
                   shape: RoundedRectangleBorder(
@@ -697,7 +693,7 @@ class _SectionCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
-    return Container(
+    return DecoratedBox(
       decoration: BoxDecoration(
         border: Border.all(color: cs.outlineVariant.withOpacity(0.6)),
         borderRadius: BorderRadius.circular(12),

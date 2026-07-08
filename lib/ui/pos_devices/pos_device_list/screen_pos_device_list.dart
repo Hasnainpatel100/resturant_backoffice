@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:back_office/imports/core_imports.dart';
@@ -34,7 +33,7 @@ class _ScreenPosDeviceListState extends State<ScreenPosDeviceList> {
       create: (context) => CubitBranch(repository: BranchRepositoryImpl())..loadBranches(widget.brandId),
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('POS Devices'),
+          title: Text('common.pos_devices'.tr()),
           leading: IconButton(icon: const Icon(Icons.arrow_back), onPressed: () => context.go('/brands/${widget.brandId}')),
           actions: [
             IconButton(icon: const Icon(Icons.add), onPressed: () => _showRegisterDialog(context)),
@@ -55,7 +54,7 @@ class _ScreenPosDeviceListState extends State<ScreenPosDeviceList> {
                           children: [
                             Icon(Icons.tablet_android_outlined, size: 64, color: Theme.of(context).colorScheme.outline),
                             SizedBox(height: AppSpacing.md),
-                            const Text('No branches found'),
+                            Text('common.no_branches_found'.tr()),
                           ],
                         ),
                       ),
@@ -69,11 +68,11 @@ class _ScreenPosDeviceListState extends State<ScreenPosDeviceList> {
                         children: [
                           Icon(Icons.tablet_android_outlined, size: 64, color: Theme.of(context).colorScheme.outline),
                           SizedBox(height: AppSpacing.md),
-                          const Text('Select a branch to view POS devices'),
+                          Text('common.select_a_branch_to_view_pos_de'.tr()),
                           SizedBox(height: AppSpacing.md),
                           DropdownButtonFormField<String>(
                             decoration: const InputDecoration(labelText: 'Branch'),
-                            hint: const Text('Select branch'),
+                            hint: Text('common.select_branch'.tr()),
                             items: branchState.branches.map((b) {
                               return DropdownMenuItem(value: b.id, child: Text(b.displayName));
                             }).toList(),
@@ -108,12 +107,12 @@ class _ScreenPosDeviceListState extends State<ScreenPosDeviceList> {
                           children: [
                             Icon(Icons.tablet_android_outlined, size: 64, color: Theme.of(context).colorScheme.outline),
                             SizedBox(height: AppSpacing.md),
-                            Text('No POS devices registered', style: Theme.of(context).textTheme.titleMedium),
+                            Text('common.no_pos_devices_registered'.tr(), style: Theme.of(context).textTheme.titleMedium),
                             SizedBox(height: AppSpacing.sm),
                             ElevatedButton.icon(
                               onPressed: () => _showRegisterDialog(context),
                               icon: const Icon(Icons.add),
-                              label: const Text('Register Device'),
+                              label: Text('common.register_device'.tr()),
                             ),
                           ],
                         ),
@@ -146,7 +145,7 @@ class _ScreenPosDeviceListState extends State<ScreenPosDeviceList> {
                               ),
                               isThreeLine: true,
                               trailing: Container(
-                                padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                                 decoration: BoxDecoration(
                                   color: device.isActive ? Colors.green.shade100 : Colors.grey.shade200,
                                   borderRadius: BorderRadius.circular(12),
@@ -173,12 +172,12 @@ class _ScreenPosDeviceListState extends State<ScreenPosDeviceList> {
       showDialog(
         context: context,
         builder: (dialogContext) => AlertDialog(
-          title: const Text('Branch Required'),
-          content: const Text('Please select a branch to register a device.'),
+          title: Text('common.branch_required'.tr()),
+          content: Text('common.please_select_a_branch_to_regi'.tr()),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(dialogContext),
-              child: const Text('OK'),
+              child: Text('common.ok'.tr()),
             ),
           ],
         ),
@@ -192,7 +191,7 @@ class _ScreenPosDeviceListState extends State<ScreenPosDeviceList> {
     showDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: const Text('Register Device'),
+        title: Text('common.register_device'.tr()),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -202,7 +201,7 @@ class _ScreenPosDeviceListState extends State<ScreenPosDeviceList> {
           ],
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(dialogContext), child: const Text('Cancel')),
+          TextButton(onPressed: () => Navigator.pop(dialogContext), child: Text('common.cancel'.tr())),
           ElevatedButton(
             onPressed: () {
               if (deviceNameController.text.isNotEmpty && deviceIdController.text.isNotEmpty) {
@@ -215,7 +214,7 @@ class _ScreenPosDeviceListState extends State<ScreenPosDeviceList> {
                 Navigator.pop(dialogContext);
               }
             },
-            child: const Text('Register'),
+            child: Text('common.register'.tr()),
           ),
         ],
       ),

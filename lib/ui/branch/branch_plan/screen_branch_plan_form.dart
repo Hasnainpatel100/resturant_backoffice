@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:go_router/go_router.dart';
+import 'package:easy_localization/easy_localization.dart';
 import '../../../data/repositories/branch_plan_repository_impl.dart';
 import '../../../theme/theme_constants.dart';
 import 'cubit_branch_plan.dart';
@@ -74,10 +75,10 @@ class _ScreenBranchPlanFormState extends State<ScreenBranchPlanForm> {
       final expiryAtMs = _selectedExpiryDate!.toUtc().millisecondsSinceEpoch.toString();
 
       final data = {
-        "maxUsers": int.tryParse(_maxUsersController.text) ?? 0,
-        "maxPosDevices": int.tryParse(_maxPosDevicesController.text) ?? 0,
-        "expiryAt": expiryAtMs,
-        "note": _noteController.text,
+        'maxUsers': int.tryParse(_maxUsersController.text) ?? 0,
+        'maxPosDevices': int.tryParse(_maxPosDevicesController.text) ?? 0,
+        'expiryAt': expiryAtMs,
+        'note': _noteController.text,
       };
 
       // Call the API via cubit
@@ -115,7 +116,7 @@ class _ScreenBranchPlanFormState extends State<ScreenBranchPlanForm> {
               },
               child: Scaffold(
                 appBar: AppBar(
-                  title: const Text('Assign Plan'),
+                  title: Text('common.assign_plan'.tr()),
                   actions: [
                     TextButton.icon(
                       onPressed: _isSaving ? null : () => _submit(blocContext),
@@ -151,9 +152,9 @@ class _ScreenBranchPlanFormState extends State<ScreenBranchPlanForm> {
                               controller: _maxUsersController,
                               keyboardType: TextInputType.number,
                               inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                              decoration: const InputDecoration(
-                                hintText: 'e.g. 10',
-                                prefixIcon: Icon(Icons.people_outline),
+                              decoration: InputDecoration(
+                                hintText: 'common.e_g_10'.tr(),
+                                prefixIcon: const Icon(Icons.people_outline),
                               ),
                               validator: (v) => v == null || v.isEmpty ? 'Required' : null,
                             ),
@@ -165,9 +166,9 @@ class _ScreenBranchPlanFormState extends State<ScreenBranchPlanForm> {
                               controller: _maxPosDevicesController,
                               keyboardType: TextInputType.number,
                               inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                              decoration: const InputDecoration(
-                                hintText: 'e.g. 5',
-                                prefixIcon: Icon(Icons.devices_outlined),
+                              decoration: InputDecoration(
+                                hintText: 'common.e_g_5'.tr(),
+                                prefixIcon: const Icon(Icons.devices_outlined),
                               ),
                               validator: (v) => v == null || v.isEmpty ? 'Required' : null,
                             ),
@@ -179,10 +180,10 @@ class _ScreenBranchPlanFormState extends State<ScreenBranchPlanForm> {
                               controller: _dateController,
                               readOnly: true,
                               onTap: () => _selectDate(context),
-                              decoration: const InputDecoration(
-                                hintText: 'Select Date',
-                                prefixIcon: Icon(Icons.calendar_today_outlined),
-                                suffixIcon: Icon(Icons.arrow_drop_down),
+                              decoration: InputDecoration(
+                                hintText: 'common.select_date'.tr(),
+                                prefixIcon: const Icon(Icons.calendar_today_outlined),
+                                suffixIcon: const Icon(Icons.arrow_drop_down),
                               ),
                               validator: (v) => v == null || v.isEmpty ? 'Required' : null,
                             ),
@@ -193,9 +194,9 @@ class _ScreenBranchPlanFormState extends State<ScreenBranchPlanForm> {
                             TextFormField(
                               controller: _noteController,
                               maxLines: 3,
-                              decoration: const InputDecoration(
-                                hintText: 'Premium plan assigned...',
-                                prefixIcon: Icon(Icons.note_outlined),
+                              decoration: InputDecoration(
+                                hintText: 'common.premium_plan_assigned'.tr(),
+                                prefixIcon: const Icon(Icons.note_outlined),
                               ),
                             ),
                             
@@ -219,7 +220,7 @@ class _ScreenBranchPlanFormState extends State<ScreenBranchPlanForm> {
                                           color: Colors.white,
                                         ),
                                       )
-                                    : const Text('Assign Plan'),
+                                    : Text('common.assign_plan'.tr()),
                               ),
                             ),
                           ],
@@ -240,8 +241,7 @@ class _ScreenBranchPlanFormState extends State<ScreenBranchPlanForm> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'Assign Plan to Branch',
+        Text('common.assign_plan_to_branch'.tr(),
           style: Theme.of(context).textTheme.headlineSmall?.copyWith(
             fontWeight: FontWeight.bold,
             color: cs.onSurface,

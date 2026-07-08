@@ -1,8 +1,5 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:go_router/go_router.dart';
 import 'package:fl_chart/fl_chart.dart';
-import 'package:intl/intl.dart';
 
 import 'package:back_office/imports/core_imports.dart';
 import 'package:back_office/data/repositories/bill_repository_impl.dart';
@@ -26,9 +23,9 @@ class ScreenHome extends StatelessWidget {
 
     if (brandId == null || brandId.isEmpty) {
       return Scaffold(
-        appBar: AppTopBar(title: 'Dashboard'),
-        body: const Center(
-          child: Text('No active brand found. Please contact support.'),
+        appBar: AppTopBar(title: 'home.dashboard'.tr()),
+        body: Center(
+          child: Text('common.home_no_active_brand'.tr().tr()),
         ),
       );
     }
@@ -88,7 +85,7 @@ class _DashboardViewState extends State<DashboardView> {
           return Scaffold(
             backgroundColor: cs.surface,
             appBar: AppTopBar(
-              title: 'Dashboard',
+              title: 'home.dashboard'.tr(),
               actions: [
                 _buildBranchSelector(context, dashboardState),
                 const SizedBox(width: 12),
@@ -118,10 +115,10 @@ class _DashboardViewState extends State<DashboardView> {
               contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               border: OutlineInputBorder(),
             ),
-            value: branchState.branches.any((b) => b.id == dashboardState.selectedBranchId)
+            initialValue: branchState.branches.any((b) => b.id == dashboardState.selectedBranchId)
                 ? dashboardState.selectedBranchId
                 : null,
-            hint: const Text('Select Branch'),
+            hint: Text('common.home_select_branch'.tr().tr()),
             items: branchState.branches.map((b) {
               return DropdownMenuItem(value: b.id, child: Text(b.displayName));
             }).toList(),
@@ -177,8 +174,7 @@ class _DashboardViewState extends State<DashboardView> {
             children: [
               Icon(Icons.dashboard_outlined, size: 64, color: cs.outline),
               const SizedBox(height: 16),
-              Text(
-                'Please select a branch from the dropdown above to view the dashboard report.',
+              Text('common.home_select_branch_prompt'.tr().tr(),
                 textAlign: TextAlign.center,
                 style: Theme.of(context).textTheme.titleMedium,
               ),
@@ -200,7 +196,7 @@ class _DashboardViewState extends State<DashboardView> {
             Icon(Icons.error_outline, size: 64, color: cs.error),
             const SizedBox(height: 16),
             Text(
-              state.errorMessage ?? 'Error loading dashboard report',
+              state.errorMessage ?? 'home.error_loading'.tr(),
               style: Theme.of(context).textTheme.titleMedium,
             ),
             const SizedBox(height: 16),
@@ -208,7 +204,7 @@ class _DashboardViewState extends State<DashboardView> {
               onPressed: () {
                 context.read<CubitDashboard>().loadDashboard();
               },
-              child: const Text('Retry'),
+              child: Text('common.home_retry'.tr().tr()),
             ),
           ],
         ),
@@ -216,8 +212,8 @@ class _DashboardViewState extends State<DashboardView> {
     }
 
     if (state.report == null) {
-      return const Center(
-        child: Text('No report data available.'),
+      return Center(
+        child: Text('common.home_no_report_data'.tr().tr()),
       );
     }
 
@@ -242,13 +238,12 @@ class _DashboardViewState extends State<DashboardView> {
 
   Widget _buildDashboardHeader(BuildContext context, StateDashboard state) {
     final df = DateFormat('MMM dd, yyyy');
-    final subtitle = 'Business Performance Overview • ${df.format(state.fromDate)} - ${df.format(state.toDate)}';
+    final subtitle = '${'home.business_performance'.tr()} • ${df.format(state.fromDate)} - ${df.format(state.toDate)}';
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'Dashboard Report',
+        Text('common.home_dashboard_report'.tr().tr(),
           style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                 fontWeight: FontWeight.bold,
               ),
@@ -263,7 +258,6 @@ class _DashboardViewState extends State<DashboardView> {
       ],
     );
   }
-
   Widget _buildMetricsGrid(BuildContext context, DashboardReportModel report) {
     final summary = report.summary;
     final cancellation = report.cancellationReport;
@@ -382,7 +376,7 @@ class _DashboardViewState extends State<DashboardView> {
     if (isMobile) {
       return Column(
         children: charts.map((c) => Padding(
-              padding: const EdgeInsets.only(bottom: 16.0),
+              padding: const EdgeInsets.only(bottom: 16),
               child: c,
             )).toList(),
       );
@@ -516,7 +510,7 @@ class _DashboardViewState extends State<DashboardView> {
     final hourlyData = List<DashboardHourlySaleModel>.from(report.hourlySales)
       ..sort((a, b) => a.hour.compareTo(b.hour));
 
-    double maxVal = 100.0;
+    double maxVal = 100;
     final barGroups = List.generate(hourlyData.length, (index) {
       final data = hourlyData[index];
       if (data.amount > maxVal) maxVal = data.amount;
@@ -576,7 +570,7 @@ class _DashboardViewState extends State<DashboardView> {
                   final idx = value.toInt();
                   if (idx >= 0 && idx < hourlyData.length) {
                     return Padding(
-                      padding: const EdgeInsets.only(top: 8.0),
+                      padding: const EdgeInsets.only(top: 8),
                       child: Text(
                         '${hourlyData[idx].hour}:00',
                         style: TextStyle(color: Colors.grey.shade500, fontSize: 10),
@@ -601,15 +595,15 @@ class _DashboardViewState extends State<DashboardView> {
     const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
     const shortDays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
-    final dayAmountMap = {for (var item in report.dayWise) item.day: item.amount};
+    final dayAmountMap = {for (final item in report.dayWise) item.day: item.amount};
     final spots = List.generate(7, (index) {
       final day = daysOfWeek[index];
       final amount = dayAmountMap[day] ?? 0.0;
       return FlSpot(index.toDouble(), amount);
     });
 
-    double maxAmount = 100.0;
-    for (var spot in spots) {
+    double maxAmount = 100;
+    for (final spot in spots) {
       if (spot.y > maxAmount) maxAmount = spot.y;
     }
     maxAmount = (maxAmount / 1000).ceil() * 1000.0;
@@ -651,7 +645,7 @@ class _DashboardViewState extends State<DashboardView> {
                   final idx = value.toInt();
                   if (idx >= 0 && idx < 7) {
                     return Padding(
-                      padding: const EdgeInsets.only(top: 8.0),
+                      padding: const EdgeInsets.only(top: 8),
                       child: Text(
                         shortDays[idx],
                         style: TextStyle(color: Colors.grey.shade500, fontSize: 10),
@@ -670,7 +664,7 @@ class _DashboardViewState extends State<DashboardView> {
           maxY: maxAmount,
           lineBarsData: [
             LineChartBarData(
-              spots: spots,
+              spots: spots, 
               isCurved: true,
               color: Theme.of(context).colorScheme.primary,
               barWidth: 3,
@@ -709,7 +703,7 @@ class _DashboardViewState extends State<DashboardView> {
       {'name': 'IGST', 'amount': report.taxReport.igst},
     ];
 
-    double maxTaxVal = 100.0;
+    double maxTaxVal = 100;
     final taxGroups = List.generate(taxData.length, (index) {
       final amount = taxData[index]['amount'] as double;
       if (amount > maxTaxVal) maxTaxVal = amount;
@@ -768,7 +762,7 @@ class _DashboardViewState extends State<DashboardView> {
                   final idx = value.toInt();
                   if (idx >= 0 && idx < taxData.length) {
                     return Padding(
-                      padding: const EdgeInsets.only(top: 8.0),
+                      padding: const EdgeInsets.only(top: 8),
                       child: Text(
                         taxData[idx]['name'] as String,
                         style: TextStyle(color: Colors.grey.shade500, fontSize: 10),
@@ -829,7 +823,7 @@ class _DashboardViewState extends State<DashboardView> {
     if (isMobile) {
       return Column(
         children: tables.map((t) => Padding(
-              padding: const EdgeInsets.only(bottom: 16.0),
+              padding: const EdgeInsets.only(bottom: 16),
               child: t,
             )).toList(),
       );
@@ -880,8 +874,7 @@ class _DashboardViewState extends State<DashboardView> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              'Payment Modes Details',
+            Text('common.payment_modes_details'.tr(),
               style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 16),
@@ -895,11 +888,11 @@ class _DashboardViewState extends State<DashboardView> {
               children: [
                 TableRow(
                   decoration: BoxDecoration(border: Border(bottom: BorderSide(color: cs.outlineVariant))),
-                  children: const [
-                    Padding(padding: EdgeInsets.symmetric(vertical: 8.0), child: Text('MODE', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 11))),
-                    Padding(padding: EdgeInsets.symmetric(vertical: 8.0), child: Text('COUNT', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 11))),
-                    Padding(padding: EdgeInsets.symmetric(vertical: 8.0), child: Text('AMOUNT', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 11))),
-                    Padding(padding: EdgeInsets.symmetric(vertical: 8.0), child: Text('SHARE', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 11))),
+                  children: [
+                    Padding(padding: const EdgeInsets.symmetric(vertical: 8), child: Text('common.mode'.tr(), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 11))),
+                    Padding(padding: const EdgeInsets.symmetric(vertical: 8), child: Text('common.count'.tr(), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 11))),
+                    Padding(padding: const EdgeInsets.symmetric(vertical: 8), child: Text('common.amount'.tr(), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 11))),
+                    Padding(padding: const EdgeInsets.symmetric(vertical: 8), child: Text('common.share'.tr(), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 11))),
                   ],
                 ),
                 ...report.paymentModes.map((pm) {
@@ -907,10 +900,10 @@ class _DashboardViewState extends State<DashboardView> {
                   return TableRow(
                     decoration: BoxDecoration(border: Border(bottom: BorderSide(color: cs.outlineVariant.withOpacity(0.3)))),
                     children: [
-                      Padding(padding: const EdgeInsets.symmetric(vertical: 10.0), child: _buildPaymentBadge(pm.mode)),
-                      Padding(padding: const EdgeInsets.symmetric(vertical: 10.0), child: Text('${pm.count}', style: const TextStyle(fontSize: 13))),
-                      Padding(padding: const EdgeInsets.symmetric(vertical: 10.0), child: Text('₹${formatNumber(pm.amount)}', style: const TextStyle(fontSize: 13))),
-                      Padding(padding: const EdgeInsets.symmetric(vertical: 10.0), child: Text('$share%', style: const TextStyle(fontSize: 13))),
+                      Padding(padding: const EdgeInsets.symmetric(vertical: 10), child: _buildPaymentBadge(pm.mode)),
+                      Padding(padding: const EdgeInsets.symmetric(vertical: 10), child: Text('${pm.count}', style: const TextStyle(fontSize: 13))),
+                      Padding(padding: const EdgeInsets.symmetric(vertical: 10), child: Text('₹${formatNumber(pm.amount)}', style: const TextStyle(fontSize: 13))),
+                      Padding(padding: const EdgeInsets.symmetric(vertical: 10), child: Text('$share%', style: const TextStyle(fontSize: 13))),
                     ],
                   );
                 }),
@@ -970,8 +963,7 @@ class _DashboardViewState extends State<DashboardView> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              'Discount Breakdown',
+            Text('common.discount_breakdown'.tr(),
               style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 16),
@@ -983,25 +975,25 @@ class _DashboardViewState extends State<DashboardView> {
               children: [
                 TableRow(
                   decoration: BoxDecoration(border: Border(bottom: BorderSide(color: cs.outlineVariant))),
-                  children: const [
-                    Padding(padding: EdgeInsets.symmetric(vertical: 8.0), child: Text('REASON', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 11))),
-                    Padding(padding: EdgeInsets.symmetric(vertical: 8.0), child: Text('AMOUNT', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 11))),
+                  children: [
+                    Padding(padding: const EdgeInsets.symmetric(vertical: 8), child: Text('common.reason'.tr(), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 11))),
+                    Padding(padding: const EdgeInsets.symmetric(vertical: 8), child: Text('common.amount'.tr(), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 11))),
                   ],
                 ),
                 ...disc.byReason.entries.map((e) {
                   return TableRow(
                     decoration: BoxDecoration(border: Border(bottom: BorderSide(color: cs.outlineVariant.withOpacity(0.3)))),
                     children: [
-                      Padding(padding: const EdgeInsets.symmetric(vertical: 10.0), child: Text(e.key, style: const TextStyle(fontSize: 13))),
-                      Padding(padding: const EdgeInsets.symmetric(vertical: 10.0), child: Text('₹${formatNumber(e.value)}', style: const TextStyle(fontSize: 13))),
+                      Padding(padding: const EdgeInsets.symmetric(vertical: 10), child: Text(e.key, style: const TextStyle(fontSize: 13))),
+                      Padding(padding: const EdgeInsets.symmetric(vertical: 10), child: Text('₹${formatNumber(e.value)}', style: const TextStyle(fontSize: 13))),
                     ],
                   );
                 }),
                 TableRow(
                   decoration: const BoxDecoration(color: Colors.transparent),
                   children: [
-                    const Padding(padding: EdgeInsets.symmetric(vertical: 12.0), child: Text('Total', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13))),
-                    Padding(padding: const EdgeInsets.symmetric(vertical: 12.0), child: Text('₹${formatNumber(disc.total)}', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13))),
+                    Padding(padding: const EdgeInsets.symmetric(vertical: 12), child: Text('common.total'.tr(), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13))),
+                    Padding(padding: const EdgeInsets.symmetric(vertical: 12), child: Text('₹${formatNumber(disc.total)}', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13))),
                   ],
                 ),
               ],
@@ -1026,8 +1018,7 @@ class _DashboardViewState extends State<DashboardView> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              'Day-Wise Sales Details',
+            Text('common.day_wise_sales_details'.tr(),
               style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 16),
@@ -1041,11 +1032,11 @@ class _DashboardViewState extends State<DashboardView> {
               children: [
                 TableRow(
                   decoration: BoxDecoration(border: Border(bottom: BorderSide(color: cs.outlineVariant))),
-                  children: const [
-                    Padding(padding: EdgeInsets.symmetric(vertical: 8.0), child: Text('DAY', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 11))),
-                    Padding(padding: EdgeInsets.symmetric(vertical: 8.0), child: Text('ORDERS', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 11))),
-                    Padding(padding: EdgeInsets.symmetric(vertical: 8.0), child: Text('REVENUE', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 11))),
-                    Padding(padding: EdgeInsets.symmetric(vertical: 8.0), child: Text('AVG PER ORDER', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 11))),
+                  children: [
+                    Padding(padding: const EdgeInsets.symmetric(vertical: 8), child: Text('common.day'.tr(), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 11))),
+                    Padding(padding: const EdgeInsets.symmetric(vertical: 8), child: Text('common.orders'.tr(), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 11))),
+                    Padding(padding: const EdgeInsets.symmetric(vertical: 8), child: Text('common.revenue'.tr(), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 11))),
+                    Padding(padding: const EdgeInsets.symmetric(vertical: 8), child: Text('common.avg_per_order'.tr(), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 11))),
                   ],
                 ),
                 ...report.dayWise.map((dw) {
@@ -1053,10 +1044,10 @@ class _DashboardViewState extends State<DashboardView> {
                   return TableRow(
                     decoration: BoxDecoration(border: Border(bottom: BorderSide(color: cs.outlineVariant.withOpacity(0.3)))),
                     children: [
-                      Padding(padding: const EdgeInsets.symmetric(vertical: 10.0), child: Text(dw.day, style: const TextStyle(fontSize: 13))),
-                      Padding(padding: const EdgeInsets.symmetric(vertical: 10.0), child: Text('${dw.count}', style: const TextStyle(fontSize: 13))),
-                      Padding(padding: const EdgeInsets.symmetric(vertical: 10.0), child: Text('₹${formatNumber(dw.amount)}', style: const TextStyle(fontSize: 13))),
-                      Padding(padding: const EdgeInsets.symmetric(vertical: 10.0), child: Text('₹${formatNumber(double.parse(avgOrder.toStringAsFixed(2)))}', style: const TextStyle(fontSize: 13))),
+                      Padding(padding: const EdgeInsets.symmetric(vertical: 10), child: Text(dw.day, style: const TextStyle(fontSize: 13))),
+                      Padding(padding: const EdgeInsets.symmetric(vertical: 10), child: Text('${dw.count}', style: const TextStyle(fontSize: 13))),
+                      Padding(padding: const EdgeInsets.symmetric(vertical: 10), child: Text('₹${formatNumber(dw.amount)}', style: const TextStyle(fontSize: 13))),
+                      Padding(padding: const EdgeInsets.symmetric(vertical: 10), child: Text('₹${formatNumber(double.parse(avgOrder.toStringAsFixed(2)))}', style: const TextStyle(fontSize: 13))),
                     ],
                   );
                 }),
@@ -1192,7 +1183,7 @@ class _LegendItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4.0),
+      padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -1228,7 +1219,7 @@ class _TopItemsList extends StatelessWidget {
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
     if (items.isEmpty) {
-      return const Center(child: Text('No item data available'));
+      return Center(child: Text('common.no_item_data_available'.tr()));
     }
 
     final displayedItems = items.take(5).toList();
@@ -1239,7 +1230,7 @@ class _TopItemsList extends StatelessWidget {
       children: displayedItems.map((item) {
         final ratio = maxQty > 0 ? (item.quantity / maxQty) : 0.0;
         return Padding(
-          padding: const EdgeInsets.symmetric(vertical: 4.0),
+          padding: const EdgeInsets.symmetric(vertical: 4),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [

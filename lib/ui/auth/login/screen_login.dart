@@ -40,13 +40,11 @@ class ScreenLogin extends HookWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 SizedBox(height: AppSpacing.xl),
-                Text(
-                  'Welcome Back',
+                Text('common.auth_welcome_back'.tr().tr(),
                   style: tt.headlineMedium?.copyWith(fontWeight: FontWeight.bold),
                 ),
                 SizedBox(height: AppSpacing.sm),
-                Text(
-                  'Sign in to your account',
+                Text('common.auth_sign_in_subtitle'.tr().tr(),
                   textAlign: TextAlign.center,
                   style: tt.bodyMedium?.copyWith(color: cs.onSurfaceVariant),
                 ),
@@ -58,11 +56,11 @@ class ScreenLogin extends HookWidget {
                       AppTextField(
                         controller: usernameController,
                         enabled: !isLoading,
-                        label: 'Username',
+                        label: 'common.auth_username'.tr().tr(),
                         prefixIcon: const Icon(Icons.person_outline),
                         validator: (v) {
                           if (AppUtils.isBlank(v)) {
-                            return 'Username is required';
+                            return 'auth.username_required'.tr();
                           }
                           return null;
                         },
@@ -71,7 +69,7 @@ class ScreenLogin extends HookWidget {
                       AppTextField(
                         controller: pinController,
                         enabled: !isLoading,
-                        label: 'PIN',
+                        label: 'common.auth_pin'.tr().tr(),
                         obscureText: obscurePin.value,
                         prefixIcon: const Icon(Icons.lock_outline),
                         keyboardType: TextInputType.number,
@@ -83,10 +81,10 @@ class ScreenLogin extends HookWidget {
                         ),
                         validator: (v) {
                           if (AppUtils.isBlank(v)) {
-                            return 'PIN is required';
+                            return 'auth.pin_required'.tr();
                           }
                           if (v!.length < 4) {
-                            return 'PIN must be at least 4 digits';
+                            return 'auth.pin_min_length'.tr();
                           }
                           return null;
                         },
@@ -106,8 +104,7 @@ class ScreenLogin extends HookWidget {
                                   onChanged: (value) => rememberMe.value = value ?? false,
                                 ),
                               ),
-                              Text(
-                                'Remember me',
+                              Text('common.auth_remember_me'.tr().tr(),
                                 style: tt.bodySmall?.copyWith(color: cs.onSurfaceVariant),
                               ),
                             ],
@@ -116,7 +113,7 @@ class ScreenLogin extends HookWidget {
                       ),
                       SizedBox(height: AppSpacing.lg),
                       AppButton(
-                        label: 'Sign In',
+                        label: 'common.auth_sign_in'.tr().tr(),
                         isLoading: isLoading,
                         onPressed: isLoading ? null : handleLogin,
                         width: ButtonSize.large,

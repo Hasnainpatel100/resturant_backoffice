@@ -174,7 +174,7 @@ class _ScreenCategoryItemsState extends State<ScreenCategoryItems> {
           color: Theme.of(context).colorScheme.error,
           size: 32,
         ),
-        title: const Text('Delete Item'),
+        title: Text('common.delete_item'.tr()),
         content: RichText(
           textAlign: TextAlign.center,
           text: TextSpan(
@@ -192,7 +192,7 @@ class _ScreenCategoryItemsState extends State<ScreenCategoryItems> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('Cancel'),
+            child: Text('common.cancel'.tr()),
           ),
           FilledButton(
             style: FilledButton.styleFrom(
@@ -202,7 +202,7 @@ class _ScreenCategoryItemsState extends State<ScreenCategoryItems> {
               Navigator.pop(ctx);
               _cubit.deleteMenuItem(item.id, widget.brandId);
             },
-            child: const Text('Delete'),
+            child: Text('common.delete'.tr()),
           ),
         ],
       ),
@@ -416,7 +416,7 @@ class _ScreenCategoryItemsState extends State<ScreenCategoryItems> {
           floatingActionButton: FloatingActionButton.extended(
             onPressed: _openAddItemSheet,
             icon: const Icon(Icons.add_rounded),
-            label: const Text('Add Item'),
+            label: Text('common.add_item'.tr()),
           ),
         ),
       ),
@@ -450,7 +450,7 @@ class _SearchBar extends StatelessWidget {
         autofocus: true,
         onChanged: onChanged,
         decoration: InputDecoration(
-          hintText: 'Search items by name or description…',
+          hintText: 'common.search_items_by_name_or_descri'.tr(),
           prefixIcon: const Icon(Icons.search, size: 20),
           suffixIcon: controller.text.isNotEmpty
               ? IconButton(
@@ -604,7 +604,7 @@ class _ItemCard extends StatelessWidget {
                                   Icon(Icons.edit_outlined,
                                       size: 16, color: cs.onSurface),
                                   const SizedBox(width: 10),
-                                  const Text('Edit'),
+                                  Text('common.edit'.tr()),
                                 ]),
                               ),
                               PopupMenuItem(
@@ -614,7 +614,7 @@ class _ItemCard extends StatelessWidget {
                                   Icon(Icons.info_outline_rounded,
                                       size: 16, color: cs.onSurface),
                                   const SizedBox(width: 10),
-                                  const Text('See Details'),
+                                  Text('common.see_details'.tr()),
                                 ]),
                               ),
                               PopupMenuItem(
@@ -624,7 +624,7 @@ class _ItemCard extends StatelessWidget {
                                   Icon(Icons.delete_outline,
                                       size: 16, color: cs.error),
                                   const SizedBox(width: 10),
-                                  Text('Delete',
+                                  Text('common.delete'.tr(),
                                       style: TextStyle(color: cs.error)),
                                 ]),
                               ),
@@ -1221,7 +1221,7 @@ class _BasicTab extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Name
-          _FieldLabel('Item Name *'),
+          const _FieldLabel('Item Name *'),
           const SizedBox(height: 6),
           TextFormField(
             controller: nameCtrl,
@@ -1237,7 +1237,7 @@ class _BasicTab extends StatelessWidget {
 
           // Code (create only)
           if (!isEditMode) ...[
-            _FieldLabel('Item Code *'),
+            const _FieldLabel('Item Code *'),
             const SizedBox(height: 6),
             TextFormField(
               controller: codeCtrl,
@@ -1252,7 +1252,7 @@ class _BasicTab extends StatelessWidget {
           ],
 
           // Description
-          _FieldLabel('Description'),
+          const _FieldLabel('Description'),
           const SizedBox(height: 6),
           TextFormField(
             controller: descCtrl,
@@ -1275,7 +1275,7 @@ class _BasicTab extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _FieldLabel('Tax %'),
+                    const _FieldLabel('Tax %'),
                     const SizedBox(height: 6),
                     TextFormField(
                       controller: taxCtrl,
@@ -1296,7 +1296,7 @@ class _BasicTab extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _FieldLabel('Display Order'),
+                    const _FieldLabel('Display Order'),
                     const SizedBox(height: 6),
                     TextFormField(
                       controller: orderCtrl,
@@ -1315,16 +1315,16 @@ class _BasicTab extends StatelessWidget {
           const SizedBox(height: 16),
 
           // Status dropdown
-          _FieldLabel('Status'),
+          const _FieldLabel('Status'),
           const SizedBox(height: 6),
           DropdownButtonFormField<String>(
             value: ['ACTIVE', 'INACTIVE'].contains(status.toUpperCase())
                 ? status.toUpperCase()
                 : 'ACTIVE',
             decoration: _deco('', Icons.toggle_on_outlined, context),
-            items: const [
-              DropdownMenuItem(value: 'ACTIVE', child: Text('Active')),
-              DropdownMenuItem(value: 'INACTIVE', child: Text('Inactive')),
+            items: [
+              DropdownMenuItem(value: 'ACTIVE', child: Text('common.active'.tr())),
+              DropdownMenuItem(value: 'INACTIVE', child: Text('common.inactive'.tr())),
             ],
             onChanged: onStatusChanged,
           ),
@@ -1372,7 +1372,7 @@ class _PricingTab extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Base price
-          _FieldLabel('Base Price (₹) *'),
+          const _FieldLabel('Base Price (₹) *'),
           const SizedBox(height: 6),
           TextFormField(
             controller: priceCtrl,
@@ -1398,10 +1398,10 @@ class _PricingTab extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Room Type Prices',
+                    Text('common.room_type_prices'.tr(),
                         style: tt.titleSmall
                             ?.copyWith(fontWeight: FontWeight.bold)),
-                    Text('Override price per room type',
+                    Text('common.override_price_per_room_type'.tr(),
                         style: tt.bodySmall
                             ?.copyWith(color: cs.onSurfaceVariant)),
                   ],
@@ -1420,7 +1420,7 @@ class _PricingTab extends StatelessWidget {
                         onRoomPricesChanged([
                           ...roomPrices,
                           RoomPrice(
-                              roomTypeId: available.first.id, price: 0.0),
+                              roomTypeId: available.first.id, price: 0),
                         ]);
                       },
                 style: FilledButton.styleFrom(
@@ -1428,12 +1428,12 @@ class _PricingTab extends StatelessWidget {
                       horizontal: 12, vertical: 8),
                   minimumSize: Size.zero,
                 ),
-                child: const Row(
+                child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(Icons.add, size: 16),
-                    SizedBox(width: 4),
-                    Text('Add'),
+                    const Icon(Icons.add, size: 16),
+                    const SizedBox(width: 4),
+                    Text('common.add'.tr()),
                   ],
                 ),
               ),
@@ -1629,10 +1629,10 @@ class _SizesTab extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Size Variants',
+                    Text('common.size_variants'.tr(),
                         style: tt.titleSmall
                             ?.copyWith(fontWeight: FontWeight.bold)),
-                    Text('e.g. Half / Full with different prices',
+                    Text('common.e_g_half_full_with_different_p'.tr(),
                         style: tt.bodySmall
                             ?.copyWith(color: cs.onSurfaceVariant)),
                   ],
@@ -1646,12 +1646,12 @@ class _SizesTab extends StatelessWidget {
                       horizontal: 12, vertical: 8),
                   minimumSize: Size.zero,
                 ),
-                child: const Row(
+                child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(Icons.add, size: 16),
-                    SizedBox(width: 4),
-                    Text('Add Size'),
+                    const Icon(Icons.add, size: 16),
+                    const SizedBox(width: 4),
+                    Text('common.add_size'.tr()),
                   ],
                 ),
               ),
@@ -1744,7 +1744,7 @@ class _SizeRowState extends State<_SizeRow> {
               textCapitalization: TextCapitalization.words,
               decoration: InputDecoration(
                 labelText: 'Size Name',
-                hintText: 'e.g. Half',
+                hintText: 'common.e_g_half'.tr(),
                 border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8)),
                 contentPadding: const EdgeInsets.symmetric(
@@ -1819,10 +1819,10 @@ class _ModifiersTab extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Modifier Groups',
+                    Text('common.modifier_groups'.tr(),
                         style: tt.titleSmall
                             ?.copyWith(fontWeight: FontWeight.bold)),
-                    Text('e.g. Spice Level, Add-ons',
+                    Text('common.e_g_spice_level_add_ons'.tr(),
                         style: tt.bodySmall
                             ?.copyWith(color: cs.onSurfaceVariant)),
                   ],
@@ -1838,12 +1838,12 @@ class _ModifiersTab extends StatelessWidget {
                       horizontal: 12, vertical: 8),
                   minimumSize: Size.zero,
                 ),
-                child: const Row(
+                child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(Icons.add, size: 16),
-                    SizedBox(width: 4),
-                    Text('Add Group'),
+                    const Icon(Icons.add, size: 16),
+                    const SizedBox(width: 4),
+                    Text('common.add_group'.tr()),
                   ],
                 ),
               ),
@@ -1944,7 +1944,7 @@ class _ModifierGroupCardState extends State<_ModifierGroupCard> {
                     textCapitalization: TextCapitalization.words,
                     decoration: InputDecoration(
                       labelText: 'Group Name',
-                      hintText: 'e.g. Spice Level',
+                      hintText: 'common.e_g_spice_level'.tr(),
                       border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(8)),
                       contentPadding: const EdgeInsets.symmetric(
@@ -2023,7 +2023,7 @@ class _ModifierGroupCardState extends State<_ModifierGroupCard> {
             padding: const EdgeInsets.fromLTRB(12, 8, 12, 4),
             child: Row(
               children: [
-                Text('Options',
+                Text('common.options'.tr(),
                     style: tt.labelSmall
                         ?.copyWith(fontWeight: FontWeight.w600)),
                 const Spacer(),
@@ -2034,7 +2034,7 @@ class _ModifierGroupCardState extends State<_ModifierGroupCard> {
                     widget.onChanged(m.copyWith(options: opts));
                   },
                   icon: const Icon(Icons.add, size: 14),
-                  label: const Text('Add Option'),
+                  label: Text('common.add_option'.tr()),
                   style: TextButton.styleFrom(
                     padding: const EdgeInsets.symmetric(
                         horizontal: 8, vertical: 4),
@@ -2048,7 +2048,7 @@ class _ModifierGroupCardState extends State<_ModifierGroupCard> {
           if (m.options.isEmpty)
             Padding(
               padding: const EdgeInsets.fromLTRB(12, 0, 12, 10),
-              child: Text('No options yet. Tap Add Option.',
+              child: Text('common.no_options_yet_tap_add_option'.tr(),
                   style: tt.bodySmall
                       ?.copyWith(color: cs.onSurfaceVariant)),
             )
@@ -2132,7 +2132,7 @@ class _ModifierOptionRowState extends State<_ModifierOptionRow> {
               controller: _nameCtrl,
               textCapitalization: TextCapitalization.words,
               decoration: InputDecoration(
-                hintText: 'e.g. Mild',
+                hintText: 'common.e_g_mild'.tr(),
                 border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8)),
                 contentPadding: const EdgeInsets.symmetric(
@@ -2159,7 +2159,7 @@ class _ModifierOptionRowState extends State<_ModifierOptionRow> {
                     RegExp(r'^\d+\.?\d{0,2}'))
               ],
               decoration: InputDecoration(
-                hintText: '₹ 0',
+                hintText: 'common.0'.tr(),
                 border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8)),
                 contentPadding: const EdgeInsets.symmetric(
@@ -2208,10 +2208,10 @@ class _ImagesTab extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Image URLs',
+                    Text('common.image_urls'.tr(),
                         style: tt.titleSmall
                             ?.copyWith(fontWeight: FontWeight.bold)),
-                    Text('Add one or more image links for this item',
+                    Text('common.add_one_or_more_image_links_fo'.tr(),
                         style: tt.bodySmall
                             ?.copyWith(color: cs.onSurfaceVariant)),
                   ],
@@ -2224,12 +2224,12 @@ class _ImagesTab extends StatelessWidget {
                       horizontal: 12, vertical: 8),
                   minimumSize: Size.zero,
                 ),
-                child: const Row(
+                child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(Icons.add, size: 16),
-                    SizedBox(width: 4),
-                    Text('Add URL'),
+                    const Icon(Icons.add, size: 16),
+                    const SizedBox(width: 4),
+                    Text('common.add_url'.tr()),
                   ],
                 ),
               ),
@@ -2327,7 +2327,7 @@ class _ImageUrlRowState extends State<_ImageUrlRow> {
               controller: _ctrl,
               keyboardType: TextInputType.url,
               decoration: InputDecoration(
-                hintText: 'https://cdn.example.com/image.jpg',
+                hintText: 'common.https_cdn_example_com_image_jp'.tr(),
                 prefixIcon: const Icon(Icons.link, size: 18),
                 border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10)),
@@ -2379,7 +2379,7 @@ class _TogglesCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
-    return Container(
+    return DecoratedBox(
       decoration: BoxDecoration(
         color: cs.surfaceContainerLow,
         borderRadius: BorderRadius.circular(14),
@@ -2616,7 +2616,7 @@ class _EmptyItemsView extends StatelessWidget {
               FilledButton.icon(
                 onPressed: onAdd,
                 icon: const Icon(Icons.add_rounded, size: 18),
-                label: const Text('Add First Item'),
+                label: Text('common.add_first_item'.tr()),
                 style: FilledButton.styleFrom(
                   padding: const EdgeInsets.symmetric(
                       horizontal: 24, vertical: 12),
@@ -2662,8 +2662,7 @@ class _ErrorView extends StatelessWidget {
               child: Icon(Icons.wifi_off_rounded, size: 36, color: cs.error),
             ),
             const SizedBox(height: 16),
-            Text(
-              'Something went wrong',
+            Text('common.something_went_wrong'.tr(),
               style: Theme.of(context)
                   .textTheme
                   .titleSmall
@@ -2682,7 +2681,7 @@ class _ErrorView extends StatelessWidget {
             OutlinedButton.icon(
               onPressed: onRetry,
               icon: const Icon(Icons.refresh_rounded, size: 18),
-              label: const Text('Retry'),
+              label: Text('common.retry'.tr()),
               style: OutlinedButton.styleFrom(
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10)),
@@ -2707,7 +2706,7 @@ class _MenuItemDetailDialog extends StatelessWidget {
   String _getRoomTypeName(String id) {
     final rt = roomTypes.firstWhere(
       (r) => r.id == id,
-      orElse: () => RoomTypeModel(
+      orElse: () => const RoomTypeModel(
         id: '',
         brandId: '',
         branchId: '',
@@ -2891,8 +2890,7 @@ class _MenuItemDetailDialog extends StatelessWidget {
                             const SizedBox(height: 8),
                             Align(
                               alignment: Alignment.centerLeft,
-                              child: Text(
-                                'Room Type Pricing:',
+                              child: Text('common.room_type_pricing'.tr(),
                                 style: tt.bodySmall?.copyWith(fontWeight: FontWeight.bold, color: cs.onSurfaceVariant),
                               ),
                             ),

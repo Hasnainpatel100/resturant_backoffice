@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import 'package:easy_localization/easy_localization.dart';
 import '../../../data/repositories/branch_plan_repository_impl.dart';
 import '../../../theme/theme_constants.dart';
 import 'cubit_branch_plan.dart';
@@ -69,12 +70,12 @@ class _PlanHistoryView extends StatelessWidget {
             }
           },
         ),
-        title: const Text('Plan History'),
+        title: Text('common.plan_history'.tr()),
         actions: [
           ElevatedButton.icon(
             onPressed: () => _navigateToForm(context),
             icon: const Icon(Icons.add),
-            label: const Text('Assign Plan'),
+            label: Text('common.assign_plan'.tr()),
             style: ElevatedButton.styleFrom(
               backgroundColor: cs.primary,
               foregroundColor: cs.onPrimary,
@@ -107,7 +108,7 @@ class _PlanHistoryView extends StatelessWidget {
                         .read<CubitBranchPlan>()
                         .loadPlanHistory(branchId),
                     icon: const Icon(Icons.refresh),
-                    label: const Text('Retry'),
+                    label: Text('common.retry'.tr()),
                   ),
                 ],
               ),
@@ -121,15 +122,13 @@ class _PlanHistoryView extends StatelessWidget {
                 children: [
                   Icon(Icons.history, size: 64, color: cs.outline),
                   SizedBox(height: AppSpacing.md),
-                  Text(
-                    'No plan history yet',
+                  Text('common.no_plan_history_yet'.tr(),
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
                           color: cs.onSurfaceVariant,
                         ),
                   ),
                   SizedBox(height: AppSpacing.xs),
-                  Text(
-                    'Assign a plan to this branch to get started',
+                  Text('common.assign_a_plan_to_this_branch_t'.tr(),
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
                           color: cs.outline,
                         ),
@@ -182,7 +181,7 @@ class _PlanHistoryView extends StatelessWidget {
                   margin: EdgeInsets.only(bottom: AppSpacing.md),
                   elevation: 1,
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12.0),
+                    borderRadius: BorderRadius.circular(12),
                     side: BorderSide(
                       color: isExpired
                           ? cs.error.withOpacity(0.3)
@@ -223,7 +222,7 @@ class _PlanHistoryView extends StatelessWidget {
                                     ? cs.error.withOpacity(0.1)
                                     : Colors.green.withOpacity(0.1),
                                 borderRadius:
-                                    BorderRadius.circular(6.0),
+                                    BorderRadius.circular(6),
                               ),
                               child: Text(
                                 isExpired ? 'Expired' : 'Active',
@@ -250,21 +249,21 @@ class _PlanHistoryView extends StatelessWidget {
                             Expanded(
                               child: _DetailItem(
                                 icon: Icons.people_outline,
-                                label: 'Max Users',
+                                label: 'common.max_users'.tr(),
                                 value: '${plan.maxUsers}',
                               ),
                             ),
                             Expanded(
                               child: _DetailItem(
                                 icon: Icons.devices_outlined,
-                                label: 'Max Devices',
+                                label: 'common.max_devices'.tr(),
                                 value: '${plan.maxPosDevices}',
                               ),
                             ),
                             Expanded(
                               child: _DetailItem(
                                 icon: Icons.calendar_today_outlined,
-                                label: 'Expires',
+                                label: 'common.expires'.tr(),
                                 value: expiryFormatted,
                                 valueColor: isExpired ? cs.error : null,
                               ),

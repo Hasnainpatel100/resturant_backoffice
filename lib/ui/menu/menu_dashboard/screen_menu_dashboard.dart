@@ -114,7 +114,7 @@ class _MenuDashboardView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Menu'),
+        title: Text('common.menu'.tr()),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => context.go('/brands/$brandId'),
@@ -251,7 +251,7 @@ class _MenuDashboardView extends StatelessWidget {
           _showCategoryDialog(context);
         },
         icon: const Icon(Icons.add),
-        label: const Text('Add Category'),
+        label: Text('common.add_category'.tr()),
       )
           : null,
     );
@@ -412,7 +412,7 @@ class _MenuDashboardView extends StatelessWidget {
           color: Theme.of(context).colorScheme.error,
           size: 32,
         ),
-        title: const Text('Delete Category'),
+        title: Text('common.delete_category'.tr()),
         content: RichText(
           textAlign: TextAlign.center,
           text: TextSpan(
@@ -432,7 +432,7 @@ class _MenuDashboardView extends StatelessWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogCtx),
-            child: const Text('Cancel'),
+            child: Text('common.cancel'.tr()),
           ),
           FilledButton(
             style: FilledButton.styleFrom(
@@ -442,7 +442,7 @@ class _MenuDashboardView extends StatelessWidget {
               Navigator.pop(dialogCtx);
               context.read<CubitMenu>().deleteCategory(brandId,categoryId);
             },
-            child: const Text('Delete'),
+            child: Text('common.delete'.tr()),
           ),
         ],
       ),
@@ -578,13 +578,13 @@ class _CategoryActionMenu extends StatelessWidget {
       icon: const Icon(Icons.more_vert, size: 18),
       padding: EdgeInsets.zero,
       itemBuilder: (_) => [
-        const PopupMenuItem(
+        PopupMenuItem(
           value: _CategoryAction.edit,
           child: Row(
             children: [
-              Icon(Icons.edit_outlined, size: 18),
+              const Icon(Icons.edit_outlined, size: 18),
               SizedBox(width: 8),
-              Text('Edit'),
+              Text('common.edit'.tr()),
             ],
           ),
         ),
@@ -598,21 +598,20 @@ class _CategoryActionMenu extends StatelessWidget {
                 color: Theme.of(context).colorScheme.error,
               ),
               const SizedBox(width: 8),
-              Text(
-                'Delete',
+              Text('common.delete'.tr(),
                 style: TextStyle(color: Theme.of(context).colorScheme.error),
               ),
             ],
           ),
         ),
         const PopupMenuDivider(),
-        const PopupMenuItem(
+        PopupMenuItem(
           value: _CategoryAction.importCsv,
           child: Row(
             children: [
-              Icon(Icons.upload_file_rounded, size: 18),
+              const Icon(Icons.upload_file_rounded, size: 18),
               SizedBox(width: 8),
-              Text('Import CSV / Excel'),
+              Text('common.import_csv_excel'.tr()),
             ],
           ),
         ),
@@ -731,10 +730,10 @@ class _CategoryFormDialogState extends State<_CategoryFormDialog> {
               // Display order (optional)
               TextFormField(
                 controller: _orderCtrl,
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   labelText: 'Display Order',
-                  prefixIcon: Icon(Icons.sort),
-                  hintText: 'e.g. 1',
+                  prefixIcon: const Icon(Icons.sort),
+                  hintText: 'common.e_g_1'.tr(),
                 ),
                 keyboardType: TextInputType.number,
                 inputFormatters: [FilteringTextInputFormatter.digitsOnly],
@@ -745,10 +744,10 @@ class _CategoryFormDialogState extends State<_CategoryFormDialog> {
               // Image URL (optional)
               TextFormField(
                 controller: _imageUrlCtrl,
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   labelText: 'Image URL',
-                  prefixIcon: Icon(Icons.image_outlined),
-                  hintText: 'https://example.com/image.jpg',
+                  prefixIcon: const Icon(Icons.image_outlined),
+                  hintText: 'common.https_example_com_image_jpg'.tr(),
                 ),
                 keyboardType: TextInputType.url,
                 textInputAction: TextInputAction.done,
@@ -769,7 +768,7 @@ class _CategoryFormDialogState extends State<_CategoryFormDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: const Text('Cancel'),
+          child: Text('common.cancel'.tr()),
         ),
         FilledButton(
           onPressed: _submit,
@@ -806,8 +805,7 @@ class _BranchSelector extends StatelessWidget {
             children: [
               Icon(Icons.store_outlined, size: 48, color: cs.outline),
               SizedBox(height: AppSpacing.md),
-              Text(
-                'Select a branch to manage its menu',
+              Text('common.select_a_branch_to_manage_its'.tr(),
                 style: Theme.of(context).textTheme.bodyMedium,
                 textAlign: TextAlign.center,
               ),
@@ -818,15 +816,14 @@ class _BranchSelector extends StatelessWidget {
                     return const Center(child: CircularProgressIndicator());
                   }
                   if (branchState.branches.isEmpty) {
-                    return Text(
-                      'No branches found',
+                    return Text('common.no_branches_found'.tr(),
                       style: TextStyle(color: cs.outline),
                     );
                   }
                   return DropdownButtonFormField<String>(
                     decoration:
                     const InputDecoration(labelText: 'Branch'),
-                    hint: const Text('Select branch'),
+                    hint: Text('common.select_branch'.tr()),
                     items: branchState.branches
                         .map(
                           (b) => DropdownMenuItem(
@@ -864,13 +861,11 @@ class _EmptyCategoriesView extends StatelessWidget {
         children: [
           Icon(Icons.category_outlined, size: 64, color: cs.outlineVariant),
           SizedBox(height: AppSpacing.md),
-          Text(
-            'No categories yet',
+          Text('common.no_categories_yet'.tr(),
             style: Theme.of(context).textTheme.titleMedium,
           ),
           SizedBox(height: AppSpacing.sm),
-          Text(
-            'Add a category to start building your menu.',
+          Text('common.add_a_category_to_start_buildi'.tr(),
             style: Theme.of(context)
                 .textTheme
                 .bodySmall
@@ -881,7 +876,7 @@ class _EmptyCategoriesView extends StatelessWidget {
           ElevatedButton.icon(
             onPressed: onAdd,
             icon: const Icon(Icons.add),
-            label: const Text('Add Category'),
+            label: Text('common.add_category'.tr()),
           ),
         ],
       ),
@@ -919,7 +914,7 @@ class _ErrorView extends StatelessWidget {
             OutlinedButton.icon(
               onPressed: onRetry,
               icon: const Icon(Icons.refresh),
-              label: const Text('Retry'),
+              label: Text('common.retry'.tr()),
             ),
           ],
         ),

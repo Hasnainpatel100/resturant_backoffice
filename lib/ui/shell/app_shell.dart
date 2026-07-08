@@ -5,19 +5,19 @@ void showLogoutConfirmation(BuildContext context, VoidCallback onConfirm) {
   showDialog(
     context: context,
     builder: (dialogContext) => AlertDialog(
-      title: const Text('Logout'),
-      content: const Text('Are you sure you want to logout?'),
+      title: Text('common.logout'.tr()),
+      content: Text('common.are_you_sure_you_want_to_logou'.tr()),
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(dialogContext),
-          child: const Text('Cancel'),
+          child: Text('common.cancel'.tr()),
         ),
         ElevatedButton(
           onPressed: () {
             Navigator.pop(dialogContext);
             onConfirm();
           },
-          child: const Text('Logout'),
+          child: Text('common.logout'.tr()),
         ),
       ],
     ),
@@ -67,24 +67,24 @@ class AppShell extends StatelessWidget {
 
         if (isDesktop) {
           return _DesktopShell(
-            child: child,
             currentLocation: currentLocation,
             user: user,
+            child: child,
           );
         }
 
         if (isTablet) {
           return _TabletShell(
-            child: child,
             currentLocation: currentLocation,
             user: user,
+            child: child,
           );
         }
 
         return _MobileShell(
-          child: child,
           currentLocation: currentLocation,
           user: user,
+          child: child,
         );
       },
     );
@@ -147,24 +147,11 @@ class _DesktopSidebar extends StatelessWidget {
     final brandId = _getActiveBrandId(currentLocation, user);
 
     final usersRoute = brandId != null ? '/brands/$brandId/users' : AppRoutes.brandList;
+    final tablesRoute = brandId != null ? '/brands/$brandId/tables' : AppRoutes.brandList;
+    final roomTypesRoute = brandId != null ? '/brands/$brandId/room-types' : AppRoutes.brandList;
+    final menuRoute = brandId != null ? '/brands/$brandId/menu' : AppRoutes.brandList;
+    final posDevicesRoute = brandId != null ? '/brands/$brandId/pos-devices' : AppRoutes.brandList;
     final billsRoute = brandId != null ? '/brands/$brandId/bills' : AppRoutes.brandList;
-    final branchesRoute = brandId != null ? '/brands/$brandId/branches' : AppRoutes.brandList;
-    final branchCreateRoute = brandId != null ? '/brands/$brandId/branches/create' : AppRoutes.brandList;
-    final inventoryRoute = brandId != null ? '/brands/$brandId/inventory' : AppRoutes.brandList;
-
-    final String userInitials;
-    if (user?.name != null && user!.name!.isNotEmpty) {
-      final parts = user!.name!.trim().split(RegExp(r'\s+'));
-      if (parts.length > 1) {
-        userInitials = '${parts[0][0]}${parts[parts.length - 1][0]}'.toUpperCase();
-      } else {
-        userInitials = parts[0][0].toUpperCase();
-      }
-    } else {
-      userInitials = 'RK';
-    }
-    final String displayName = user?.name ?? 'Rohan Kale';
-    final String displayEmail = user?.email ?? 'owner@rhpos.app';
 
     return Container(
       width: 260,
@@ -177,43 +164,24 @@ class _DesktopSidebar extends StatelessWidget {
             child: Row(
               children: [
                 Container(
-                  width: 40,
-                  height: 40,
-                  alignment: Alignment.center,
+                  padding: EdgeInsets.all(AppSpacing.sm),
                   decoration: BoxDecoration(
-                    color: cs.primary,
-                    borderRadius: BorderRadius.circular(10),
+                    color: cs.primaryContainer,
+                    borderRadius: AppBorders.md,
                   ),
-                  child: const Text(
-                    'R',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 20,
-                      fontWeight: FontWeight.w900,
-                    ),
-                  ),
+                  child: Icon(Icons.restaurant, color: cs.onPrimaryContainer, size: 24),
                 ),
                 SizedBox(width: AppSpacing.md),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        'RH POS',
-                        style: theme.textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.w900,
-                          letterSpacing: 0.2,
-                          color: cs.onSurface,
-                        ),
+                      Text('common.backoffice'.tr(),
+                        style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
                       ),
                       Text(
-                        'BACKOFFICE',
-                        style: theme.textTheme.labelSmall?.copyWith(
-                          color: cs.onSurfaceVariant.withOpacity(0.6),
-                          fontSize: 9,
-                          letterSpacing: 1.2,
-                          fontWeight: FontWeight.bold,
-                        ),
+                        user?.role ?? 'Admin',
+                        style: theme.textTheme.bodySmall?.copyWith(color: cs.onSurfaceVariant),
                       ),
                     ],
                   ),
@@ -229,61 +197,91 @@ class _DesktopSidebar extends StatelessWidget {
             child: ListView(
               padding: EdgeInsets.symmetric(vertical: AppSpacing.md),
               children: [
-                const _NavSection(title: 'OVERVIEW'),
+                const _NavSection(title: 'MAIN'),
                 _NavItem(
-                  icon: Icons.grid_view_outlined,
-                  activeIcon: Icons.grid_view,
-                  label: 'Dashboard',
+                  icon: Icons.dashboard_outlined,
+                  activeIcon: Icons.dashboard,
+                  label: 'common.dashboard'.tr(),
                   route: AppRoutes.home,
                   currentLocation: currentLocation,
                 ),
-
-                SizedBox(height: AppSpacing.md),
-                const _NavSection(title: 'NETWORK'),
                 _NavItem(
-                  icon: Icons.storefront_outlined,
-                  activeIcon: Icons.storefront,
-                  label: 'Restaurants',
+                  icon: Icons.store_outlined,
+                  activeIcon: Icons.store,
+                  label: 'common.brands'.tr(),
                   route: AppRoutes.brandList,
-                  currentLocation: currentLocation,
-                ),
-                _NavItem(
-                  icon: Icons.device_hub_outlined,
-                  activeIcon: Icons.device_hub,
-                  label: 'Branches',
-                  route: branchesRoute,
-                  currentLocation: currentLocation,
-                ),
-
-                SizedBox(height: AppSpacing.md),
-                const _NavSection(title: 'OPERATIONS'),
-                _NavItem(
-                  icon: Icons.assignment_outlined,
-                  activeIcon: Icons.assignment,
-                  label: 'Orders',
-                  route: billsRoute,
-                  currentLocation: currentLocation,
-                  badge: '12',
-                ),
-                _NavItem(
-                  icon: Icons.people_outline,
-                  activeIcon: Icons.people,
-                  label: 'Staff',
-                  route: usersRoute,
                   currentLocation: currentLocation,
                 ),
                 _NavItem(
                   icon: Icons.inventory_2_outlined,
                   activeIcon: Icons.inventory_2,
-                  label: 'Inventory',
-                  route: inventoryRoute,
+                  label: 'common.inventory'.tr(),
+                  route: '/inventory',
                   currentLocation: currentLocation,
                 ),
                 _NavItem(
+                  icon: Icons.people_outlined,
+                  activeIcon: Icons.people,
+                  label: 'common.users'.tr(),
+                  route: usersRoute,
+                  currentLocation: currentLocation,
+                ),
+
+                SizedBox(height: AppSpacing.lg),
+                const _NavSection(title: 'MANAGEMENT'),
+                _NavItem(
+                  icon: Icons.table_restaurant_outlined,
+                  activeIcon: Icons.table_restaurant,
+                  label: 'common.tables'.tr(),
+                  route: tablesRoute,
+                  currentLocation: currentLocation,
+                ),
+                _NavItem(
+                  icon: Icons.receipt_long_outlined,
+                  activeIcon: Icons.receipt_long,
+                  label: 'common.bills'.tr(),
+                  route: billsRoute,
+                  currentLocation: currentLocation,
+                ),
+                _NavItem(
+                  icon: Icons.hotel_outlined,
+                  activeIcon: Icons.hotel,
+                  label: 'common.room_types'.tr(),
+                  route: roomTypesRoute,
+                  currentLocation: currentLocation,
+                ),
+                _NavItem(
+                  icon: Icons.devices_outlined,
+                  activeIcon: Icons.devices,
+                  label: 'common.pos_devices'.tr(),
+                  route: posDevicesRoute,
+                  currentLocation: currentLocation,
+                ),
+                _NavItem(
+                  icon: Icons.menu_book_outlined,
+                  activeIcon: Icons.menu_book,
+                  label: 'common.menu'.tr(),
+                  route: menuRoute,
+                  currentLocation: currentLocation,
+                ),
+                _FeedbackNavGroup(
+                  currentLocation: currentLocation,
+                ),
+
+                SizedBox(height: AppSpacing.lg),
+                const _NavSection(title: 'SYSTEM'),
+                _NavItem(
                   icon: Icons.settings_outlined,
                   activeIcon: Icons.settings,
-                  label: 'Settings',
+                  label: 'common.settings'.tr(),
                   route: AppRoutes.settings,
+                  currentLocation: currentLocation,
+                ),
+                _NavItem(
+                  icon: Icons.notifications_outlined,
+                  activeIcon: Icons.notifications,
+                  label: 'common.notifications'.tr(),
+                  route: '/notifications',
                   currentLocation: currentLocation,
                 ),
               ],
@@ -292,107 +290,22 @@ class _DesktopSidebar extends StatelessWidget {
 
           const Divider(height: 1),
 
-          // Footer Profile Card
-          Padding(
-            padding: EdgeInsets.all(AppSpacing.md),
-            child: Builder(
-              builder: (ctx) => PopupMenuButton<String>(
-                offset: const Offset(0, -120),
-                shape: RoundedRectangleBorder(borderRadius: AppBorders.md),
-                child: Row(
-                  children: [
-                    CircleAvatar(
-                      radius: 18,
-                      backgroundColor: cs.primary,
-                      child: Text(
-                        userInitials,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 13,
-                        ),
-                      ),
-                    ),
-                    SizedBox(width: AppSpacing.sm),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            displayName,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: theme.textTheme.bodyMedium?.copyWith(
-                              fontWeight: FontWeight.bold,
-                              color: cs.onSurface,
-                            ),
-                          ),
-                          Text(
-                            displayEmail,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: theme.textTheme.bodySmall?.copyWith(
-                              color: cs.onSurfaceVariant,
-                              fontSize: 10,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-                itemBuilder: (context) => [
-                  PopupMenuItem(
-                    value: 'profile',
-                    child: Row(
-                      children: [
-                        const Icon(Icons.person_outline, size: 20),
-                        SizedBox(width: AppSpacing.sm),
-                        const Text('Profile'),
-                      ],
-                    ),
-                  ),
-                  PopupMenuItem(
-                    value: 'settings',
-                    child: Row(
-                      children: [
-                        const Icon(Icons.settings_outlined, size: 20),
-                        SizedBox(width: AppSpacing.sm),
-                        const Text('Settings'),
-                      ],
-                    ),
-                  ),
-                  const PopupMenuDivider(),
-                  PopupMenuItem(
-                    value: 'logout',
-                    child: Row(
-                      children: [
-                        const Icon(Icons.logout, size: 20, color: Colors.red),
-                        SizedBox(width: AppSpacing.sm),
-                        const Text('Logout', style: TextStyle(color: Colors.red)),
-                      ],
-                    ),
-                  ),
-                ],
-                onSelected: (value) {
-                  switch (value) {
-                    case 'profile':
-                      context.go(AppRoutes.profile);
-                      break;
-                    case 'settings':
-                      context.go(AppRoutes.settings);
-                      break;
-                    case 'logout':
-                      showLogoutConfirmation(context, () {
-                        ctx.read<CubitSession>().logout();
-                        context.go(AppRoutes.login);
-                      });
-                      break;
-                  }
-                },
-              ),
+          // Footer
+          Builder(
+            builder: (ctx) => _NavItem(
+              icon: Icons.logout_outlined,
+              activeIcon: Icons.logout,
+              label: 'common.logout'.tr(),
+              route: AppRoutes.login,
+              currentLocation: currentLocation,
+              isFooter: true,
+              onLogout: () => showLogoutConfirmation(context, () {
+                    ctx.read<CubitSession>().logout();
+                    context.go(AppRoutes.login);
+                  }),
             ),
           ),
+          SizedBox(height: AppSpacing.md),
         ],
       ),
     );
@@ -456,7 +369,6 @@ class _TabletSidebar extends StatelessWidget {
     final menuRoute = brandId != null ? '/brands/$brandId/menu' : AppRoutes.brandList;
     final posDevicesRoute = brandId != null ? '/brands/$brandId/pos-devices' : AppRoutes.brandList;
     final billsRoute = brandId != null ? '/brands/$brandId/bills' : AppRoutes.brandList;
-    final inventoryRoute = brandId != null ? '/brands/$brandId/inventory' : AppRoutes.brandList;
 
     return Container(
       width: 72,
@@ -465,21 +377,12 @@ class _TabletSidebar extends StatelessWidget {
         children: [
           SizedBox(height: AppSpacing.md),
           Container(
-            width: 40,
-            height: 40,
-            alignment: Alignment.center,
+            padding: EdgeInsets.all(AppSpacing.sm),
             decoration: BoxDecoration(
-              color: cs.primary,
+              color: cs.primaryContainer,
               borderRadius: AppBorders.sm,
             ),
-            child: const Text(
-              'R',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 18,
-                fontWeight: FontWeight.w900,
-              ),
-            ),
+            child: Icon(Icons.restaurant, color: cs.onPrimaryContainer, size: 24),
           ),
           SizedBox(height: AppSpacing.lg),
           Expanded(
@@ -488,61 +391,68 @@ class _TabletSidebar extends StatelessWidget {
                 children: [
                   _TabletNavItem(
                     icon: Icons.dashboard,
-                    label: 'Home',
+                    label: 'common.home'.tr(),
                     route: AppRoutes.home,
                     currentLocation: currentLocation,
                   ),
                   _TabletNavItem(
                     icon: Icons.store,
-                    label: 'Brands',
+                    label: 'common.brands'.tr(),
                     route: AppRoutes.brandList,
                     currentLocation: currentLocation,
                   ),
                   _TabletNavItem(
                     icon: Icons.people,
-                    label: 'Users',
+                    label: 'common.users'.tr(),
                     route: usersRoute,
                     currentLocation: currentLocation,
                   ),
                   _TabletNavItem(
                     icon: Icons.table_restaurant,
-                    label: 'Tables',
+                    label: 'common.tables'.tr(),
                     route: tablesRoute,
                     currentLocation: currentLocation,
                   ),
                   _TabletNavItem(
                     icon: Icons.hotel,
-                    label: 'Room Types',
+                    label: 'common.room_types'.tr(),
                     route: roomTypesRoute,
                     currentLocation: currentLocation,
                   ),
                   _TabletNavItem(
                     icon: Icons.devices,
-                    label: 'POS Devices',
+                    label: 'common.pos_devices'.tr(),
                     route: posDevicesRoute,
                     currentLocation: currentLocation,
                   ),
                   _TabletNavItem(
                     icon: Icons.menu_book,
-                    label: 'Menu',
+                    label: 'common.menu'.tr(),
                     route: menuRoute,
                     currentLocation: currentLocation,
                   ),
                   _TabletNavItem(
+                    icon: Icons.description,
+                    label: 'Feedback Configuration',
+                    route: AppRoutes.feedbackList,
+                    currentLocation: currentLocation,
+                  ),
+
+                  _TabletNavItem(
+                    icon: Icons.rate_review,
+                    label: 'Customer Responses',
+                    route: AppRoutes.customerResponses,
+                    currentLocation: currentLocation,
+                  ),
+                  _TabletNavItem(
                     icon: Icons.receipt_long,
-                    label: 'Bills',
+                    label: 'common.bills'.tr(),
                     route: billsRoute,
                     currentLocation: currentLocation,
                   ),
                   _TabletNavItem(
-                    icon: Icons.inventory_2_outlined,
-                    label: 'Inventory',
-                    route: inventoryRoute,
-                    currentLocation: currentLocation,
-                  ),
-                  _TabletNavItem(
                     icon: Icons.settings,
-                    label: 'Settings',
+                    label: 'common.settings'.tr(),
                     route: AppRoutes.settings,
                     currentLocation: currentLocation,
                   ),
@@ -552,7 +462,7 @@ class _TabletSidebar extends StatelessWidget {
           ),
           _TabletNavItem(
             icon: Icons.logout,
-            label: 'Logout',
+            label: 'common.logout'.tr(),
             route: AppRoutes.login,
             currentLocation: currentLocation,
           ),
@@ -641,11 +551,11 @@ class _MobileShell extends StatelessWidget {
         title: Text(_getPageTitle(currentLocation)),
         actions: [
           IconButton(
-            icon: Icon(Icons.notifications_outlined),
+            icon: const Icon(Icons.notifications_outlined),
             onPressed: () {},
           ),
           IconButton(
-            icon: Icon(Icons.account_circle_outlined),
+            icon: const Icon(Icons.account_circle_outlined),
             onPressed: () => context.go(AppRoutes.profile),
           ),
         ],
@@ -663,9 +573,10 @@ class _MobileShell extends StatelessWidget {
     if (location == '/profile') return 'Profile';
     if (location == '/home') return 'Home';
     if (location == '/users') return 'Users';
-    if (location == '/inventory' || location.contains('/inventory')) return 'Inventory';
+    if (location == '/inventory') return 'Inventory';
     if (location == '/pos-devices' || location == '/all-pos-devices') return 'POS Devices';
     if (location.contains('/bills')) return 'Bills';
+    if (location.startsWith('/feedback')) return 'Feedback';
     if (location == '/notifications') return 'Notifications';
     return 'Dashboard';
   }
@@ -689,7 +600,6 @@ class _MobileDrawer extends StatelessWidget {
     final menuRoute = brandId != null ? '/brands/$brandId/menu' : AppRoutes.brandList;
     final posDevicesRoute = brandId != null ? '/brands/$brandId/pos-devices' : AppRoutes.brandList;
     final billsRoute = brandId != null ? '/brands/$brandId/bills' : AppRoutes.brandList;
-    final inventoryRoute = brandId != null ? '/brands/$brandId/inventory' : AppRoutes.brandList;
 
     return Drawer(
       child: ListView(
@@ -708,8 +618,8 @@ class _MobileDrawer extends StatelessWidget {
             ),
           ),
           ListTile(
-            leading: Icon(Icons.dashboard),
-            title: Text('Dashboard'),
+            leading: const Icon(Icons.dashboard),
+            title: Text('common.dashboard'.tr()),
             selected: currentLocation == AppRoutes.home,
             onTap: () {
               Navigator.pop(context);
@@ -717,8 +627,8 @@ class _MobileDrawer extends StatelessWidget {
             },
           ),
           ListTile(
-            leading: Icon(Icons.store),
-            title: Text('Brands'),
+            leading: const Icon(Icons.store),
+            title: Text('common.brands'.tr()),
             selected: currentLocation.startsWith('/brands') &&
                 !currentLocation.contains('/users') &&
                 !currentLocation.contains('/tables') &&
@@ -731,8 +641,8 @@ class _MobileDrawer extends StatelessWidget {
             },
           ),
           ListTile(
-            leading: Icon(Icons.people),
-            title: Text('Users'),
+            leading: const Icon(Icons.people),
+            title: Text('common.users'.tr()),
             selected: currentLocation.startsWith(usersRoute) && brandId != null,
             onTap: () {
               Navigator.pop(context);
@@ -740,8 +650,8 @@ class _MobileDrawer extends StatelessWidget {
             },
           ),
           ListTile(
-            leading: Icon(Icons.table_restaurant),
-            title: Text('Tables'),
+            leading: const Icon(Icons.table_restaurant),
+            title: Text('common.tables'.tr()),
             selected: currentLocation.startsWith(tablesRoute) && brandId != null,
             onTap: () {
               Navigator.pop(context);
@@ -749,8 +659,8 @@ class _MobileDrawer extends StatelessWidget {
             },
           ),
           ListTile(
-            leading: Icon(Icons.hotel),
-            title: Text('Room Types'),
+            leading: const Icon(Icons.hotel),
+            title: Text('common.room_types'.tr()),
             selected: currentLocation.startsWith(roomTypesRoute) && brandId != null,
             onTap: () {
               Navigator.pop(context);
@@ -758,8 +668,8 @@ class _MobileDrawer extends StatelessWidget {
             },
           ),
           ListTile(
-            leading: Icon(Icons.devices),
-            title: Text('POS Devices'),
+            leading: const Icon(Icons.devices),
+            title: Text('common.pos_devices'.tr()),
             selected: currentLocation.startsWith(posDevicesRoute) && brandId != null,
             onTap: () {
               Navigator.pop(context);
@@ -767,8 +677,8 @@ class _MobileDrawer extends StatelessWidget {
             },
           ),
           ListTile(
-            leading: Icon(Icons.menu_book),
-            title: Text('Menu'),
+            leading: const Icon(Icons.menu_book),
+            title: Text('common.menu'.tr()),
             selected: currentLocation.startsWith(menuRoute) && brandId != null,
             onTap: () {
               Navigator.pop(context);
@@ -776,8 +686,25 @@ class _MobileDrawer extends StatelessWidget {
             },
           ),
           ListTile(
+            leading: const Icon(Icons.description),
+            title: const Text('Feedback Configuration'),
+            onTap: () {
+              Navigator.pop(context);
+              context.go(AppRoutes.feedbackList);
+            },
+          ),
+
+          ListTile(
+            leading: const Icon(Icons.rate_review),
+            title: const Text('Customer Responses'),
+            onTap: () {
+              Navigator.pop(context);
+              context.go(AppRoutes.customerResponses);
+            },
+          ),
+          ListTile(
             leading: const Icon(Icons.receipt_long),
-            title: const Text('Bills'),
+            title: Text('common.bills'.tr()),
             selected: currentLocation.startsWith(billsRoute) && brandId != null,
             onTap: () {
               Navigator.pop(context);
@@ -785,28 +712,19 @@ class _MobileDrawer extends StatelessWidget {
             },
           ),
           ListTile(
-            leading: const Icon(Icons.inventory_2_outlined),
-            title: const Text('Inventory'),
-            selected: currentLocation.contains('/inventory') && brandId != null,
-            onTap: () {
-              Navigator.pop(context);
-              context.go(inventoryRoute);
-            },
-          ),
-          ListTile(
-            leading: Icon(Icons.settings),
-            title: Text('Settings'),
+            leading: const Icon(Icons.settings),
+            title: Text('common.settings'.tr()),
             selected: currentLocation == AppRoutes.settings || currentLocation == AppRoutes.profile,
             onTap: () {
               Navigator.pop(context);
               context.go(AppRoutes.settings);
             },
           ),
-          Divider(),
+          const Divider(),
           Builder(
             builder: (ctx) => ListTile(
-              leading: Icon(Icons.logout),
-              title: Text('Logout'),
+              leading: const Icon(Icons.logout),
+              title: Text('common.logout'.tr()),
               onTap: () {
                 Navigator.pop(context);
                 showLogoutConfirmation(context, () {
@@ -845,14 +763,14 @@ class _TopBar extends StatelessWidget {
           // Search
           Expanded(
             child: Container(
-              constraints: BoxConstraints(maxWidth: 400),
+              constraints: const BoxConstraints(maxWidth: 400),
               child: TextField(
                 decoration: InputDecoration(
-                  hintText: 'Search...',
-                  prefixIcon: Icon(Icons.search, size: 20),
+                  hintText: 'common.search'.tr(),
+                  prefixIcon: const Icon(Icons.search, size: 20),
                   isDense: true,
-                  contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                  border: OutlineInputBorder(
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  border: const OutlineInputBorder(
                     borderRadius: AppBorders.md,
                     borderSide: BorderSide.none,
                   ),
@@ -867,12 +785,12 @@ class _TopBar extends StatelessWidget {
 
           // Actions
           IconButton(
-            icon: Icon(Icons.notifications_outlined),
+            icon: const Icon(Icons.notifications_outlined),
             onPressed: () {},
             tooltip: 'Notifications',
           ),
           IconButton(
-            icon: Icon(Icons.help_outline),
+            icon: const Icon(Icons.help_outline),
             onPressed: () {},
             tooltip: 'Help',
           ),
@@ -880,8 +798,8 @@ class _TopBar extends StatelessWidget {
 
           // User Avatar
           PopupMenuButton<String>(
-            offset: Offset(0, 48),
-            shape: RoundedRectangleBorder(borderRadius: AppBorders.md),
+            offset: const Offset(0, 48),
+            shape: const RoundedRectangleBorder(borderRadius: AppBorders.md),
             child: Row(
               children: [
                 CircleAvatar(
@@ -898,7 +816,7 @@ class _TopBar extends StatelessWidget {
                 ),
                 SizedBox(width: AppSpacing.sm),
                 Text(user?.name ?? 'User', style: theme.textTheme.bodyMedium),
-                Icon(Icons.arrow_drop_down),
+                const Icon(Icons.arrow_drop_down),
               ],
             ),
             itemBuilder: (context) => [
@@ -906,9 +824,9 @@ class _TopBar extends StatelessWidget {
                 value: 'profile',
                 child: Row(
                   children: [
-                    Icon(Icons.person_outline, size: 20),
+                    const Icon(Icons.person_outline, size: 20),
                     SizedBox(width: AppSpacing.sm),
-                    Text('Profile'),
+                    Text('common.profile'.tr()),
                   ],
                 ),
               ),
@@ -916,20 +834,20 @@ class _TopBar extends StatelessWidget {
                 value: 'settings',
                 child: Row(
                   children: [
-                    Icon(Icons.settings_outlined, size: 20),
+                    const Icon(Icons.settings_outlined, size: 20),
                     SizedBox(width: AppSpacing.sm),
-                    Text('Settings'),
+                    Text('common.settings'.tr()),
                   ],
                 ),
               ),
-              PopupMenuDivider(),
+              const PopupMenuDivider(),
               PopupMenuItem(
                 value: 'logout',
                 child: Row(
                   children: [
-                    Icon(Icons.logout, size: 20),
+                    const Icon(Icons.logout, size: 20),
                     SizedBox(width: AppSpacing.sm),
-                    Text('Logout'),
+                    Text('common.logout'.tr()),
                   ],
                 ),
               ),
@@ -988,7 +906,8 @@ class _NavItem extends StatelessWidget {
     required this.label,
     required this.route,
     required this.currentLocation,
-    this.badge,
+    this.isFooter = false,
+    this.onLogout,
   });
 
   final IconData icon;
@@ -996,7 +915,8 @@ class _NavItem extends StatelessWidget {
   final String label;
   final String route;
   final String currentLocation;
-  final String? badge;
+  final bool isFooter;
+  final VoidCallback? onLogout;
 
   @override
   Widget build(BuildContext context) {
@@ -1023,7 +943,12 @@ class _NavItem extends StatelessWidget {
         color: isSelected ? cs.primaryContainer : Colors.transparent,
         borderRadius: AppBorders.md,
         child: InkWell(
-          onTap: () => context.go(route),
+          onTap: isFooter && onLogout != null
+              ? () {
+                  onLogout!();
+                  context.go(route);
+                }
+              : () => context.go(route),
           borderRadius: AppBorders.md,
           child: Padding(
             padding: EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.sm + 4),
@@ -1032,39 +957,70 @@ class _NavItem extends StatelessWidget {
                 Icon(
                   isSelected ? activeIcon : icon,
                   size: 20,
-                  color: isSelected ? cs.onPrimaryContainer : cs.onSurfaceVariant,
+                  color: isSelected ? cs.onPrimaryContainer : (isFooter ? cs.error : cs.onSurfaceVariant),
                 ),
                 SizedBox(width: AppSpacing.md),
                 Expanded(
                   child: Text(
                     label,
                     style: theme.textTheme.bodyMedium?.copyWith(
-                      color: isSelected ? cs.onPrimaryContainer : cs.onSurface,
+                      color: isSelected ? cs.onPrimaryContainer : (isFooter ? cs.error : cs.onSurface),
                       fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
                     ),
                   ),
                 ),
-                if (badge != null) ...[
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                    decoration: BoxDecoration(
-                      color: cs.primary,
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: Text(
-                      badge!,
-                      style: theme.textTheme.labelSmall?.copyWith(
-                        color: cs.onPrimary,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 10,
-                      ),
-                    ),
-                  ),
-                ],
               ],
             ),
           ),
         ),
+      ),
+    );
+  }
+}
+class _FeedbackNavGroup extends StatelessWidget {
+  const _FeedbackNavGroup({
+    required this.currentLocation,
+  });
+
+  final String currentLocation;
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+
+    final expanded =
+    currentLocation.startsWith('/feedback');
+
+    return Theme(
+      data: Theme.of(context).copyWith(
+        dividerColor: Colors.transparent,
+      ),
+      child: ExpansionTile(
+        initiallyExpanded: expanded,
+        leading: Icon(
+          Icons.feedback_outlined,
+          color: cs.onSurfaceVariant,
+        ),
+        title: const Text(
+          'Feedback',
+        ),
+        childrenPadding: const EdgeInsets.only(left: 28),
+        children: [
+          _NavItem(
+            icon: Icons.description_outlined,
+            activeIcon: Icons.description,
+            label: 'Feedback Configuration',
+            route: AppRoutes.feedbackList,
+            currentLocation: currentLocation,
+          ),
+          _NavItem(
+            icon: Icons.rate_review_outlined,
+            activeIcon: Icons.rate_review,
+            label: 'Customer Responses',
+            route: AppRoutes.customerResponses,
+            currentLocation: currentLocation,
+          ),
+        ],
       ),
     );
   }

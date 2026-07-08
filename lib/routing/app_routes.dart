@@ -60,6 +60,13 @@ abstract final class AppRoutes {
   static const String billList = '/brands/:brandId/bills';
   static const String billDetail = '/brands/:brandId/bills/:billId';
 
+  // Feedback
+  static const String feedbackList = '/feedback';
+  static const String feedbackCreate = '/feedback/create';
+  static const String feedbackQuestionBuilder = '/feedback/questions';
+  static const String customerResponses = '/feedback/responses';
+  static const String feedbackDetail = '/feedback/detail/:feedbackId';
+  static const String feedbackSettings = '/feedback/settings';
   // Inventory routes
   static const String inventoryDashboard = '/brands/:brandId/inventory';
 

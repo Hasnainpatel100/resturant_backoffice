@@ -2,7 +2,6 @@ import 'package:equatable/equatable.dart';
 import 'package:back_office/data/models/table_model.dart';
 import 'package:back_office/data/models/api_response_model.dart';
 
-import '../../../data/models/room_type_model.dart';
 
 enum StateTableStatus { initial, loading, loaded, error }
 

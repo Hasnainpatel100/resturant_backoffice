@@ -1,4 +1,3 @@
-import 'package:fpdart/fpdart.dart';
 
 import '../imports/core_imports.dart';
 

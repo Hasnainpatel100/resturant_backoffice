@@ -1,7 +1,5 @@
 import 'package:back_office/imports/imports.dart';
 import 'package:back_office/ui/settings/settings/cubit_theme.dart';
-import 'package:flutter/material.dart';
-import 'package:back_office/imports/core_imports.dart';
 
 class ScreenSettings extends StatelessWidget {
   const ScreenSettings({super.key});
@@ -9,18 +7,18 @@ class ScreenSettings extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Settings')),
+      appBar: AppBar(title: Text('common.settings'.tr())),
       body: ListView(
         padding: EdgeInsets.all(AppSpacing.md),
         children: [
-          Text('Preferences', style: Theme.of(context).textTheme.titleMedium),
+          Text('common.preferences'.tr(), style: Theme.of(context).textTheme.titleMedium),
           SizedBox(height: AppSpacing.md),
           Card(
             child: Column(
               children: [
                 ListTile(
                   leading: const Icon(Icons.dark_mode),
-                  title: const Text('Dark Mode'),
+                  title: Text('common.dark_mode'.tr()),
                   trailing: Switch(
                     value: Theme.of(context).brightness == Brightness.dark,
                     onChanged: (value) {
@@ -31,37 +29,39 @@ class ScreenSettings extends StatelessWidget {
                 const Divider(height: 1),
                 ListTile(
                   leading: const Icon(Icons.language),
-                  title: const Text('Language'),
+                  title: Text('common.language'.tr()),
                   subtitle: Text(
-                    context.locale.languageCode == 'hi'
-                        ? 'Hindi'
-                        : 'English',
+                    switch (context.locale.languageCode) {
+                      'hi' => 'common.hindi'.tr(),
+                      'ur' => 'common.urdu'.tr(),
+                      _ => 'common.english'.tr(),
+                    },
                   ),
                   trailing: const Icon(Icons.chevron_right),
                   onTap: () {
                     showDialog(
                       context: context,
                       builder: (context) => AlertDialog(
-                        title: const Text('Select Language'),
+                        title: Text('common.select_language'.tr()),
                         content: Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             ListTile(
-                              title: const Text('English'),
+                              title: Text('common.english'.tr()),
                               onTap: () {
                                 context.setLocale(const Locale('en'));
                                 Navigator.pop(context);
                               },
                             ),
                             ListTile(
-                              title: const Text('हिन्दी'),
+                              title: Text('common.hindi'.tr()),
                               onTap: () {
                                 context.setLocale(const Locale('hi'));
                                 Navigator.pop(context);
                               },
                             ),
                             ListTile(
-                              title: const Text('اردو'),
+                              title: Text('common.urdu'.tr()),
                               onTap: () {
                                 context.setLocale(const Locale('ur'));
                                 Navigator.pop(context);
@@ -77,21 +77,21 @@ class ScreenSettings extends StatelessWidget {
             ),
           ),
           SizedBox(height: AppSpacing.lg),
-          Text('Account', style: Theme.of(context).textTheme.titleMedium),
+          Text('common.account'.tr(), style: Theme.of(context).textTheme.titleMedium),
           SizedBox(height: AppSpacing.md),
           Card(
             child: Column(
               children: [
                 ListTile(
                   leading: const Icon(Icons.security),
-                  title: const Text('Change PIN'),
+                  title: Text('common.change_pin'.tr()),
                   trailing: const Icon(Icons.chevron_right),
                   onTap: () {},
                 ),
                 const Divider(height: 1),
                 ListTile(
                   leading: const Icon(Icons.notifications),
-                  title: const Text('Notifications'),
+                  title: Text('common.notifications'.tr()),
                   trailing: const Icon(Icons.chevron_right),
                   onTap: () {},
                 ),
@@ -99,27 +99,27 @@ class ScreenSettings extends StatelessWidget {
             ),
           ),
           SizedBox(height: AppSpacing.lg),
-          Text('About', style: Theme.of(context).textTheme.titleMedium),
+          Text('common.about'.tr(), style: Theme.of(context).textTheme.titleMedium),
           SizedBox(height: AppSpacing.md),
           Card(
             child: Column(
               children: [
                 ListTile(
                   leading: const Icon(Icons.info),
-                  title: const Text('App Version'),
-                  subtitle: const Text('1.0.0'),
+                  title: Text('common.app_version'.tr()),
+                  subtitle: Text('common.1_0_0'.tr()),
                 ),
                 const Divider(height: 1),
                 ListTile(
                   leading: const Icon(Icons.description),
-                  title: const Text('Terms of Service'),
+                  title: Text('common.terms_of_service'.tr()),
                   trailing: const Icon(Icons.chevron_right),
                   onTap: () {},
                 ),
                 const Divider(height: 1),
                 ListTile(
                   leading: const Icon(Icons.privacy_tip),
-                  title: const Text('Privacy Policy'),
+                  title: Text('common.privacy_policy'.tr()),
                   trailing: const Icon(Icons.chevron_right),
                   onTap: () {},
                 ),

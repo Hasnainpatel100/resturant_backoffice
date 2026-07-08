@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:back_office/imports/core_imports.dart';
@@ -33,7 +32,7 @@ class _BranchListView extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Branches'),
+        title: Text('common.branches'.tr()),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => context.go('/brands/$brandId'),
@@ -47,7 +46,7 @@ class _BranchListView extends StatelessWidget {
           FilledButton.icon(
             onPressed: () => context.go('/brands/$brandId/branches/create'),
             icon: const Icon(Icons.add, size: 18),
-            label: const Text('Add Branch'),
+            label: Text('common.add_branch'.tr()),
             style: FilledButton.styleFrom(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               visualDensity: VisualDensity.compact,
@@ -84,7 +83,7 @@ class _BranchListView extends StatelessWidget {
                   FilledButton.icon(
                     onPressed: () => context.read<CubitBranch>().loadBranches(brandId),
                     icon: const Icon(Icons.refresh),
-                    label: const Text('Retry'),
+                    label: Text('common.retry'.tr()),
                   ),
                 ],
               ),
@@ -105,19 +104,19 @@ class _BranchListView extends StatelessWidget {
                     child: Icon(Icons.location_city_outlined, size: 64, color: cs.primary),
                   ),
                   SizedBox(height: AppSpacing.lg),
-                  Text('No branches yet',
+                  Text('common.no_branches_yet'.tr(),
                       style: Theme.of(context)
                           .textTheme
                           .titleLarge
                           ?.copyWith(fontWeight: FontWeight.w600)),
                   SizedBox(height: AppSpacing.sm),
-                  Text('Add your first branch to this brand',
+                  Text('common.add_your_first_branch_to_this'.tr(),
                       style: TextStyle(color: cs.outline)),
                   SizedBox(height: AppSpacing.lg),
                   FilledButton.icon(
                     onPressed: () => context.go('/brands/$brandId/branches/create'),
                     icon: const Icon(Icons.add),
-                    label: const Text('Add Branch'),
+                    label: Text('common.add_branch'.tr()),
                     style: FilledButton.styleFrom(
                       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
                     ),
@@ -195,14 +194,14 @@ class _BranchListView extends StatelessWidget {
       context: context,
       builder: (dialogContext) => AlertDialog(
         icon: Icon(Icons.warning_amber_rounded, color: cs.error, size: 40),
-        title: const Text('Delete Branch?'),
+        title: Text('common.delete_branch'.tr()),
         content: Text(
           'Are you sure you want to delete "${branch.displayName}"?\n\nThis action cannot be undone.',
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
-            child: const Text('Cancel'),
+            child: Text('common.cancel'.tr()),
           ),
           FilledButton(
             onPressed: () {
@@ -210,7 +209,7 @@ class _BranchListView extends StatelessWidget {
               context.read<CubitBranch>().deleteBranch(branch.id);
             },
             style: FilledButton.styleFrom(backgroundColor: cs.error),
-            child: const Text('Delete'),
+            child: Text('common.delete'.tr()),
           ),
         ],
       ),
@@ -313,11 +312,11 @@ class _BranchCard extends StatelessWidget {
                       }
                     },
                     itemBuilder: (context) => [
-                      const PopupMenuItem(
+                      PopupMenuItem(
                         value: 'edit',
                         child: ListTile(
-                          leading: Icon(Icons.edit),
-                          title: Text('Edit'),
+                          leading: const Icon(Icons.edit),
+                          title: Text('common.edit'.tr()),
                           dense: true,
                           contentPadding: EdgeInsets.zero,
                         ),
@@ -326,7 +325,7 @@ class _BranchCard extends StatelessWidget {
                         value: 'delete',
                         child: ListTile(
                           leading: Icon(Icons.delete, color: cs.error),
-                          title: Text('Delete', style: TextStyle(color: cs.error)),
+                          title: Text('common.delete'.tr(), style: TextStyle(color: cs.error)),
                           dense: true,
                           contentPadding: EdgeInsets.zero,
                         ),

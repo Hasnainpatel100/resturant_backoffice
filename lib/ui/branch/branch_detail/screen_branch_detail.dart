@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:back_office/imports/core_imports.dart';
@@ -46,7 +45,7 @@ class _BranchDetailView extends StatelessWidget {
       builder: (context, state) {
         return Scaffold(
           appBar: AppBar(
-            title: const Text('Branch Details'),
+            title: Text('common.branch_details'.tr()),
             leading: IconButton(
               icon: const Icon(Icons.arrow_back),
               onPressed: () => context.go('/brands/$brandId/branches'),
@@ -61,7 +60,7 @@ class _BranchDetailView extends StatelessWidget {
                   },
                 ),
                 icon: const Icon(Icons.layers, size: 16),
-                label: const Text('Plan'),
+                label: Text('common.plan'.tr()),
                 style: FilledButton.styleFrom(
                   padding: const EdgeInsets.symmetric(horizontal: 12),
                   visualDensity: VisualDensity.compact,
@@ -105,7 +104,7 @@ class _BranchDetailView extends StatelessWidget {
             FilledButton.icon(
               onPressed: () => context.read<CubitBranch>().loadBranch(branchId),
               icon: const Icon(Icons.refresh),
-              label: const Text('Retry'),
+              label: Text('common.retry'.tr()),
             ),
           ],
         ),
@@ -114,7 +113,7 @@ class _BranchDetailView extends StatelessWidget {
 
     final branch = state.branch;
     if (branch == null) {
-      return const Center(child: Text('Branch not found'));
+      return Center(child: Text('common.branch_not_found'.tr()));
     }
 
     return SingleChildScrollView(
@@ -133,8 +132,8 @@ class _BranchDetailView extends StatelessWidget {
             title: 'Contact',
             color: Colors.teal,
             children: [
-              _InfoRow(icon: Icons.phone_outlined, label: 'Phone', value: branch.contact.phones.primary),
-              _InfoRow(icon: Icons.email_outlined, label: 'Email', value: branch.contact.email),
+              _InfoRow(icon: Icons.phone_outlined, label: 'common.phone'.tr(), value: branch.contact.phones.primary),
+              _InfoRow(icon: Icons.email_outlined, label: 'common.email'.tr(), value: branch.contact.email),
             ],
           ),
 
@@ -148,19 +147,19 @@ class _BranchDetailView extends StatelessWidget {
             children: [
               _InfoRow(
                 icon: Icons.home_outlined,
-                label: 'Address',
+                label: 'common.address'.tr(),
                 value: branch.address.full,
               ),
               if (branch.address.city.isNotEmpty)
                 _InfoRow(
                   icon: Icons.location_city,
-                  label: 'City',
+                  label: 'common.city'.tr(),
                   value: '${branch.address.city}, ${branch.address.state}',
                 ),
               if (branch.address.country.isNotEmpty)
                 _InfoRow(
                   icon: Icons.public,
-                  label: 'Country',
+                  label: 'common.country'.tr(),
                   value: '${branch.address.country} ${branch.address.zipCode}',
                 ),
             ],
@@ -175,8 +174,8 @@ class _BranchDetailView extends StatelessWidget {
               title: 'Registration',
               color: Colors.orange,
               children: [
-                _InfoRow(icon: Icons.receipt_long, label: 'GST No', value: branch.registration.gstNo),
-                _InfoRow(icon: Icons.verified_outlined, label: 'FSSAI', value: branch.registration.fssaiNo),
+                _InfoRow(icon: Icons.receipt_long, label: 'common.gst_no'.tr(), value: branch.registration.gstNo),
+                _InfoRow(icon: Icons.verified_outlined, label: 'common.fssai'.tr(), value: branch.registration.fssaiNo),
               ],
             ),
 
@@ -191,13 +190,13 @@ class _BranchDetailView extends StatelessWidget {
             children: [
               _InfoRow(
                 icon: Icons.star,
-                label: 'Type',
+                label: 'common.type'.tr(),
                 value: branch.settings.isMasterBranch ? 'Master Branch' : 'Regular Branch',
               ),
               if (branch.settings.open.isNotEmpty)
-                _InfoRow(icon: Icons.access_time, label: 'Opens', value: branch.settings.open),
+                _InfoRow(icon: Icons.access_time, label: 'common.opens'.tr(), value: branch.settings.open),
               if (branch.settings.close.isNotEmpty)
-                _InfoRow(icon: Icons.access_time_filled, label: 'Closes', value: branch.settings.close),
+                _InfoRow(icon: Icons.access_time_filled, label: 'common.closes'.tr(), value: branch.settings.close),
             ],
           ),
 
@@ -244,14 +243,13 @@ class _BranchDetailView extends StatelessWidget {
       context: context,
       builder: (dialogContext) => AlertDialog(
         icon: Icon(Icons.warning_amber_rounded, color: cs.error, size: 40),
-        title: const Text('Delete Branch?'),
-        content: const Text(
-          'This will permanently delete this branch.\n\nThis action cannot be undone.',
+        title: Text('common.delete_branch'.tr()),
+        content: Text('common.this_will_permanently_delete_t'.tr(),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
-            child: const Text('Cancel'),
+            child: Text('common.cancel'.tr()),
           ),
           FilledButton(
             onPressed: () {
@@ -259,7 +257,7 @@ class _BranchDetailView extends StatelessWidget {
               context.read<CubitBranch>().deleteBranch(branchId);
             },
             style: FilledButton.styleFrom(backgroundColor: cs.error),
-            child: const Text('Delete Branch'),
+            child: Text('common.delete_branch'.tr()),
           ),
         ],
       ),
@@ -356,11 +354,10 @@ class _BranchHeaderCard extends StatelessWidget {
                         ),
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
-                          children: const [
-                            Icon(Icons.star, size: 12, color: Colors.amber),
+                          children: [
+                            const Icon(Icons.star, size: 12, color: Colors.amber),
                             SizedBox(width: 2),
-                            Text(
-                              'Master',
+                            Text('common.master'.tr(),
                               style: TextStyle(
                                 fontSize: 10,
                                 color: Colors.amber,
@@ -511,8 +508,7 @@ class _PlanCard extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(width: 8),
-                    Text(
-                      'Plan Details',
+                    Text('common.plan_details'.tr(),
                       style: Theme.of(context).textTheme.titleMedium?.copyWith(
                             fontWeight: FontWeight.w600,
                           ),
@@ -525,9 +521,8 @@ class _PlanCard extends StatelessWidget {
                           color: Colors.red.withOpacity(0.1),
                           borderRadius: BorderRadius.circular(12),
                         ),
-                        child: const Text(
-                          'Expired',
-                          style: TextStyle(
+                        child: Text('common.expired'.tr(),
+                          style: const TextStyle(
                             color: Colors.red,
                             fontSize: 11,
                             fontWeight: FontWeight.w600,
@@ -541,19 +536,19 @@ class _PlanCard extends StatelessWidget {
                   children: [
                     _PlanStat(
                       icon: Icons.people,
-                      label: 'Max Users',
+                      label: 'common.max_users'.tr(),
                       value: '${plan.maxUsers}',
                     ),
                     SizedBox(width: AppSpacing.lg),
                     _PlanStat(
                       icon: Icons.tablet_android,
-                      label: 'Max Devices',
+                      label: 'common.max_devices'.tr(),
                       value: '${plan.maxPosDevices}',
                     ),
                     SizedBox(width: AppSpacing.lg),
                     _PlanStat(
                       icon: Icons.calendar_today,
-                      label: 'Expires',
+                      label: 'common.expires'.tr(),
                       value: plan.expiryDate?.toString().split(' ')[0] ?? '-',
                     ),
                   ],
