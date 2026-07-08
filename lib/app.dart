@@ -30,7 +30,7 @@ class App extends StatelessWidget {
     return CupertinoApp.router(
       title: 'BackOffice',
       debugShowCheckedModeBanner: false,
-      theme: buildCupertinoTheme(primaryColorHex: '#007ea8'),
+      theme: buildCupertinoTheme(primaryColorHex: '#008272'),
       routerConfig: appRouter,
       localizationsDelegates: context.localizationDelegates,
       supportedLocales: context.supportedLocales,
@@ -46,8 +46,8 @@ class App extends StatelessWidget {
           builder: (context, isDark) {
             return Theme(
               data: isDark
-                  ? buildDarkTheme(primaryColorHex: '#007ea8')
-                  : buildLightTheme(primaryColorHex: '#007ea8'),
+                  ? buildDarkTheme(primaryColorHex: '#008272')
+                  : buildLightTheme(primaryColorHex: '#008272'),
               child: content,
             );
           },

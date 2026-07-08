@@ -1,0 +1,10 @@
+^H:\POS\RESTAURANT_BACKOFFICE\BACKOFFICE_300426\BUILD\WINDOWS\X64\CMAKEFILES\B81D78B938341713EF2F093393CB5122\INSTALL_FORCE.RULE
+setlocal
+cd .
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd

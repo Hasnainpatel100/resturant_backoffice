@@ -40,6 +40,7 @@ class CubitBrand extends Cubit<StateBrand> {
     );
   }
 
+
   Future<void> updateBrand(String brandId, Map<String, dynamic> data) async {
     emit(state.copyWith(status: BrandStatus.loading));
     final result = await _repository.updateBrand(brandId, data);

@@ -1,0 +1,161 @@
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:go_router/go_router.dart';
+import 'package:back_office/shared/shared.dart';
+import 'package:back_office/data/models/restaurant_inventory/raw_material_tax_model.dart';
+import 'package:back_office/ui/restaurant_inventory/controllers/master_controllers.dart';
+import 'package:back_office/data/repositories/restaurant_inventory/master_repositories.dart';
+
+class ScreenTaxList extends StatefulWidget {
+  final String brandId;
+  const ScreenTaxList({super.key, required this.brandId});
+
+  @override
+  State<ScreenTaxList> createState() => _ScreenTaxListState();
+}
+
+class _ScreenTaxListState extends State<ScreenTaxList> {
+  late final RawMaterialTaxController controller;
+
+  @override
+  void initState() {
+    super.initState();
+    controller = Get.put(
+        RawMaterialTaxController(repository: RawMaterialTaxRepositoryImpl()));
+    controller.loadTaxes();
+  }
+
+  @override
+  void dispose() {
+    Get.delete<RawMaterialTaxController>();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+
+    return Scaffold(
+      backgroundColor: cs.surfaceContainerLowest,
+      appBar: AppBar(
+        backgroundColor: cs.surface,
+        scrolledUnderElevation: 1,
+        title: const Text('Raw Material Taxes',
+            style: TextStyle(fontWeight: FontWeight.w800)),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh_rounded),
+            tooltip: 'Refresh',
+            onPressed: () => controller.loadTaxes(),
+          ),
+          const SizedBox(width: 4),
+          FilledButton.icon(
+            onPressed: () =>
+                context.push('/brands/${widget.brandId}/inventory/taxes/create'),
+            icon: const Icon(Icons.add_rounded, size: 18),
+            label: const Text('New Tax'),
+            style: FilledButton.styleFrom(
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10))),
+          ),
+          const SizedBox(width: 12),
+        ],
+      ),
+      body: Obx(() {
+        if (controller.isLoading.value && controller.taxes.isEmpty) {
+          return const Center(child: CircularProgressIndicator());
+        }
+        if (controller.errorMessage.value != null && controller.taxes.isEmpty) {
+          return AppEmptyState(
+            icon: Icons.error_outline_rounded,
+            title: 'Failed to load taxes',
+            subtitle: controller.errorMessage.value,
+            actionLabel: 'Retry',
+            onAction: () => controller.loadTaxes(),
+          );
+        }
+        if (controller.taxes.isEmpty) {
+          return AppEmptyState(
+            icon: Icons.percent_rounded,
+            title: 'No taxes defined yet',
+            subtitle:
+                'Define taxes applied on raw materials (e.g. VAT 5%, Service Tax, etc.)',
+            actionLabel: 'Add Tax',
+            onAction: () => context
+                .push('/brands/${widget.brandId}/inventory/taxes/create'),
+          );
+        }
+
+        return RefreshIndicator(
+          onRefresh: () => controller.loadTaxes(),
+          child: ListView.builder(
+            padding: EdgeInsets.fromLTRB(
+                AppSpacing.md, AppSpacing.sm, AppSpacing.md, AppSpacing.xxl),
+            itemCount: controller.taxes.length,
+            itemBuilder: (context, index) {
+              final tax = controller.taxes[index];
+              final valueLabel = tax.taxType == 'percentage'
+                  ? '${tax.taxValue}%'
+                  : '\$${tax.taxValue} Fixed';
+              return AppListCard(
+                icon: Icons.percent_rounded,
+                iconColor: Colors.deepPurple.shade400,
+                title: tax.taxName,
+                lines: [
+                  'Rate: $valueLabel  •  Applies On: ${tax.appliesOn.toUpperCase()}',
+                  'Included in Rate: ${tax.includeInRate ? "Yes" : "No"}',
+                ],
+                actions: [
+                  AppListCardAction(
+                    icon: Icons.edit_outlined,
+                    tooltip: 'Edit',
+                    onTap: () => context.push(
+                        '/brands/${widget.brandId}/inventory/taxes/${tax.id}/edit'),
+                  ),
+                  AppListCardAction(
+                    icon: Icons.delete_outline_rounded,
+                    tooltip: 'Delete',
+                    color: cs.error,
+                    onTap: () => _confirmDelete(context, tax),
+                  ),
+                ],
+              );
+            },
+          ),
+        );
+      }),
+    );
+  }
+
+  void _confirmDelete(BuildContext context, RawMaterialTaxModel tax) {
+    final cs = Theme.of(context).colorScheme;
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        icon: Icon(Icons.warning_amber_rounded, color: cs.error, size: 40),
+        title: const Text('Delete Tax?'),
+        content: Text(
+            'Are you sure you want to delete "${tax.displayLabel}"?\n\nThis action cannot be undone.'),
+        actions: [
+          TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: const Text('Cancel')),
+          FilledButton(
+            style: FilledButton.styleFrom(backgroundColor: cs.error),
+            onPressed: () async {
+              Navigator.pop(ctx);
+              final ok = await controller.deleteTax(tax.id);
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                content: Text(ok
+                    ? 'Tax deleted successfully'
+                    : controller.errorMessage.value ?? 'Failed'),
+                backgroundColor: ok ? Colors.green : cs.error,
+              ));
+            },
+            child: const Text('Delete'),
+          ),
+        ],
+      ),
+    );
+  }
+}
