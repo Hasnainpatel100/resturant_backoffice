@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
 import '../../data/models/feedback_configuration_model.dart';
+import 'feedback_details_drawer.dart';
 
 /// Lightweight display wrapper around [FeedbackConfigurationModel].
 ///
@@ -30,7 +31,10 @@ class FeedbackListScreen extends StatefulWidget {
 }
 
 class _FeedbackListScreenState extends State<FeedbackListScreen> {
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final TextEditingController _searchController = TextEditingController();
+
+  _FeedbackListItem? _selectedItemForDrawer;
 
   String _searchQuery = '';
   String? _selectedBranch;
@@ -87,7 +91,7 @@ class _FeedbackListScreenState extends State<FeedbackListScreen> {
         status: status,
         sendMethod: sendMethod,
         delayMinutes: 15,
-        minimumOrderAmount: 0.0,
+        minimumOrderAmount: 0,
         createdAt: updatedAt.subtract(const Duration(days: 30)).millisecondsSinceEpoch,
         createdBy: 'admin@brand.com',
         updatedAt: updatedAt.millisecondsSinceEpoch,
@@ -190,7 +194,7 @@ class _FeedbackListScreenState extends State<FeedbackListScreen> {
     setState(() => _isRefreshing = true);
     // Placeholder for a real repository call, e.g.:
     // await context.read<FeedbackConfigurationCubit>().loadFeedbackConfigurations();
-    await Future.delayed(const Duration(milliseconds: 600));
+    await Future<void>.delayed(const Duration(milliseconds: 600));
     if (!mounted) return;
     setState(() {
       _allItems = _buildDummyItems();
@@ -203,7 +207,10 @@ class _FeedbackListScreenState extends State<FeedbackListScreen> {
   }
 
   void _onView(_FeedbackListItem item) {
-    context.push('/feedback/${item.config.id}/view');
+    setState(() {
+      _selectedItemForDrawer = item;
+    });
+    _scaffoldKey.currentState?.openEndDrawer();
   }
 
   void _onEdit(_FeedbackListItem item) {
@@ -315,8 +322,8 @@ class _FeedbackListScreenState extends State<FeedbackListScreen> {
           fontSize: 12,
         ),
       ),
-      backgroundColor: color.withOpacity(0.12),
-      side: BorderSide(color: color.withOpacity(0.4)),
+      backgroundColor: color.withValues(alpha: 0.12),
+      side: BorderSide(color: color.withValues(alpha: 0.4)),
       padding: const EdgeInsets.symmetric(horizontal: 4),
       visualDensity: VisualDensity.compact,
       materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
@@ -382,7 +389,7 @@ class _FeedbackListScreenState extends State<FeedbackListScreen> {
         Expanded(
           flex: 2,
           child: DropdownButtonFormField<String>(
-            value: _selectedBranch,
+            initialValue: _selectedBranch,
             isExpanded: true,
             decoration: InputDecoration(
               labelText: 'Branch',
@@ -403,7 +410,7 @@ class _FeedbackListScreenState extends State<FeedbackListScreen> {
         Expanded(
           flex: 2,
           child: DropdownButtonFormField<String>(
-            value: _selectedStatus,
+            initialValue: _selectedStatus,
             isExpanded: true,
             decoration: InputDecoration(
               labelText: 'Status',
@@ -569,7 +576,18 @@ class _FeedbackListScreenState extends State<FeedbackListScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _scaffoldKey,
       backgroundColor: Colors.grey[100],
+      endDrawer: _selectedItemForDrawer != null
+          ? FeedbackDetailsDrawer(
+              config: _selectedItemForDrawer!.config,
+              branchName: _selectedItemForDrawer!.branchName,
+              questions: FeedbackDetailsDrawer.buildDummyQuestions(
+                _selectedItemForDrawer!.config.id,
+                _selectedItemForDrawer!.questionCount,
+              ),
+            )
+          : null,
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(16),

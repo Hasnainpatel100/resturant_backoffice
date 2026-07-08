@@ -1,29 +1,6 @@
-import 'package:intl/intl.dart';
-
+import '../../data/models/feedback_answer.dart';
 import '../../data/models/feedback_response_model.dart';
 import '../../imports/core_imports.dart';
-
-class _CustomerResponseItem {
-  final String id;
-  final DateTime submittedAt;
-  final String customerName;
-  final String branchName;
-  final String orderId;
-  final double rating;
-  final FeedbackSource source;
-  final FeedbackResponseStatus status;
-
-  const _CustomerResponseItem({
-    required this.id,
-    required this.submittedAt,
-    required this.customerName,
-    required this.branchName,
-    required this.orderId,
-    required this.rating,
-    required this.source,
-    required this.status,
-  });
-}
 
 class ScreenCustomerResponse extends StatefulWidget {
   const ScreenCustomerResponse({super.key});
@@ -42,7 +19,7 @@ class _ScreenCustomerResponseState extends State<ScreenCustomerResponse> {
   DateTimeRange? _selectedDateRange;
   bool _isRefreshing = false;
 
-  late List<_CustomerResponseItem> _allItems;
+  late List<FeedbackResponseModel> _allItems;
 
   static const List<String> _branchOptions = [
     'Koregaon Park',
@@ -70,100 +47,135 @@ class _ScreenCustomerResponseState extends State<ScreenCustomerResponse> {
 
   // ── Dummy data ───────────────────────────────────────────────────────────
 
-  List<_CustomerResponseItem> _buildDummyItems() {
+  List<FeedbackResponseModel> _buildDummyItems() {
     final now = DateTime.now();
 
     return [
-      _CustomerResponseItem(
+      FeedbackResponseModel(
         id: 'resp_001',
-        submittedAt: now.subtract(const Duration(hours: 2)),
-        customerName: 'Aditi Sharma',
-        branchName: 'Koregaon Park',
+        brandId: 'brand_01',
+        branchId: 'Koregaon Park',
+        feedbackConfigurationId: 'config_01',
+        submittedAt: now.subtract(const Duration(hours: 2)).millisecondsSinceEpoch,
+        createdAt: now.subtract(const Duration(hours: 2)).millisecondsSinceEpoch,
+        customerId: 'Aditi Sharma',
         orderId: 'ORD-10234',
-        rating: 5,
-        source: FeedbackSource.qrCode,
-        status: FeedbackResponseStatus.submitted,
+        source: 'QR_CODE',
+        status: 'SUBMITTED',
+        answers: const [
+          FeedbackAnswer(questionId: 'rating', answer: 5),
+        ],
       ),
-      _CustomerResponseItem(
+      FeedbackResponseModel(
         id: 'resp_002',
-        submittedAt: now.subtract(const Duration(hours: 6)),
-        customerName: 'Rohan Deshpande',
-        branchName: 'Baner',
+        brandId: 'brand_01',
+        branchId: 'Baner',
+        feedbackConfigurationId: 'config_01',
+        submittedAt: now.subtract(const Duration(hours: 6)).millisecondsSinceEpoch,
+        createdAt: now.subtract(const Duration(hours: 6)).millisecondsSinceEpoch,
+        customerId: 'Rohan Deshpande',
         orderId: 'ORD-10229',
-        rating: 3,
-        source: FeedbackSource.whatsApp,
-        status: FeedbackResponseStatus.submitted,
+        source: 'WHATSAPP',
+        status: 'SUBMITTED',
+        answers: const [
+          FeedbackAnswer(questionId: 'rating', answer: 3),
+        ],
       ),
-      _CustomerResponseItem(
+      FeedbackResponseModel(
         id: 'resp_003',
-        submittedAt: now.subtract(const Duration(days: 1)),
-        customerName: 'Neha Kulkarni',
-        branchName: 'Viman Nagar',
+        brandId: 'brand_01',
+        branchId: 'Viman Nagar',
+        feedbackConfigurationId: 'config_01',
+        submittedAt: now.subtract(const Duration(days: 1)).millisecondsSinceEpoch,
+        createdAt: now.subtract(const Duration(days: 1)).millisecondsSinceEpoch,
+        customerId: 'Neha Kulkarni',
         orderId: 'ORD-10201',
-        rating: 4,
-        source: FeedbackSource.sms,
-        status: FeedbackResponseStatus.pending,
+        source: 'SMS',
+        status: 'PENDING',
+        answers: const [
+          FeedbackAnswer(questionId: 'rating', answer: 4),
+        ],
       ),
-      _CustomerResponseItem(
+      FeedbackResponseModel(
         id: 'resp_004',
-        submittedAt: now.subtract(const Duration(days: 2, hours: 4)),
-        customerName: 'Kunal Patil',
-        branchName: 'Wakad',
+        brandId: 'brand_01',
+        branchId: 'Wakad',
+        feedbackConfigurationId: 'config_01',
+        submittedAt: now.subtract(const Duration(days: 2, hours: 4)).millisecondsSinceEpoch,
+        createdAt: now.subtract(const Duration(days: 2, hours: 4)).millisecondsSinceEpoch,
+        customerId: 'Kunal Patil',
         orderId: 'ORD-10188',
-        rating: 2,
-        source: FeedbackSource.qrCode,
-        status: FeedbackResponseStatus.submitted,
+        source: 'QR_CODE',
+        status: 'SUBMITTED',
+        answers: const [
+          FeedbackAnswer(questionId: 'rating', answer: 2),
+        ],
       ),
-      _CustomerResponseItem(
+      FeedbackResponseModel(
         id: 'resp_005',
-        submittedAt: now.subtract(const Duration(days: 3)),
-        customerName: 'Simran Kaur',
-        branchName: 'Koregaon Park',
+        brandId: 'brand_01',
+        branchId: 'Koregaon Park',
+        feedbackConfigurationId: 'config_01',
+        submittedAt: now.subtract(const Duration(days: 3)).millisecondsSinceEpoch,
+        createdAt: now.subtract(const Duration(days: 3)).millisecondsSinceEpoch,
+        customerId: 'Simran Kaur',
         orderId: 'ORD-10176',
-        rating: 5,
-        source: FeedbackSource.whatsApp,
-        status: FeedbackResponseStatus.submitted,
+        source: 'WHATSAPP',
+        status: 'SUBMITTED',
+        answers: const [
+          FeedbackAnswer(questionId: 'rating', answer: 5),
+        ],
       ),
-      _CustomerResponseItem(
+      FeedbackResponseModel(
         id: 'resp_006',
-        submittedAt: now.subtract(const Duration(days: 5)),
-        customerName: 'Arjun Mehta',
-        branchName: 'Baner',
+        brandId: 'brand_01',
+        branchId: 'Baner',
+        feedbackConfigurationId: 'config_01',
+        submittedAt: now.subtract(const Duration(days: 5)).millisecondsSinceEpoch,
+        createdAt: now.subtract(const Duration(days: 5)).millisecondsSinceEpoch,
+        customerId: 'Arjun Mehta',
         orderId: 'ORD-10142',
-        rating: 1,
-        source: FeedbackSource.whatsApp,
-        status: FeedbackResponseStatus.pending,
+        source: 'WHATSAPP',
+        status: 'PENDING',
+        answers: const [
+          FeedbackAnswer(questionId: 'rating', answer: 1),
+        ],
       ),
-      _CustomerResponseItem(
+      FeedbackResponseModel(
         id: 'resp_007',
-        submittedAt: now.subtract(const Duration(days: 8)),
-        customerName: 'Priya Nair',
-        branchName: 'Viman Nagar',
+        brandId: 'brand_01',
+        branchId: 'Viman Nagar',
+        feedbackConfigurationId: 'config_01',
+        submittedAt: now.subtract(const Duration(days: 8)).millisecondsSinceEpoch,
+        createdAt: now.subtract(const Duration(days: 8)).millisecondsSinceEpoch,
+        customerId: 'Priya Nair',
         orderId: 'ORD-10098',
-        rating: 4,
-        source: FeedbackSource.qrCode,
-        status: FeedbackResponseStatus.submitted,
+        source: 'QR_CODE',
+        status: 'SUBMITTED',
+        answers: const [
+          FeedbackAnswer(questionId: 'rating', answer: 4),
+        ],
       ),
     ];
   }
 
   // ── Filtering ────────────────────────────────────────────────────────────
 
-  List<_CustomerResponseItem> get _filteredItems {
+  List<FeedbackResponseModel> get _filteredItems {
     return _allItems.where((item) {
       final matchesSearch = _searchQuery.isEmpty ||
           item.customerName.toLowerCase().contains(_searchQuery) ||
-          item.orderId.toLowerCase().contains(_searchQuery);
+          (item.orderId?.toLowerCase().contains(_searchQuery) ?? false);
 
       final matchesBranch = _selectedBranch == null || item.branchName == _selectedBranch;
 
       final matchesRating = _selectedRating == null || item.rating == _selectedRating;
 
-      final matchesSource = _selectedSource == null || item.source == _selectedSource;
+      final matchesSource = _selectedSource == null || item.feedbackSource == _selectedSource;
 
       final matchesDateRange = _selectedDateRange == null ||
-          (!item.submittedAt.isBefore(_selectedDateRange!.start) &&
-              !item.submittedAt.isAfter(
+          (!item.submittedDateTime.isBefore(_selectedDateRange!.start) &&
+              !item.submittedDateTime.isAfter(
                 _selectedDateRange!.end.add(const Duration(days: 1)),
               ));
 
@@ -177,7 +189,7 @@ class _ScreenCustomerResponseState extends State<ScreenCustomerResponse> {
     setState(() => _isRefreshing = true);
     // Placeholder for a real repository call, e.g.:
     // await context.read<CustomerResponseCubit>().loadCustomerResponses();
-    await Future.delayed(const Duration(milliseconds: 600));
+    await Future<void>.delayed(const Duration(milliseconds: 600));
     if (!mounted) return;
     setState(() {
       _allItems = _buildDummyItems();
@@ -198,7 +210,7 @@ class _ScreenCustomerResponseState extends State<ScreenCustomerResponse> {
     }
   }
 
-  void _onView(_CustomerResponseItem item) {
+  void _onView(FeedbackResponseModel item) {
     showDialog<void>(
       context: context,
       builder: (dialogContext) => _ResponseDetailDialog(item: item),
@@ -257,12 +269,12 @@ class _ScreenCustomerResponseState extends State<ScreenCustomerResponse> {
   Color _statusColor(FeedbackResponseStatus status, ColorScheme cs) {
     switch (status) {
       case FeedbackResponseStatus.submitted:
-        return Colors.green;
+        return context.appColors.success;
       case FeedbackResponseStatus.pending:
-        return Colors.orange;
-        case FeedbackResponseStatus.expired:
-        return Colors.red;
-        case FeedbackResponseStatus.unknown:
+        return context.appColors.warning;
+      case FeedbackResponseStatus.expired:
+        return cs.error;
+      case FeedbackResponseStatus.unknown:
         return cs.onSurfaceVariant;
     }
   }
@@ -277,10 +289,10 @@ class _ScreenCustomerResponseState extends State<ScreenCustomerResponse> {
     return sum / _allItems.length;
   }
 
-  int get _qrResponses => _allItems.where((item) => item.source == FeedbackSource.qrCode).length;
+  int get _qrResponses => _allItems.where((item) => item.feedbackSource == FeedbackSource.qrCode).length;
 
   int get _pendingResponses =>
-      _allItems.where((item) => item.status == FeedbackResponseStatus.pending).length;
+      _allItems.where((item) => item.feedbackResponseStatus == FeedbackResponseStatus.pending).length;
 
   // ── Widgets ──────────────────────────────────────────────────────────────
 
@@ -329,7 +341,7 @@ class _ScreenCustomerResponseState extends State<ScreenCustomerResponse> {
             icon: Icons.star_outline,
             label: 'Average Rating'.tr(),
             value: _averageRating.toStringAsFixed(1),
-            color: Colors.amber[800]!,
+            color: context.appColors.warning,
           ),
         ),
         SizedBox(width: AppSpacing.md),
@@ -338,7 +350,7 @@ class _ScreenCustomerResponseState extends State<ScreenCustomerResponse> {
             icon: Icons.qr_code_2,
             label: 'Today`s Responses'.tr(),
             value: '$_qrResponses',
-            color: Colors.teal,
+            color: context.appColors.info,
           ),
         ),
         SizedBox(width: AppSpacing.md),
@@ -347,7 +359,7 @@ class _ScreenCustomerResponseState extends State<ScreenCustomerResponse> {
             icon: Icons.hourglass_empty,
             label: 'Pending Responses'.tr(),
             value: '$_pendingResponses',
-            color: Colors.orange,
+            color: context.appColors.warning,
           ),
         ),
       ],
@@ -460,6 +472,7 @@ class _ScreenCustomerResponseState extends State<ScreenCustomerResponse> {
   }
 
   Widget _buildRatingStars(double rating) {
+    final cs = Theme.of(context).colorScheme;
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: List.generate(5, (index) {
@@ -467,7 +480,7 @@ class _ScreenCustomerResponseState extends State<ScreenCustomerResponse> {
         return Icon(
           filled ? Icons.star : Icons.star_border,
           size: 16,
-          color: filled ? Colors.amber[700] : Colors.grey[400],
+          color: filled ? context.appColors.warning : cs.outlineVariant,
         );
       }),
     );
@@ -536,7 +549,7 @@ class _ScreenCustomerResponseState extends State<ScreenCustomerResponse> {
           rows: items.map((item) {
             return DataRow(
               cells: [
-                DataCell(Text(dateFormat.format(item.submittedAt))),
+                DataCell(Text(dateFormat.format(item.submittedDateTime))),
                 DataCell(
                   ConstrainedBox(
                     constraints: const BoxConstraints(maxWidth: 180),
@@ -548,10 +561,10 @@ class _ScreenCustomerResponseState extends State<ScreenCustomerResponse> {
                   ),
                 ),
                 DataCell(Text(item.branchName)),
-                DataCell(Text(item.orderId)),
+                DataCell(Text(item.orderId ?? '-')),
                 DataCell(_buildRatingStars(item.rating)),
-                DataCell(_buildSourceChip(item.source)),
-                DataCell(_buildStatusChip(item.status, cs)),
+                DataCell(_buildSourceChip(item.feedbackSource)),
+                DataCell(_buildStatusChip(item.feedbackResponseStatus, cs)),
                 DataCell(
                   IconButton(
                     tooltip: 'View'.tr(),
@@ -663,7 +676,7 @@ class _SummaryCard extends StatelessWidget {
 // ─────────────────────────────────────────────────────────────────────────────
 
 class _ResponseDetailDialog extends StatelessWidget {
-  final _CustomerResponseItem item;
+  final FeedbackResponseModel item;
 
   const _ResponseDetailDialog({required this.item});
 
@@ -681,8 +694,8 @@ class _ResponseDetailDialog extends StatelessWidget {
           children: [
             _DetailRow(label: 'Customer'.tr(), value: item.customerName),
             _DetailRow(label: 'Branch'.tr(), value: item.branchName),
-            _DetailRow(label: 'Order ID'.tr(), value: item.orderId),
-            _DetailRow(label: 'Submitted'.tr(), value: dateFormat.format(item.submittedAt)),
+            _DetailRow(label: 'Order ID'.tr(), value: item.orderId ?? '-'),
+            _DetailRow(label: 'Submitted'.tr(), value: dateFormat.format(item.submittedDateTime)),
             _DetailRow(label: 'Rating'.tr(), value: '${item.rating.toInt()} / 5'),
           ],
         ),

@@ -162,7 +162,23 @@ class FeedbackResponseModel extends Equatable {
     }
   }
 
-  @override
+  // UI helpers for dummy data / display
+  String get customerName => customerId ?? 'Guest Customer';
+  String get branchName => branchId;
+
+  double get rating {
+    for (final a in answers) {
+      if (a.questionId == 'rating') {
+        if (a.answer is num) {
+          return (a.answer as num).toDouble();
+        }
+      }
+    }
+    return 0;
+  }
+
+  DateTime get submittedDateTime => DateTime.fromMillisecondsSinceEpoch(submittedAt ?? createdAt);
+
   @override
   List<Object?> get props => [
     id,
