@@ -180,15 +180,25 @@ ThemeData _buildTheme(ColorScheme colorScheme, AppColorsExtension customColors) 
     // Input Decoration Theme
     inputDecorationTheme: InputDecorationTheme(
       filled: true,
-      fillColor: colorScheme.surfaceContainerLowest,
+      fillColor: colorScheme.brightness == Brightness.light
+          ? colorScheme.surfaceContainerLow
+          : colorScheme.surfaceContainerLowest,
       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(color: colorScheme.outlineVariant),
+        borderSide: BorderSide(
+          color: colorScheme.brightness == Brightness.light
+              ? colorScheme.outline.withValues(alpha: 0.5)
+              : colorScheme.outlineVariant,
+        ),
       ),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(color: colorScheme.outlineVariant),
+        borderSide: BorderSide(
+          color: colorScheme.brightness == Brightness.light
+              ? colorScheme.outline.withValues(alpha: 0.5)
+              : colorScheme.outlineVariant,
+        ),
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
@@ -207,13 +217,13 @@ ThemeData _buildTheme(ColorScheme colorScheme, AppColorsExtension customColors) 
         fontWeight: FontWeight.bold,
       ),
       labelStyle: textTheme.bodyMedium?.copyWith(
-        color: colorScheme.onSurfaceVariant.withOpacity(0.7),
+        color: colorScheme.onSurfaceVariant.withValues(alpha: 0.9),
       ),
       hintStyle: textTheme.bodyMedium?.copyWith(
-        color: colorScheme.onSurfaceVariant.withOpacity(0.5),
+        color: colorScheme.onSurfaceVariant.withValues(alpha: 0.65),
       ),
-      prefixIconColor: colorScheme.onSurfaceVariant.withOpacity(0.8),
-      suffixIconColor: colorScheme.onSurfaceVariant.withOpacity(0.8),
+      prefixIconColor: colorScheme.onSurfaceVariant.withValues(alpha: 0.9),
+      suffixIconColor: colorScheme.onSurfaceVariant.withValues(alpha: 0.9),
     ),
 
     // Navigation Bar Theme

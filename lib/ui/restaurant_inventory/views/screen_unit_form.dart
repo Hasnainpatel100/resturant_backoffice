@@ -71,7 +71,13 @@ class _ScreenUnitFormState extends State<ScreenUnitForm> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(_isEditing ? 'Unit updated' : 'Unit created'), backgroundColor: Colors.green),
       );
-      Navigator.of(context).pop();
+      if (context.mounted) {
+        if (context.canPop()) {
+          context.pop();
+        } else {
+          context.go('/brands/${widget.brandId}/inventory/units');
+        }
+      }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(

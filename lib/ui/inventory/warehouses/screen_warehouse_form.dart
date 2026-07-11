@@ -99,7 +99,11 @@ class _WarehouseFormViewState extends State<_WarehouseFormView> {
             ),
           );
           if (context.mounted) {
-            Navigator.of(context).pop();
+            if (context.canPop()) {
+              context.pop();
+            } else {
+              context.go('/brands/${widget.brandId}/inventory/warehouses');
+            }
           }
         }
         if (state.status == WarehouseStatus.error) {

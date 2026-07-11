@@ -91,7 +91,11 @@ class _UnitFormViewState extends State<_UnitFormView> {
             ),
           );
           if (context.mounted) {
-            Navigator.of(context).pop();
+            if (context.canPop()) {
+              context.pop();
+            } else {
+              context.go('/brands/${widget.brandId}/inventory/units');
+            }
           }
         }
         if (state.status == UnitStatus.error) {

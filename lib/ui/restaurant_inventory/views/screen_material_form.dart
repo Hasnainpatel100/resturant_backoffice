@@ -148,7 +148,13 @@ class _ScreenMaterialFormState extends State<ScreenMaterialForm> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(_isEditing ? 'Material updated' : 'Material created'), backgroundColor: Colors.green),
       );
-      Navigator.of(context).pop();
+      if (context.mounted) {
+        if (context.canPop()) {
+          context.pop();
+        } else {
+          context.go('/brands/${widget.brandId}/inventory/items');
+        }
+      }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(

@@ -150,7 +150,11 @@ class _ItemFormViewState extends State<_ItemFormView> {
             ),
           );
           if (context.mounted) {
-            Navigator.of(context).pop();
+            if (context.canPop()) {
+              context.pop();
+            } else {
+              context.go('/brands/${widget.brandId}/inventory/items');
+            }
           }
         }
         if (state.status == ItemStatus.error) {

@@ -158,11 +158,19 @@ class _ScreenTransferFormState extends State<ScreenTransferForm> {
         ? await controller.updateTransfer(widget.transferId!, transfer)
         : await controller.createTransfer(transfer);
 
+    if (!mounted) return;
+
     if (success) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(newStatus == 'posted' ? 'Transfer posted successfully' : 'Transfer draft saved'), backgroundColor: Colors.green),
       );
-      context.pop();
+      if (context.mounted) {
+        if (context.canPop()) {
+          context.pop();
+        } else {
+          context.go('/brands/${widget.brandId}/inventory/transfers');
+        }
+      }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(

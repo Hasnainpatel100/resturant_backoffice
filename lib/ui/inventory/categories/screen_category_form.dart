@@ -102,7 +102,11 @@ class _CategoryFormViewState extends State<_CategoryFormView> {
             ),
           );
           if (context.mounted) {
-            Navigator.of(context).pop();
+            if (context.canPop()) {
+              context.pop();
+            } else {
+              context.go('/brands/${widget.brandId}/inventory/categories');
+            }
           }
         }
         if (state.status == CategoryStatus.error) {

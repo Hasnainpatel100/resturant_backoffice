@@ -93,7 +93,13 @@ class _ScreenLocationFormState extends State<ScreenLocationForm> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(_isEditing ? 'Location updated' : 'Location created'), backgroundColor: Colors.green),
       );
-      Navigator.of(context).pop();
+      if (context.mounted) {
+        if (context.canPop()) {
+          context.pop();
+        } else {
+          context.go('/brands/${widget.brandId}/inventory/warehouses');
+        }
+      }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(

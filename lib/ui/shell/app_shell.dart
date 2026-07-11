@@ -152,7 +152,7 @@ class _DesktopSidebar extends StatelessWidget {
     final menuRoute = brandId != null ? '/brands/$brandId/menu' : AppRoutes.brandList;
     final posDevicesRoute = brandId != null ? '/brands/$brandId/pos-devices' : AppRoutes.brandList;
     final billsRoute = brandId != null ? '/brands/$brandId/bills' : AppRoutes.brandList;
-    final inventoryRoute = brandId != null ? '/brands/$brandId/inventory' : AppRoutes.brandList;
+
 
     return Container(
       width: 260,
@@ -213,12 +213,9 @@ class _DesktopSidebar extends StatelessWidget {
                   route: AppRoutes.brandList,
                   currentLocation: currentLocation,
                 ),
-                _NavItem(
-                  icon: Icons.inventory_2_outlined,
-                  activeIcon: Icons.inventory_2,
-                  label: 'common.inventory'.tr(),
-                  route: inventoryRoute,
+                _InventoryNavGroup(
                   currentLocation: currentLocation,
+                  user: user,
                 ),
                 _NavItem(
                   icon: Icons.people_outlined,
@@ -651,15 +648,107 @@ class _MobileDrawer extends StatelessWidget {
               context.go(AppRoutes.brandList);
             },
           ),
-          ListTile(
-            leading: const Icon(Icons.inventory_2),
-            title: Text('common.inventory'.tr()),
-            selected: currentLocation.startsWith(inventoryRoute) && brandId != null,
-            onTap: () {
-              Navigator.pop(context);
-              context.go(inventoryRoute);
-            },
-          ),
+          if (brandId != null)
+            Theme(
+              data: theme.copyWith(dividerColor: Colors.transparent),
+              child: ExpansionTile(
+                initiallyExpanded: currentLocation.startsWith(inventoryRoute),
+                leading: Icon(
+                  currentLocation.startsWith(inventoryRoute)
+                      ? Icons.inventory_2
+                      : Icons.inventory_2_outlined,
+                  color: currentLocation.startsWith(inventoryRoute)
+                      ? cs.primary
+                      : cs.onSurfaceVariant,
+                ),
+                title: Text(
+                  'common.inventory'.tr(),
+                  style: TextStyle(
+                    color: currentLocation.startsWith(inventoryRoute)
+                        ? cs.primary
+                        : cs.onSurface,
+                    fontWeight: currentLocation.startsWith(inventoryRoute)
+                        ? FontWeight.w600
+                        : FontWeight.normal,
+                  ),
+                ),
+                childrenPadding: const EdgeInsets.only(left: 16),
+                children: [
+                  ListTile(
+                    leading: const Icon(Icons.dashboard_outlined),
+                    title: const Text('Dashboard'),
+                    selected: currentLocation == inventoryRoute,
+                    onTap: () {
+                      Navigator.pop(context);
+                      context.go(inventoryRoute);
+                    },
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.inventory_2_outlined),
+                    title: const Text('Items'),
+                    selected: currentLocation.startsWith('$inventoryRoute/items'),
+                    onTap: () {
+                      Navigator.pop(context);
+                      context.go('$inventoryRoute/items');
+                    },
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.straighten_outlined),
+                    title: const Text('Units'),
+                    selected: currentLocation.startsWith('$inventoryRoute/units'),
+                    onTap: () {
+                      Navigator.pop(context);
+                      context.go('$inventoryRoute/units');
+                    },
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.warehouse_outlined),
+                    title: const Text('Warehouses'),
+                    selected: currentLocation.startsWith('$inventoryRoute/warehouses'),
+                    onTap: () {
+                      Navigator.pop(context);
+                      context.go('$inventoryRoute/warehouses');
+                    },
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.people_outline),
+                    title: const Text('Suppliers'),
+                    selected: currentLocation.startsWith('$inventoryRoute/suppliers'),
+                    onTap: () {
+                      Navigator.pop(context);
+                      context.go('$inventoryRoute/suppliers');
+                    },
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.compare_arrows_outlined),
+                    title: const Text('Transfers'),
+                    selected: currentLocation.startsWith('$inventoryRoute/transfers'),
+                    onTap: () {
+                      Navigator.pop(context);
+                      context.go('$inventoryRoute/transfers');
+                    },
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.analytics_outlined),
+                    title: const Text('Reports'),
+                    selected: currentLocation.startsWith('$inventoryRoute/reports'),
+                    onTap: () {
+                      Navigator.pop(context);
+                      context.go('$inventoryRoute/reports');
+                    },
+                  ),
+                ],
+              ),
+            )
+          else
+            ListTile(
+              leading: const Icon(Icons.inventory_2_outlined),
+              title: Text('common.inventory'.tr()),
+              onTap: () {
+                Navigator.pop(context);
+                context.go(AppRoutes.brandList);
+              },
+            ),
           ListTile(
             leading: const Icon(Icons.people),
             title: Text('common.users'.tr()),
@@ -928,6 +1017,7 @@ class _NavItem extends StatelessWidget {
     required this.currentLocation,
     this.isFooter = false,
     this.onLogout,
+    this.exactMatch = false,
   });
 
   final IconData icon;
@@ -937,6 +1027,7 @@ class _NavItem extends StatelessWidget {
   final String currentLocation;
   final bool isFooter;
   final VoidCallback? onLogout;
+  final bool exactMatch;
 
   @override
   Widget build(BuildContext context) {
@@ -954,6 +1045,8 @@ class _NavItem extends StatelessWidget {
               !currentLocation.contains('/menu') &&
               !currentLocation.contains('/branches') &&
               !currentLocation.contains('/inventory'));
+    } else if (exactMatch) {
+      isSelected = currentLocation == route;
     } else {
       isSelected = currentLocation.startsWith(route);
     }
@@ -1039,6 +1132,108 @@ class _FeedbackNavGroup extends StatelessWidget {
             activeIcon: Icons.rate_review,
             label: 'Customer Responses',
             route: AppRoutes.customerResponses,
+            currentLocation: currentLocation,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _InventoryNavGroup extends StatelessWidget {
+  const _InventoryNavGroup({
+    required this.currentLocation,
+    this.user,
+  });
+
+  final String currentLocation;
+  final AppUser? user;
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    final brandId = _getActiveBrandId(currentLocation, user);
+
+    if (brandId == null) {
+      return _NavItem(
+        icon: Icons.inventory_2_outlined,
+        activeIcon: Icons.inventory_2,
+        label: 'common.inventory'.tr(),
+        route: AppRoutes.brandList,
+        currentLocation: currentLocation,
+      );
+    }
+
+    final inventoryRoute = '/brands/$brandId/inventory';
+    final expanded = currentLocation.startsWith(inventoryRoute);
+
+    return Theme(
+      data: Theme.of(context).copyWith(
+        dividerColor: Colors.transparent,
+      ),
+      child: ExpansionTile(
+        initiallyExpanded: expanded,
+        leading: Icon(
+          expanded ? Icons.inventory_2 : Icons.inventory_2_outlined,
+          color: expanded ? cs.primary : cs.onSurfaceVariant,
+        ),
+        title: Text(
+          'common.inventory'.tr(),
+          style: TextStyle(
+            color: expanded ? cs.primary : cs.onSurface,
+            fontWeight: expanded ? FontWeight.w600 : FontWeight.normal,
+          ),
+        ),
+        childrenPadding: const EdgeInsets.only(left: 28),
+        children: [
+          _NavItem(
+            icon: Icons.dashboard_outlined,
+            activeIcon: Icons.dashboard,
+            label: 'Dashboard',
+            route: inventoryRoute,
+            currentLocation: currentLocation,
+            exactMatch: true,
+          ),
+          _NavItem(
+            icon: Icons.inventory_2_outlined,
+            activeIcon: Icons.inventory_2,
+            label: 'Items',
+            route: '$inventoryRoute/items',
+            currentLocation: currentLocation,
+          ),
+          _NavItem(
+            icon: Icons.straighten_outlined,
+            activeIcon: Icons.straighten,
+            label: 'Units',
+            route: '$inventoryRoute/units',
+            currentLocation: currentLocation,
+          ),
+          _NavItem(
+            icon: Icons.warehouse_outlined,
+            activeIcon: Icons.warehouse,
+            label: 'Warehouses',
+            route: '$inventoryRoute/warehouses',
+            currentLocation: currentLocation,
+          ),
+          _NavItem(
+            icon: Icons.people_outline,
+            activeIcon: Icons.people,
+            label: 'Suppliers',
+            route: '$inventoryRoute/suppliers',
+            currentLocation: currentLocation,
+          ),
+          _NavItem(
+            icon: Icons.compare_arrows_outlined,
+            activeIcon: Icons.compare_arrows,
+            label: 'Transfers',
+            route: '$inventoryRoute/transfers',
+            currentLocation: currentLocation,
+          ),
+          _NavItem(
+            icon: Icons.analytics_outlined,
+            activeIcon: Icons.analytics,
+            label: 'Reports',
+            route: '$inventoryRoute/reports',
             currentLocation: currentLocation,
           ),
         ],

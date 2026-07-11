@@ -94,11 +94,19 @@ class _ScreenVendorFormState extends State<ScreenVendorForm> {
         ? await controller.updateVendor(widget.supplierId!, v)
         : await controller.createVendor(v);
 
+    if (!mounted) return;
+
     if (success) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(_isEditing ? 'Vendor updated' : 'Vendor created'), backgroundColor: Colors.green),
       );
-      context.pop();
+      if (context.mounted) {
+        if (context.canPop()) {
+          context.pop();
+        } else {
+          context.go('/brands/${widget.brandId}/inventory/suppliers');
+        }
+      }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(

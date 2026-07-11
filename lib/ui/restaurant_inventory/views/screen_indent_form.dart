@@ -128,11 +128,19 @@ class _ScreenIndentFormState extends State<ScreenIndentForm> {
         ? await controller.updateIndent(widget.indentId!, indent)
         : await controller.createIndent(indent);
 
+    if (!mounted) return;
+
     if (success) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(newStatus == 'submitted' ? 'Indent submitted successfully' : 'Indent draft saved'), backgroundColor: Colors.green),
       );
-      context.pop();
+      if (context.mounted) {
+        if (context.canPop()) {
+          context.pop();
+        } else {
+          context.go('/brands/${widget.brandId}/inventory/indents');
+        }
+      }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
