@@ -7,52 +7,77 @@ class CubitTable extends Cubit<StateTable> {
 
   // Cache brandId so delete/update can use it without the UI passing it again.
   String? _brandId;
+  String? _branchId;
 
   CubitTable({required TableRepository repository})
       : _repository = repository,
         super(const StateTable());
-
-  Future<void> loadTables(String brandId, String branchId, {String? status}) async {
+  Future<void> loadTables(
+      String brandId,
+      String branchId, {
+        String? status,
+      }) async {
     _brandId = brandId;
-
-    emit(state.copyWith(status: StateTableStatus.loading, errorMessage: null));
-    final result = await _repository.getTables(brandId, branchId, status: status);
-    result.fold(
-          (failure) => emit(state.copyWith(
-        status: StateTableStatus.error,
-        errorMessage: failure.message,
-      )),
-          (response) => emit(state.copyWith(
-        status: StateTableStatus.loaded,
-        tables: response.items,
-        meta: response.meta,
-        errorMessage: null,     // ✅ FIX: Clear any prior error on success
-      )),
+    _branchId = branchId;
+    emit(state.copyWith(
+      status: StateTableStatus.loading,
+      errorMessage: null,
+    ));
+    final result = await _repository.getTables(
+      brandId,
+      branchId,
+      status: status,
+      page: 1,
+      limit: 1000,
     );
-  }
-
-  Future<void> createTables(String brandId, List<Map<String, dynamic>> data) async {
-    emit(state.copyWith(status: StateTableStatus.loading, errorMessage: null));
-    final result = await _repository.createTables(brandId, data);
     result.fold(
-          (failure) => emit(state.copyWith(
-        status: StateTableStatus.error,
-        errorMessage: failure.message,
-      )),
-          (response) {
-        // ✅ FIX: Append newly created tables to existing state list for instant UI update.
-        // Original code used response.items but if ListResponse.fromJsonList wasn't returning
-        // items correctly the list would be empty. With unified fromJson this now works.
-        emit(state.copyWith(
+          (failure) => emit(
+        state.copyWith(
+          status: StateTableStatus.error,
+          errorMessage: failure.message,
+        ),
+      ),
+          (response) => emit(
+        state.copyWith(
           status: StateTableStatus.loaded,
-          tables: [...state.tables, ...response.items],
+          tables: response.items,
           meta: response.meta,
           errorMessage: null,
+        ),
+      ),
+    );
+  }
+  Future<void> createTables(
+      String brandId,
+      List<Map<String, dynamic>> data,
+      ) async {
+    emit(state.copyWith(
+      status: StateTableStatus.loading,
+      errorMessage: null,
+    ));
+
+    final result = await _repository.createTables(brandId, data);
+    await result.fold(
+          (failure) async {
+        emit(state.copyWith(
+          status: StateTableStatus.error,
+          errorMessage: failure.message,
         ));
+      },
+          (response) async {
+        if (_branchId != null) {
+          await loadTables(brandId, _branchId!);
+        } else {
+          emit(state.copyWith(
+            status: StateTableStatus.loaded,
+            tables: [...state.tables, ...response.items],
+            meta: response.meta,
+            errorMessage: null,
+          ));
+        }
       },
     );
   }
-
   Future<void> updateTable(String tableId, Map<String, dynamic> data) async {
     emit(state.copyWith(status: StateTableStatus.loading, errorMessage: null));
     final result = await _repository.updateTable(tableId, data);
@@ -74,7 +99,6 @@ class CubitTable extends Cubit<StateTable> {
       },
     );
   }
-
   Future<void> deleteTable(String tableId) async {
     if (_brandId == null) {
       emit(state.copyWith(

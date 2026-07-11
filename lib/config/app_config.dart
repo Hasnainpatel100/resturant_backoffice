@@ -143,6 +143,11 @@ class _AuthInterceptor extends Interceptor {
           AppConfig.setAuthData(
             accessToken: newAccess,
             refreshToken: newRefresh,
+            userId: AppConfig.userId,
+            brandId: AppConfig.brandId,
+            branchId: AppConfig.branchId,
+            role: AppConfig.role,
+            userType: AppConfig.userType,
           );
 
           await SecureStorageService.instance.write('accessToken', newAccess);

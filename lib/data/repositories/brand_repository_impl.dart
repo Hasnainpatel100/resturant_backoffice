@@ -41,6 +41,20 @@ class BrandRepositoryImpl implements BrandRepository {
 
   @override
   FutureEither<ListResponse<BrandBasicModel>> getBrands({int page = 1, int limit = 20}) async {
+    // Any userType == 'BRAND' user, regardless of role, sees only their own brand
+    if (AppConfig.userType == 'BRAND' && AppConfig.brandId.isNotEmpty) {
+      return runTask(() async {
+        final response = await AppConfig.dio.get<Map<String, dynamic>>('/api/brands/${AppConfig.brandId}');
+        final data = response.data!['data'] as Map<String, dynamic>;
+        final brand = BrandBasicModel.fromJson(data);
+        return ListResponse<BrandBasicModel>(
+          items: [brand],
+          meta: const MetaData(page: 1, pageSize: 1, totalItems: 1, totalPages: 1),
+        );
+      });
+    }
+
+    // Non-BRAND users retain existing behavior — fetch all brands
     return runTask(() async {
       final response = await AppConfig.dio.get<Map<String, dynamic>>(
         '/api/brands',

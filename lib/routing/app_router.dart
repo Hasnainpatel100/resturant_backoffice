@@ -35,8 +35,8 @@ import 'package:back_office/ui/profile/screen_profile.dart';
 import 'package:back_office/ui/shell/placeholder_screens.dart';
 import '../data/models/feedback_configuration_model.dart';
 
-import '../ui/feedback/feedback_list_screen.dart';
-import '../ui/feedback/feedback_configuration_screen.dart';
+import '../ui/feedback/feedback_configuration/feedback_list_screen.dart';
+import '../ui/feedback/feedback_configuration/feedback_configuration_screen.dart';
 import '../ui/feedback/feedback_question_builder_screen.dart';
 import '../ui/feedback/screen_customer_response.dart';
 import '../ui/room_types/screen_room_type_dashboard.dart';

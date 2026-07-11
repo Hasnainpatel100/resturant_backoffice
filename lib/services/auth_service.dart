@@ -60,6 +60,10 @@ class AuthService {
       await SecureStorageService.instance.write('accessToken', accessToken);
       await SecureStorageService.instance.write('refreshToken', refreshToken);
       await SecureStorageService.instance.write('userId', user.id);
+      await SecureStorageService.instance.write('brandId', user.brandId);
+      await SecureStorageService.instance.write('branchId', user.branchId);
+      await SecureStorageService.instance.write('role', user.role);
+      await SecureStorageService.instance.write('userType', user.userType);
 
       _authStateController.add(user);
       return user;
@@ -145,12 +149,40 @@ class AuthService {
       return right(null);
     }
 
+    final userIdResult = await SecureStorageService.instance.read('userId');
+    final brandIdResult = await SecureStorageService.instance.read('brandId');
+    final branchIdResult = await SecureStorageService.instance.read('branchId');
+    final roleResult = await SecureStorageService.instance.read('role');
+    final userTypeResult = await SecureStorageService.instance.read('userType');
+
+    final userId = userIdResult.fold((_) => '', (v) => v ?? '');
+    final brandId = brandIdResult.fold((_) => '', (v) => v ?? '');
+    final branchId = branchIdResult.fold((_) => '', (v) => v ?? '');
+    final role = roleResult.fold((_) => '', (v) => v ?? '');
+    final userType = userTypeResult.fold((_) => '', (v) => v ?? '');
+
+    final user = AppUser(
+      id: userId,
+      email: '',
+      name: '',
+      brandId: brandId,
+      branchId: branchId,
+      role: role,
+      userType: userType,
+    );
+
     config.AppConfig.setAuthData(
       accessToken: accessToken,
       refreshToken: refreshToken,
+      userId: user.id,
+      brandId: user.brandId,
+      branchId: user.branchId,
+      role: user.role,
+      userType: user.userType,
     );
 
-    return right(null);
+    _authStateController.add(user);
+    return right(user);
   }
 
   void dispose() {
