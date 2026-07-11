@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
-import '../../data/models/feedback_configuration_model.dart';
-import 'feedback_details_drawer.dart';
+import '../../../data/models/feedback_configuration_model.dart';
+import '../feedback_details_drawer.dart';
 
 /// Lightweight display wrapper around [FeedbackConfigurationModel].
 ///

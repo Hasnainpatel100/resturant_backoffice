@@ -1,7 +1,7 @@
 import 'package:go_router/go_router.dart';
 
-import '../../imports/core_imports.dart';
-import '../../data/models/feedback_configuration_model.dart';
+import '../../../imports/core_imports.dart';
+import '../../../data/models/feedback_configuration_model.dart';
 
 /// Screen for creating / editing a feedback configuration.
 ///

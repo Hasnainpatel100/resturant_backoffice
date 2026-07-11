@@ -218,16 +218,49 @@ class _ScreenTableLayoutState extends State<ScreenTableLayout> {
   /// e.g. if A1..A5 exist, returns 6. If no matching tables exist, returns 1.
   int _nextNumberForPrefix(String prefix) {
     final tables = _cubitTable?.state.tables ?? [];
-    final regex = RegExp('^${RegExp.escape(prefix)}(\\d+)\$');
+
+    final regex = RegExp(
+      '^${RegExp.escape(prefix)}(\\d+)\$',
+      caseSensitive: false,
+    );
 
     int maxSuffix = 0;
+
     for (final t in tables) {
       final match = regex.firstMatch(t.tableNumber);
+
       if (match == null) continue;
+
       final n = int.tryParse(match.group(1)!) ?? 0;
-      if (n > maxSuffix) maxSuffix = n;
+
+      if (n > maxSuffix) {
+        maxSuffix = n;
+      }
     }
+
     return maxSuffix + 1;
+  }
+  ({String prefix, int? startNumber, int numberWidth})
+  _parseTableNumberInput(String input) {
+    final trimmedInput = input.trim();
+
+    final match = RegExp(r'^(.*?)(\d+)$').firstMatch(trimmedInput);
+
+    if (match != null) {
+      final numericPart = match.group(2)!;
+
+      return (
+      prefix: match.group(1)!,
+      startNumber: int.tryParse(numericPart),
+      numberWidth: numericPart.length,
+      );
+    }
+
+    return (
+    prefix: trimmedInput,
+    startNumber: null,
+    numberWidth: 0,
+    );
   }
 
   // ── Add Table dialog ───────────────────────────────────────────────────────
@@ -366,63 +399,106 @@ class _ScreenTableLayoutState extends State<ScreenTableLayout> {
               ),
               ElevatedButton(
                 onPressed: () {
-                  final prefix = tableNumberController.text.trim();
-                  final capacity =
-                      int.tryParse(capacityController.text) ?? 4;
+                  final input = tableNumberController.text.trim();
+                  final capacity = int.tryParse(capacityController.text) ?? 4;
 
-                  if (prefix.isEmpty || selectedRoomTypeId == null) {
+                  if (input.isEmpty || selectedRoomTypeId == null) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
-                        content: Text('common.table_number_and_room_type_are'.tr()),
+                        content: Text(
+                          'common.table_number_and_room_type_are'.tr(),
+                        ),
                       ),
                     );
                     return;
                   }
 
-                  List<Map<String, dynamic>> tables;
+                  final List<Map<String, dynamic>> tables = [];
 
                   if (isBulk) {
-                    final count =
-                        int.tryParse(bulkCountController.text) ?? 1;
+                    final count = int.tryParse(bulkCountController.text) ?? 1;
+
                     if (count < 1) return;
 
-                    // ✅ Auto-continue numbering: find the highest existing
-                    // numeric suffix for this prefix and start after it,
-                    // instead of always restarting at 1 (which caused dupes).
-                    final startNumber = _nextNumberForPrefix(prefix);
+                    final parsed = _parseTableNumberInput(input);
 
-                    tables = List.generate(
-                      count,
-                          (i) {
-                        final number = startNumber + i;
-                        return {
-                          'tableNumber': '$prefix$number',
-                          'displayName': '$prefix$number',
+                    final prefix = parsed.prefix;
+                    final numberWidth = parsed.numberWidth;
+                    final requestedStartNumber = parsed.startNumber;
+
+                    // Find the next number based on tables already existing in this branch.
+                    final existingNextNumber = _nextNumberForPrefix(prefix);
+                    debugPrint('========== BULK DEBUG ==========');
+                    debugPrint('USER INPUT: $input');
+                    debugPrint('PARSED PREFIX: $prefix');
+                    debugPrint('REQUESTED START: $requestedStartNumber');
+                    debugPrint('EXISTING NEXT NUMBER: $existingNextNumber');
+                    debugPrint('LOADED TABLE COUNT: ${_cubitTable?.state.tables.length}');
+
+                    for (final table in _cubitTable?.state.tables ?? []) {
+                      debugPrint('EXISTING TABLE: ${table.tableNumber}');
+                    }
+
+                    debugPrint('================================');
+
+                    // If user enters:
+                    //
+                    // S01 and nothing exists       -> start at S01
+                    // S01 and S01-S05 exist        -> start at S06
+                    // S10 and S01-S05 exist        -> start at S10
+                    // S only and S01-S05 exist     -> start at S06
+                    final startNumber = requestedStartNumber == null
+                        ? existingNextNumber
+                        : requestedStartNumber < existingNextNumber
+                        ? existingNextNumber
+                        : requestedStartNumber;
+
+                    final existingTableNumbers = _cubitTable?.state.tables
+                        .map((table) => table.tableNumber.toLowerCase())
+                        .toSet() ??
+                        <String>{};
+
+                    var currentNumber = startNumber;
+
+                    while (tables.length < count) {
+                      final formattedNumber = numberWidth > 0
+                          ? currentNumber.toString().padLeft(numberWidth, '0')
+                          : currentNumber.toString();
+
+                      final tableNumber = '$prefix$formattedNumber';
+
+                      // Extra safety: skip an exact duplicate if one exists.
+                      if (!existingTableNumbers.contains(tableNumber.toLowerCase())) {
+                        tables.add({
+                          'tableNumber': tableNumber,
+                          'displayName': tableNumber,
                           'capacity': capacity,
                           'branchId': _selectedBranchId,
                           'roomTypeId': selectedRoomTypeId,
-                        };
-                      },
-                    );
-                  } else {
-                    final displayName =
-                    displayNameController.text.trim();
-                    tables = [
-                      {
-                        'tableNumber': prefix,
-                        'displayName': displayName.isNotEmpty
-                            ? displayName
-                            : prefix,
-                        'capacity': capacity,
-                        'branchId': _selectedBranchId,
-                        'roomTypeId': selectedRoomTypeId,
+                        });
                       }
-                    ];
+
+                      currentNumber++;
+                    }
+                  } else {
+                    final displayName = displayNameController.text.trim();
+
+                    tables.add({
+                      'tableNumber': input,
+                      'displayName': displayName.isNotEmpty ? displayName : input,
+                      'capacity': capacity,
+                      'branchId': _selectedBranchId,
+                      'roomTypeId': selectedRoomTypeId,
+                    });
                   }
 
                   debugPrint('TABLES SENT: $tables');
-                  _cubitTable?.createTables(widget.brandId, tables);
-                  debugPrint('TABLES SENT: $tables');
+
+                  _cubitTable?.createTables(
+                    widget.brandId,
+                    tables,
+                  );
+
                   Navigator.pop(dialogContext);
                 },
                 child: Text(isBulk ? 'Add Tables' : 'Add Table'),
