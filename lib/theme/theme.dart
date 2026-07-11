@@ -92,7 +92,11 @@ ThemeData _buildTheme(ColorScheme colorScheme, AppColorsExtension customColors) 
     useMaterial3: true,
     primaryColor: colorScheme.primary,
     colorScheme: colorScheme,
-    textTheme: textTheme,
+    textTheme: textTheme.apply(
+      bodyColor: colorScheme.onSurface,
+      displayColor: colorScheme.onSurface,
+      decorationColor: colorScheme.onSurface,
+    ),
     extensions: [
       customColors,
       AppDesignTokens.fallback,
@@ -317,8 +321,13 @@ ThemeData _buildTheme(ColorScheme colorScheme, AppColorsExtension customColors) 
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
       elevation: 0,
       backgroundColor: colorScheme.surface,
-      titleTextStyle: textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
-      contentTextStyle: textTheme.bodyMedium,
+      titleTextStyle: textTheme.titleLarge?.copyWith(
+        fontWeight: FontWeight.bold,
+        color: colorScheme.onSurface,
+      ),
+      contentTextStyle: textTheme.bodyMedium?.copyWith(
+        color: colorScheme.onSurfaceVariant,
+      ),
     ),
 
     // Bottom Sheet Theme

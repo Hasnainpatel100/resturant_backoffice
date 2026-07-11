@@ -48,7 +48,9 @@ class App extends StatelessWidget {
               data: isDark
                   ? buildDarkTheme(primaryColorHex: '#008272')
                   : buildLightTheme(primaryColorHex: '#008272'),
-              child: content,
+              child: ScaffoldMessenger(
+                child: content,
+              ),
             );
           },
         );
